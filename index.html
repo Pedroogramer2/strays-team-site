@@ -103,7 +103,7 @@
                         </div>
                     </div>
                     <div class="player-info">
-                        <h3 class="player-name">Strays Principal</h3>
+                        <h3 class="player-name">Strays</h3>
                         <p class="player-role">Profissional players</p>
                         <p class="player-details">Indefined • Coach</p>
                         
@@ -143,16 +143,19 @@
                 </div>
 
                 <div id="teamModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-team-name">
-        <div class="modal-content">
-            <button class="close-button" aria-label="Fechar modal">&times;</button>
-            <div class="modal-header">
-                <h2 id="modal-team-name">Nome do Time</h2>
-            </div>
-            <div id="modal-players-container" class="players-grid-modal">
-                <!-- O JavaScript vai preencher os jogadores aqui -->
-            </div>
+    <div class="modal-content">
+        <button class="close-button" aria-label="Fechar modal">&times;</button>
+        <div class="modal-header">
+            <h2 id="modal-team-name">Nome do Time</h2>
         </div>
+        <div class="carousel-player-modal" style="display: flex; align-items: center; justify-content: center; gap: 24px; width: 100%;">
+            <button class="player-prev-btn btn-premium" aria-label="Anterior" style="min-width:40px;">&#8592;</button>
+            <div id="modal-player-container" style="flex:1; min-width:220px;"></div>
+            <button class="player-next-btn btn-premium" aria-label="Próximo" style="min-width:40px;">&#8594;</button>
+        </div>
+        <div id="carousel-indicator" style="text-align:center; margin-top:12px; color:var(--primary-gold); font-weight:bold;"></div>
     </div>
+</div>
 
 
                 <div class="player-card card-premium fade-in stagger-2" data-team="core">
@@ -483,7 +486,7 @@
                     </div>
                     <h3 class="sponsor-name">Disponivel</h3>
                     <button class="sponsor-link">
-                        <span>Visit Website</span>
+                        <span>Acesse o site</span>
                         <i class="fas fa-external-link-alt"></i>
                     </button>
                 </div>
@@ -494,7 +497,7 @@
                     </div>
                     <h3 class="sponsor-name">Disponivel</h3>
                     <button class="sponsor-link">
-                        <span>Visit Website</span>
+                        <span>Acesse o site</span>
                         <i class="fas fa-external-link-alt"></i>
                     </button>
                 </div>
@@ -505,7 +508,7 @@
                     </div>
                     <h3 class="sponsor-name">Disponivel</h3>
                     <button class="sponsor-link">
-                        <span>Visit Website</span>
+                        <span>Acesse o site</span>
                         <i class="fas fa-external-link-alt"></i>
                     </button>
                 </div>
@@ -516,7 +519,7 @@
                     </div>
                     <h3 class="sponsor-name">Disponivel</h3>
                     <button class="sponsor-link">
-                        <span>Visit Website</span>
+                        <span>Acesse o site</span>
                         <i class="fas fa-external-link-alt"></i>
                     </button>
                 </div>
@@ -526,7 +529,7 @@
             <div class="partnership-cta glass-effect fade-in">
                 <h3 class="cta-title">Para os interessados em nos patrocinar!</h3>
                 <p class="cta-description">Faça parte de nossos patrocinadores e se junte a nossa história, enquanto nos ajudam a chegar no topo do cenário competitivo.</p>
-                <button class="btn-premium">Se torne um patrocinador</button>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSdGwj4yRRK9lZQ2JpcxAHWlAnIZkWBXsxHnxOJ-NqRcE3D5cw/viewform?usp=dialog" target="_blank" class="btn-premium">Se torne um patrocinador</a>
             </div>
         </div>
     </section>
@@ -574,7 +577,7 @@ o cenário de eSports e inspirar a próxima geração de jogadores.
                     <ul class="footer-nav">
                         <li><a href="#" class="nav-link">Sobre Strays</a></li>
                         <li><a href="#team" class="nav-link">Nossas Lines</a></li>
-                        <li><a href="#" class="nav-link">Marcar Scrim</a></li>
+                        <li><a href="https://docs.google.com/forms/d/e/1FAIpQLScS7fpzMkoQus_a0IDSmitw9RRpvD5PbCNDDm21hhm5MRnjrg/viewform?usp=dialog" target="_blank" class="nav-link">Marcar Scrim</a></li>
                         <li><a href="#" class="nav-link">Merchandise</a></li>
                         <li><a href="#team" class="nav-link">Players</a></li>
                     </ul>
@@ -588,7 +591,6 @@ o cenário de eSports e inspirar a próxima geração de jogadores.
                             <i class="fas fa-envelope"></i>
                             <div>
                                 <p>straysteambr@gmail.com</p>
-                                <p>management@strays.gg</p>
                             </div>
                         </div>
                         <div class="contact-item">
@@ -605,7 +607,7 @@ o cenário de eSports e inspirar a próxima geração de jogadores.
                     <h4 class="newsletter-title text-glow">Newsletter</h4>
                     <p class="newsletter-description">Garanta as noticias recentes, resultado de partidas, e conteúdos exclusivos.</p>
                     <form class="newsletter-form" id="newsletterForm">
-                        <input type="email" placeholder="Adicione seu email" required>
+                        <input type="email" class="newsletter-input" placeholder="Adicione seu email" required>
                         <button type="submit" class="btn-premium">
                             <i class="fas fa-paper-plane"></i>
                             Inscreva-se
@@ -922,6 +924,7 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    text-decoration: none;
 }
 
 .btn-premium::before {
@@ -2258,6 +2261,10 @@ body {
     color: #888;
 }
 
+.newsletter-input{
+    text-align: center;
+}
+
 .footer-bottom {
     display: flex;
     justify-content: space-between;
@@ -2404,8 +2411,7 @@ body {
             margin: 32px auto;
             padding: 35px;
             border-top: 3px solid var(--primary-gold);
-            width: 90%;
-            max-width: 1000px;
+            width: 30%;
             border-radius: 10px;
             position: relative;
             box-shadow: 0 5px 30px rgba(0,0,0,0.8);
@@ -2486,6 +2492,8 @@ body {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        
         
 
 @media (max-width: 480px) {
@@ -3016,16 +3024,16 @@ window.StraysTeamWebsite = {
 
  <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Atualize os nomes das chaves para bater com os data-team dos cards
     const teamsData = {
         'principal': {
-            name: 'STRAYS PRINCIPAL',
+            name: 'STRAYS',
             players: [
                 { name: 'Jogador Principal 1', role: 'Duelista', image: '/img/icone.png' },
                 { name: 'Jogador Principal 2', role: 'Sentinela', image: '/img/icone.png' },
                 { name: 'Jogador Principal 3', role: 'Iniciador', image: '/img/icone.png' },
                 { name: 'Jogador Principal 4', role: 'Controlador', image: '/img/icone.png' },
-                { name: 'Jogador Principal 5', role: 'Flex', image: '/img/icone.png' }
+                { name: 'Jogador Principal 5', role: 'Flex', image: '/img/icone.png' },
+                { name: 'Jogador Principal 6', role: 'Flex', image: '/img/icone.png' }
             ]
         },
         'core': {
@@ -3035,7 +3043,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 { name: 'Jogador Core 2', role: 'Sentinela', image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxnYW1pbmd8ZW58MHx8fHwxNzU3MDk5NjAyfDA&ixlib=rb-4.1.0&q=85&w=400&h=400&fit=crop' },
                 { name: 'Jogador Core 3', role: 'Iniciador', image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxnYW1pbmd8ZW58MHx8fHwxNzU3MDk5NjAyfDA&ixlib=rb-4.1.0&q=85&w=400&h=400&fit=crop' },
                 { name: 'Jogador Core 4', role: 'Controlador', image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxnYW1pbmd8ZW58MHx8fHwxNzU3MDk5NjAyfDA&ixlib=rb-4.1.0&q=85&w=400&h=400&fit=crop' },
-                { name: 'Jogador Core 5', role: 'Flex', image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxnYW1pbmd8ZW58MHx8fHwxNzU3MDk5NjAyfDA&ixlib=rb-4.1.0&q=85&w=400&h=400&fit=crop' }
+                { name: 'Jogador Core 5', role: 'Flex', image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxnYW1pbmd8ZW58MHx8fHwxNzU3MDk5NjAyfDA&ixlib=rb-4.1.0&q=85&w=400&h=400&fit=crop' },
+                { name: 'Jogador Core 6', role: 'Flex', image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxnYW1pbmd8ZW58MHx8fHwxNzU3MDk5NjAyfDA&ixlib=rb-4.1.0&q=85&w=400&h=400&fit=crop' }
             ]
         },
         'feminina': {
@@ -3056,25 +3065,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 { name: 'Academy 2', role: 'Sentinela', image: '/img/Strays Academy Icone.jpg' },
                 { name: 'Academy 3', role: 'Iniciador', image: '/img/Strays Academy Icone.jpg' },
                 { name: 'Academy 4', role: 'Controlador', image: '/img/Strays Academy Icone.jpg' },
-                { name: 'Academy 5', role: 'Flex', image: '/img/Strays Academy Icone.jpg' }
+                { name: 'Academy 5', role: 'Flex', image: '/img/Strays Academy Icone.jpg' },
+                { name: 'Academy 6', role: 'Flex', image: '/img/Strays Academy Icone.jpg' }
             ]
         }
     };
 
-    // --- LÓGICA DO MODAL ---
     const modal = document.getElementById('teamModal');
     if (modal) {
         const teamCards = document.querySelectorAll('.player-card');
         const modalTeamName = document.getElementById('modal-team-name');
-        const modalPlayersContainer = document.getElementById('modal-players-container');
+        const modalPlayerContainer = document.getElementById('modal-player-container');
         const closeModalButton = modal.querySelector('.close-button');
+        const prevBtn = modal.querySelector('.player-prev-btn');
+        const nextBtn = modal.querySelector('.player-next-btn');
+        const indicator = document.getElementById('carousel-indicator');
         let lastFocusedElement;
+        let currentPlayers = [];
+        let currentIndex = 0;
+
+        function renderPlayer(index) {
+            const player = currentPlayers[index];
+            if (!player) return;
+            modalPlayerContainer.innerHTML = `
+                <div class="player-info-card">
+                    <img src="${player.image}" alt="Foto de ${player.name}">
+                    <h4>${player.name}</h4>
+                    <p>${player.role}</p>
+                </div>
+            `;
+            indicator.textContent = `${index + 1} / ${currentPlayers.length}`;
+        }
 
         const openModal = (teamId) => {
             const teamInfo = teamsData[teamId];
             if (!teamInfo) { 
                 modalTeamName.textContent = 'Line não cadastrada';
-                modalPlayersContainer.innerHTML = '<p style="color:#FFD700">Nenhum jogador cadastrado para esta line.</p>';
+                modalPlayerContainer.innerHTML = '<p style="color:#FFD700">Nenhum jogador cadastrado para esta line.</p>';
+                indicator.textContent = '';
                 modal.classList.add('is-visible');
                 document.body.style.overflow = 'hidden';
                 closeModalButton.focus();
@@ -3082,11 +3110,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             lastFocusedElement = document.activeElement;
             modalTeamName.textContent = teamInfo.name;
-            modalPlayersContainer.innerHTML = '';
-            teamInfo.players.forEach((player, index) => {
-                const playerCardHTML = `<div class="player-info-card" style="animation-delay: ${index * 0.07}s"><img src="${player.image}" alt="Foto de ${player.name}"><h4>${player.name}</h4><p>${player.role}</p></div>`;
-                modalPlayersContainer.insertAdjacentHTML('beforeend', playerCardHTML);
-            });
+            currentPlayers = teamInfo.players;
+            currentIndex = 0;
+            renderPlayer(currentIndex);
             modal.classList.add('is-visible');
             document.body.style.overflow = 'hidden';
             closeModalButton.focus();
@@ -3107,7 +3133,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         closeModalButton.addEventListener('click', closeModal);
         modal.addEventListener('click', (event) => { if (event.target === modal) closeModal(); });
-        document.addEventListener('keydown', (event) => { if (event.key === "Escape" && modal.classList.contains('is-visible')) { closeModal(); } });
+        document.addEventListener('keydown', (event) => { 
+            if (event.key === "Escape" && modal.classList.contains('is-visible')) { closeModal(); }
+            if (modal.classList.contains('is-visible')) {
+                if (event.key === "ArrowLeft") prevBtn.click();
+                if (event.key === "ArrowRight") nextBtn.click();
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentPlayers.length) {
+                currentIndex = (currentIndex - 1 + currentPlayers.length) % currentPlayers.length;
+                renderPlayer(currentIndex);
+            }
+        });
+        nextBtn.addEventListener('click', () => {
+            if (currentPlayers.length) {
+                currentIndex = (currentIndex + 1) % currentPlayers.length;
+                renderPlayer(currentIndex);
+            }
+        });
     }
 });
 </script>
