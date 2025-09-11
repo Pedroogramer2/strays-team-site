@@ -1,6 +1,11 @@
 // Premium E-sports Website JavaScript
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all functionality
+
+/**
+ * Funções de Inicialização
+ * Agrupadas para melhor organização e rastreamento.
+ */
+function initAll() {
+    // Inicializa todas as funcionalidades do site
     initMobileMenu();
     initScrollEffects();
     initGalleryCarousel();
@@ -10,10 +15,16 @@ document.addEventListener('DOMContentLoaded', function() {
     initParallaxEffects();
     initTooltips();
     initMouseEffects();
-    
-    // Show loading complete
+    initIntersectionObserver(); // Nova função para o IntersectionObserver
+    initTeamModals();          // Nova função para os modais de time
+    initNewsSystem();          // Nova função para as notícias
+    initGalleryModal();        // Nova função para o modal da galeria
+    initHighlightsButton();    // Nova função para o botão de destaques
+    initHeaderLogoVisibility(); // Nova função para a visibilidade do logo
+
+    // Mostra que o carregamento foi concluído
     console.log('🎉 STRAYS TEAM website loaded successfully!');
-});
+}
 
 // Mobile Menu Functionality
 function initMobileMenu() {
@@ -24,8 +35,6 @@ function initMobileMenu() {
     if (mobileMenuBtn && mobileNav) {
         mobileMenuBtn.addEventListener('click', function() {
             mobileNav.classList.toggle('active');
-            
-            // Toggle icon
             const icon = mobileMenuBtn.querySelector('i');
             if (mobileNav.classList.contains('active')) {
                 icon.classList.remove('fa-bars');
@@ -36,7 +45,6 @@ function initMobileMenu() {
             }
         });
 
-        // Close mobile menu when clicking links
         mobileLinks.forEach(link => {
             link.addEventListener('click', function() {
                 mobileNav.classList.remove('active');
@@ -51,7 +59,7 @@ function initMobileMenu() {
 // Scroll Effects
 function initScrollEffects() {
     const header = document.getElementById('header');
-    
+
     window.addEventListener('scroll', function() {
         if (window.scrollY > 50) {
             header.classList.add('scrolled');
@@ -60,14 +68,13 @@ function initScrollEffects() {
         }
     });
 
-    // Smooth scrolling for navigation links
     const navLinks = document.querySelectorAll('a[href^="#"]');
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
             const targetId = this.getAttribute('href');
             const targetElement = document.querySelector(targetId);
-            
+
             if (targetElement) {
                 targetElement.scrollIntoView({
                     behavior: 'smooth',
@@ -80,8 +87,7 @@ function initScrollEffects() {
 
 // Gallery Carousel
 function initGalleryCarousel() {
-    const slides = [
-        {
+    const slides = [{
             image: '/img/Strays Feminina Icone.jpg',
             caption: 'Logo da Feminina'
         },
@@ -110,29 +116,25 @@ function initGalleryCarousel() {
 
     if (carouselContainer && totalImagesSpan) {
         totalImagesSpan.textContent = slides.length;
-        
+
         function updateCarousel() {
-            // Update main slide
             const slide = carouselContainer.querySelector('.carousel-slide');
             if (slide) {
                 const img = slide.querySelector('img');
                 const title = slide.querySelector('.caption-title');
-                
+
                 if (img) img.src = slides[currentSlide].image;
                 if (title) title.textContent = slides[currentSlide].caption;
             }
 
-            // Update dots
             dots.forEach((dot, index) => {
                 dot.classList.toggle('active', index === currentSlide);
             });
 
-            // Update thumbnails
             thumbnails.forEach((thumb, index) => {
                 thumb.classList.toggle('active', index === currentSlide);
             });
 
-            // Update counter
             if (currentImageSpan) {
                 currentImageSpan.textContent = currentSlide + 1;
             }
@@ -153,7 +155,6 @@ function initGalleryCarousel() {
             updateCarousel();
         }
 
-        // Event listeners
         if (nextBtn) nextBtn.addEventListener('click', nextSlide);
         if (prevBtn) prevBtn.addEventListener('click', prevSlide);
 
@@ -165,10 +166,7 @@ function initGalleryCarousel() {
             thumb.addEventListener('click', () => goToSlide(index));
         });
 
-        // Auto-play carousel
         setInterval(nextSlide, 5000);
-
-        // Initialize
         updateCarousel();
     }
 }
@@ -176,13 +174,10 @@ function initGalleryCarousel() {
 // Player Card Interactions
 function initPlayerCards() {
     const playerCards = document.querySelectorAll('.player-card');
-    
+
     playerCards.forEach((card, index) => {
         card.addEventListener('mouseenter', function() {
-            // Add premium hover effects
             this.style.transform = 'translateY(-10px) scale(1.03)';
-            
-            // Animate progress bars
             const progressFill = this.querySelector('.progress-fill');
             if (progressFill) {
                 const width = progressFill.style.width;
@@ -191,8 +186,6 @@ function initPlayerCards() {
                     progressFill.style.width = width;
                 }, 100);
             }
-
-            // Glow effect on role icon
             const roleIcon = this.querySelector('.role-icon');
             if (roleIcon) {
                 roleIcon.classList.add('glow-gold');
@@ -211,25 +204,21 @@ function initPlayerCards() {
 // Newsletter Form
 function initNewsletterForm() {
     const form = document.getElementById('newsletterForm');
-    
+
     if (form) {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const input = this.querySelector('input[type="email"]');
             const button = this.querySelector('button');
-            
+
             if (input && button) {
                 const email = input.value;
-                
+
                 if (email) {
-                    // Simulate subscription
                     button.innerHTML = '<i class="fas fa-check"></i> Subscribed!';
                     button.style.background = 'linear-gradient(45deg, #10b981, #059669)';
-                    
                     input.value = '';
-                    
-                    // Reset button after 3 seconds
                     setTimeout(() => {
                         button.innerHTML = '<i class="fas fa-paper-plane"></i> Subscribe';
                         button.style.background = '';
@@ -242,7 +231,6 @@ function initNewsletterForm() {
 
 // Scroll to Top Functionality
 function initScrollToTop() {
-    // Create scroll to top button
     const scrollTopBtn = document.createElement('button');
     scrollTopBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
     scrollTopBtn.className = 'scroll-top-btn glass-effect';
@@ -262,10 +250,8 @@ function initScrollToTop() {
         z-index: 1000;
         font-size: 18px;
     `;
-    
     document.body.appendChild(scrollTopBtn);
-    
-    // Show/hide button based on scroll position
+
     window.addEventListener('scroll', function() {
         if (window.scrollY > 500) {
             scrollTopBtn.style.opacity = '1';
@@ -275,8 +261,7 @@ function initScrollToTop() {
             scrollTopBtn.style.visibility = 'hidden';
         }
     });
-    
-    // Scroll to top when clicked
+
     scrollTopBtn.addEventListener('click', function() {
         window.scrollTo({
             top: 0,
@@ -289,24 +274,20 @@ function initScrollToTop() {
 function initParallaxEffects() {
     const heroSection = document.querySelector('.hero-section');
     const particles = document.querySelectorAll('.particle');
-    
+
     if (heroSection) {
         window.addEventListener('mousemove', function(e) {
             const mouseX = (e.clientX / window.innerWidth) * 100;
             const mouseY = (e.clientY / window.innerHeight) * 100;
-            
-            // Move background
             const heroBg = heroSection.querySelector('.hero-bg');
             if (heroBg) {
                 heroBg.style.transform = `translate(${mouseX * 0.02}px, ${mouseY * 0.02}px)`;
             }
-            
-            // Move particles
+
             particles.forEach((particle, index) => {
                 const speed = (index + 1) * 0.02;
                 const directionX = index % 2 === 0 ? 1 : -1;
                 const directionY = index % 3 === 0 ? 1 : -1;
-                
                 particle.style.transform = `translate(${mouseX * speed * directionX}px, ${mouseY * speed * directionY}px)`;
             });
         });
@@ -316,17 +297,17 @@ function initParallaxEffects() {
 // Enhanced Tooltips
 function initTooltips() {
     const tooltips = document.querySelectorAll('.tooltip');
-    
+
     tooltips.forEach(tooltip => {
         const tooltipText = tooltip.querySelector('.tooltiptext');
-        
+
         if (tooltipText) {
             tooltip.addEventListener('mouseenter', function() {
                 tooltipText.style.opacity = '1';
                 tooltipText.style.visibility = 'visible';
                 tooltipText.style.transform = 'translateY(-5px)';
             });
-            
+
             tooltip.addEventListener('mouseleave', function() {
                 tooltipText.style.opacity = '0';
                 tooltipText.style.visibility = 'hidden';
@@ -338,31 +319,25 @@ function initTooltips() {
 
 // Mouse Effects
 function initMouseEffects() {
-    // Add mouse trail effect
     const mouseTrail = [];
     const maxTrailLength = 10;
-    
+
     document.addEventListener('mousemove', function(e) {
         mouseTrail.push({
             x: e.clientX,
             y: e.clientY,
             time: Date.now()
         });
-        
-        // Limit trail length
+
         if (mouseTrail.length > maxTrailLength) {
             mouseTrail.shift();
         }
-        
-        // Update existing trail elements
+
         updateMouseTrail();
     });
-    
+
     function updateMouseTrail() {
-        // Remove old trail elements
         document.querySelectorAll('.mouse-trail').forEach(el => el.remove());
-        
-        // Create new trail elements
         mouseTrail.forEach((point, index) => {
             const trailElement = document.createElement('div');
             trailElement.className = 'mouse-trail';
@@ -379,10 +354,7 @@ function initMouseEffects() {
                 transform: translate(-50%, -50%);
                 transition: opacity 0.5s ease;
             `;
-            
             document.body.appendChild(trailElement);
-            
-            // Fade out and remove
             setTimeout(() => {
                 trailElement.style.opacity = '0';
                 setTimeout(() => {
@@ -393,10 +365,8 @@ function initMouseEffects() {
             }, 100);
         });
     }
-    
-    // Enhanced hover effects for interactive elements
+
     const interactiveElements = document.querySelectorAll('button, a, .player-card, .news-card, .sponsor-card');
-    
     interactiveElements.forEach(element => {
         element.addEventListener('mouseenter', function() {
             this.style.transition = 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
@@ -405,68 +375,47 @@ function initMouseEffects() {
 }
 
 // Intersection Observer for scroll animations
-const observerOptions = {
-    root: null,
-    rootMargin: '0px',
-    threshold: 0.1
-};
+function initIntersectionObserver() {
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+    };
 
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('fade-in');
-        }
-    });
-}, observerOptions);
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('fade-in');
+            }
+        });
+    }, observerOptions);
 
-// Observe elements for scroll animations
-document.addEventListener('DOMContentLoaded', function() {
     const animatedElements = document.querySelectorAll('.player-card, .news-card, .sponsor-card, .section-header');
     animatedElements.forEach(el => observer.observe(el));
-});
+}
 
 // Performance monitoring
 function initPerformanceMonitoring() {
-    // Monitor frame rate
     let lastTime = performance.now();
     let frameCount = 0;
-    
+
     function measureFPS() {
         const currentTime = performance.now();
         frameCount++;
-        
         if (currentTime - lastTime >= 1000) {
             const fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
             console.log(`FPS: ${fps}`);
-            
-            // Reset counters
             lastTime = currentTime;
             frameCount = 0;
         }
-        
         requestAnimationFrame(measureFPS);
     }
-    
+
     measureFPS();
 }
 
-// Initialize performance monitoring in development
-if (window.location.hostname === 'localhost') {
-    initPerformanceMonitoring();
-}
-
-// Export functions for potential external use
-window.StraysTeamWebsite = {
-    initMobileMenu,
-    initScrollEffects,
-    initGalleryCarousel,
-    initPlayerCards,
-    initNewsletterForm
-};
-
-
-
-document.addEventListener('DOMContentLoaded', () => {
+// Team Modals and Data
+function initTeamModals() {
     const teamsData = {
         'principal': {
             name: 'STRAYS',
@@ -542,7 +491,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const openModal = (teamId) => {
             const teamInfo = teamsData[teamId];
-            if (!teamInfo) { 
+            if (!teamInfo) {
                 modalTeamName.textContent = 'Line não cadastrada';
                 modalPlayerContainer.innerHTML = '<p style="color:#FFD700">Nenhum jogador cadastrado para esta line.</p>';
                 indicator.textContent = '';
@@ -564,20 +513,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const closeModal = () => {
             modal.classList.remove('is-visible');
             document.body.style.overflow = '';
-            if (lastFocusedElement) { lastFocusedElement.focus(); }
+            if (lastFocusedElement) {
+                lastFocusedElement.focus();
+            }
         };
 
         teamCards.forEach(card => {
             card.addEventListener('click', () => openModal(card.dataset.team));
             card.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openModal(card.dataset.team); }
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    openModal(card.dataset.team);
+                }
             });
         });
 
         closeModalButton.addEventListener('click', closeModal);
-        modal.addEventListener('click', (event) => { if (event.target === modal) closeModal(); });
-        document.addEventListener('keydown', (event) => { 
-            if (event.key === "Escape" && modal.classList.contains('is-visible')) { closeModal(); }
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) closeModal();
+        });
+        document.addEventListener('keydown', (event) => {
+            if (event.key === "Escape" && modal.classList.contains('is-visible')) {
+                closeModal();
+            }
             if (modal.classList.contains('is-visible')) {
                 if (event.key === "ArrowLeft") prevBtn.click();
                 if (event.key === "ArrowRight") nextBtn.click();
@@ -597,52 +555,44 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-});
+}
 
-
-document.addEventListener('DOMContentLoaded', function() {
+// Logo Visibility on scroll
+function initHeaderLogoVisibility() {
     const logo = document.getElementById('headerLogo');
     const teamSection = document.getElementById('team');
+    if (!logo || !teamSection) return;
 
     function checkLogoVisibility() {
-        if (!logo || !teamSection) return;
         const rect = teamSection.getBoundingClientRect();
         const sectionTop = rect.top + window.scrollY;
         const sectionHalf = sectionTop + rect.height / 600;
         const scrollY = window.scrollY + window.innerHeight / 2;
-
         if (scrollY >= sectionHalf) {
             logo.classList.add('visible');
         } else {
             logo.classList.remove('visible');
         }
     }
-
-    // Esconde o logo inicialmente
     logo.classList.remove('visible');
     window.addEventListener('scroll', checkLogoVisibility);
     window.addEventListener('resize', checkLogoVisibility);
     checkLogoVisibility();
-});
+}
 
-
-document.addEventListener('DOMContentLoaded', function() {
-    const patrocinarBtn = document.getElementById('highlightsBtn');
-    if (patrocinarBtn) {
-        patrocinarBtn.addEventListener('click', function() {
+// Highlights Button
+function initHighlightsButton() {
+    const highlightsBtn = document.getElementById('highlightsBtn');
+    if (highlightsBtn) {
+        highlightsBtn.addEventListener('click', function() {
             window.open('https://www.youtube.com/@STRAYSTEAM', '_blank');
         });
     }
-});
+}
 
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    // ...outros inits...
-
-    // Dados das notícias
-    const newsData = [
-        {
+// News System
+function initNewsSystem() {
+    const newsData = [{
             title: "Adquira agora a jersey da Strays",
             date: "2025-09-10",
             image: "/img/Strays Jersey gif.gif",
@@ -668,17 +618,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     ];
 
-    // Ordena por data (mais recente primeiro)
     newsData.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-    // Função para formatar a data (corrigida)
     function formatDate(dateStr) {
         const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
         const d = new Date(dateStr + 'T12:00:00');
         return `${d.getDate()} ${meses[d.getMonth()]}`;
     }
 
-    // Monta o HTML das notícias
     const newsCarousel = document.getElementById('newsCarousel');
     if (newsCarousel) {
         newsCarousel.innerHTML = newsData.map((news, idx) => `
@@ -702,13 +649,11 @@ document.addEventListener('DOMContentLoaded', function() {
         `).join('');
     }
 
-    // Modal de notícia
     const newsModal = document.getElementById('newsModal');
     const newsModalTitle = document.getElementById('news-modal-title');
     const newsModalBody = document.getElementById('news-modal-body');
     const closeNewsModalBtn = newsModal ? newsModal.querySelector('.close-button') : null;
 
-    // Delegação de evento para os botões "Leia mais"
     if (newsCarousel) {
         newsCarousel.addEventListener('click', function(e) {
             const btn = e.target.closest('.news-link');
@@ -756,4 +701,62 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.style.overflow = '';
         }
     });
-});
+}
+
+// Gallery Modal
+function initGalleryModal() {
+    const galleryModal = document.getElementById('galleryModal');
+    const galleryModalBody = document.getElementById('gallery-modal-body');
+    const closeGalleryModalBtn = galleryModal ? galleryModal.querySelector('.close-button') : null;
+
+    function openGalleryModal() {
+        const activeSlide = document.querySelector('.gallery-carousel .carousel-slide.active img');
+        if (activeSlide && galleryModal && galleryModalBody) {
+            galleryModalBody.innerHTML = `<img src="${activeSlide.src}" alt="${activeSlide.alt}" style="max-width:100%;max-height:70vh;border-radius:12px;">`;
+            galleryModal.classList.add('is-visible');
+            document.body.style.overflow = 'hidden';
+            closeGalleryModalBtn && closeGalleryModalBtn.focus();
+        }
+    }
+
+    document.querySelectorAll('.gallery-carousel .btn-secondary').forEach(btn => {
+        btn.addEventListener('click', openGalleryModal);
+    });
+
+    if (closeGalleryModalBtn) {
+        closeGalleryModalBtn.addEventListener('click', function() {
+            galleryModal.classList.remove('is-visible');
+            document.body.style.overflow = '';
+        });
+    }
+    if (galleryModal) {
+        galleryModal.addEventListener('click', function(event) {
+            if (event.target === galleryModal) {
+                galleryModal.classList.remove('is-visible');
+                document.body.style.overflow = '';
+            }
+        });
+    }
+    document.addEventListener('keydown', function(event) {
+        if (event.key === "Escape" && galleryModal && galleryModal.classList.contains('is-visible')) {
+            galleryModal.classList.remove('is-visible');
+            document.body.style.overflow = '';
+        }
+    });
+}
+
+// Export functions for potential external use
+window.StraysTeamWebsite = {
+    initMobileMenu,
+    initScrollEffects,
+    initGalleryCarousel,
+    initPlayerCards,
+    initNewsletterForm
+};
+
+// Seção de inicialização principal
+if (window.location.hostname === 'localhost') {
+    initPerformanceMonitoring();
+}
+
+document.addEventListener('DOMContentLoaded', initAll);
