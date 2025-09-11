@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STRAYS TEAM - Effort beats talent</title>
+    <title>STRAYS - O Esforço vence o Talento</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="img/icone.png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
@@ -17,7 +18,7 @@
                     <img src="img/icone.png" alt="Logo Strays" class="footer-brand-logo">
                     <div class="brand-info fade-in">
                         <h1 class="brand-name text-glow">STRAYS</h1>
-                        <p class="brand-slogan">Esforço vence Talento</p>
+                        <p class="brand-slogan">O Esforço vence o Talento</p>
                     </div>
                 </div>
 
@@ -68,7 +69,7 @@
             <div class="hero-logo fade-in">
               <br><br><br><br>
                 <h1 class="hero-title">STRAYS</h1>
-                <p class="hero-slogan">Esforço vence Talento</p>
+                <p class="hero-slogan text-glow">O Esforço vence o Talento</p>
             </div>
 
 
@@ -92,8 +93,8 @@
                 <p class="section-subtitle">Lines dedicadas e excepcionais unidas pela habilidade, estratégia e uma sede insaciável de vitória.</p>
             </div>
 
-            <div class="players-grid">
-                <div class="player-card card-premium fade-in stagger-1" data-player="1">
+           <div class="players-grid">
+    <div class="player-card card-premium fade-in stagger-1" data-team="principal">
                     <div class="player-image image-container">
                         <img src="/img/icone.png" alt="Logo Strays principal">
                         <div class="role-icon role-duelist glass-effect">
@@ -140,7 +141,20 @@
                     </div>
                 </div>
 
-                <div class="player-card card-premium fade-in stagger-2" data-player="2">
+                <div id="teamModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-team-name">
+        <div class="modal-content">
+            <button class="close-button" aria-label="Fechar modal">&times;</button>
+            <div class="modal-header">
+                <h2 id="modal-team-name">Nome do Time</h2>
+            </div>
+            <div id="modal-players-container" class="players-grid-modal">
+                <!-- O JavaScript vai preencher os jogadores aqui -->
+            </div>
+        </div>
+    </div>
+
+
+                <div class="player-card card-premium fade-in stagger-2" data-team="core">
                     <div class="player-image image-container">
                         <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxnYW1pbmd8ZW58MHx8fHwxNzU3MDk5NjAyfDA&ixlib=rb-4.1.0&q=85&w=400&h=400&fit=crop" alt="VIPER">
                         <div class="role-icon role-controller glass-effect">
@@ -187,9 +201,9 @@
                     </div>
                 </div>
 
-                <div class="player-card card-premium fade-in stagger-3" data-player="3">
+                <div class="player-card card-premium fade-in stagger-3" data-team="feminina">
                     <div class="player-image image-container">
-                        <img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwzfHxnYW1pbmd8ZW58MHx8fHwxNzU3MDk5NjAyfDA&ixlib=rb-4.1.0&q=85&w=400&h=400&fit=crop" alt="SAGE">
+                        <img src="img/Strays Feminina Icone.jpg" alt="SAGE">
                         <div class="role-icon role-sentinel glass-effect">
                             <i class="fas fa-shield-alt"></i>
                         </div>
@@ -234,9 +248,9 @@
                     </div>
                 </div>
 
-                <div class="player-card card-premium fade-in stagger-4" data-player="4">
+                <div class="player-card card-premium fade-in stagger-4" data-team="academy">
                     <div class="player-image image-container">
-                        <img src="https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHw0fHxnYW1pbmd8ZW58MHx8fHwxNzU3MDk5NjAyfDA&ixlib=rb-4.1.0&q=85&w=400&h=400&fit=crop" alt="SOVA">
+                        <img src="img/Strays Academy Icone.jpg" alt="SOVA">
                         <div class="role-icon role-initiator glass-effect">
                             <i class="fas fa-eye"></i>
                         </div>
@@ -394,11 +408,11 @@
                             <div class="caption-actions">
                                 <button class="btn-premium">
                                     <i class="fas fa-play"></i>
-                                    View Full
+                                    Veja completo
                                 </button>
                                 <button class="btn-secondary">
                                     <i class="fas fa-expand"></i>
-                                    Expand
+                                    Expandir
                                 </button>
                             </div>
                         </div>
@@ -527,7 +541,7 @@
     <img src="img/icone.png" alt="Logo Strays" class="footer-brand-logo">
     <div class="footer-brand-info">
         <h3 class="footer-brand-name text-glow">STRAYS</h3>
-        <p class="footer-brand-slogan">Esforço vence Talento</p>
+        <p class="footer-brand-slogan">O Esforço vence o Talento</p>
     </div>
 </div>
                     <p class="footer-description">
@@ -538,16 +552,16 @@ o cenário de eSports e inspirar a próxima geração de jogadores.
                     
                     <!-- Social Media -->
                     <div class="footer-social">
-                        <a href="https://www.instagram.com/straysteam" class="social-link glass-effect fade-in stagger-1">
+                        <a href="https://www.instagram.com/straysteam" class="social-link , social-link-instagram glass-effect fade-in stagger-1">
                             <i class="fab fa-instagram"></i>
                         </a>
-                        <a href="https://x.com/straysvlr" class="social-link glass-effect fade-in stagger-2">
+                        <a href="https://x.com/straysvlr" class="social-link , social-link-twitter glass-effect fade-in stagger-2">
                             <i class="fab fa-twitter"></i>
                         </a>
-                        <a href="https://www.youtube.com/@STRAYSTEAM" class="social-link glass-effect fade-in stagger-3">
+                        <a href="https://www.youtube.com/@STRAYSTEAM" class="social-link , social-link-youtube glass-effect fade-in stagger-3">
                             <i class="fab fa-youtube"></i>
                         </a>
-                        <a href="https://www.twitch.tv/rissa_str" class="social-link glass-effect fade-in stagger-4">
+                        <a href="https://www.twitch.tv/rissa_str" class="social-link , social-link-twitch glass-effect fade-in stagger-4">
                             <i class="fab fa-twitch"></i>
                         </a>
                     </div>
@@ -781,25 +795,25 @@ body {
 
 @keyframes pulse-glow {
     0%, 100% {
-        box-shadow: 0 0 20px rgba(255, 215, 0, 0.3), 0 0 40px rgba(255, 215, 0, 0.1);
+        box-shadow: 0 0 5px rgba(255, 215, 0, 0.3), 0 0 10px rgba(255, 215, 0, 0.1);
     }
     50% {
-        box-shadow: 0 0 30px rgba(255, 215, 0, 0.6), 0 0 60px rgba(255, 215, 0, 0.2);
+        box-shadow: 0 0 7px rgba(255, 215, 0, 0.6), 0 0 15px rgba(255, 215, 0, 0.2);
     }
 }
 
 @keyframes text-glow-pulse {
     from {
         text-shadow: 
-            0 0 5px currentColor,
-            0 0 10px currentColor,
-            0 0 15px currentColor;
+            0 0 1px currentColor,
+            0 0 2px currentColor,
+            0 0 4px currentColor;
     }
     to {
         text-shadow: 
-            0 0 10px currentColor,
-            0 0 20px currentColor,
-            0 0 30px currentColor;
+            0 0 2px currentColor,
+            0 0 5px currentColor,
+            0 0 7px currentColor;
     }
 }
 
@@ -2107,10 +2121,24 @@ body {
     text-decoration: none
 }
 
-.social-link:hover {
-    color: var(--primary-gold);
+.social-link-instagram:hover {
+    color: rgba(241, 94, 143, 0.815);
     transform: scale(1.1);
-    background: rgba(255, 215, 0, 0.1);
+}
+
+.social-link-twitter:hover {
+    color: rgba(81, 163, 230, 0.897);
+    transform: scale(1.1);
+}
+
+.social-link-youtube:hover {
+    color: rgba(236, 25, 25, 0.897);
+    transform: scale(1.1);
+}
+
+.social-link-twitch:hover {
+    color: rgba(86, 2, 126, 0.897);
+    transform: scale(1.1);
 }
 
 .footer-section-title {
@@ -2327,6 +2355,118 @@ body {
         transform: translateY(-5px) scale(1.02);
     }
 }
+.modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity var(--transition-speed-fast) ease, visibility 0s var(--transition-speed-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.is-visible {
+            visibility: visible;
+            opacity: 1;
+            transition-delay: 0s;
+        }
+
+        .modal-content {
+            background-color: var(--medium-gray);
+            margin: 32px auto;
+            padding: 35px;
+            border-top: 3px solid var(--primary-gold);
+            width: 90%;
+            max-width: 1000px;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.8);
+            transform: translateY(-30px);
+            transition: transform var(--transition-speed-slow) cubic-bezier(0.165, 0.84, 0.44, 1);
+            max-height: 80vh; 
+        }
+
+        .modal.is-visible .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            color: var(--primary-gold);
+            font-weight: 900;
+        }
+
+        .close-button {
+            color: var(--light-gray);
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 40px;
+            line-height: 1;
+            transition: color var(--transition-speed-fast) ease, transform var(--transition-speed-fast) ease;
+            border: none;
+            background: none;
+            padding: 0;
+            cursor: pointer;
+        }
+
+        .close-button:hover, .close-button:focus-visible {
+            color: var(--primary-gold);
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        .players-grid-modal {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 30px;
+        }
+
+        .player-info-card {
+            background-color: var(--dark-gray);
+            border-radius: 8px;
+            text-align: center;
+            padding: 20px;
+            border: 1px solid var(--light-gray);
+            transition: transform var(--transition-speed-fast) ease, border-color var(--transition-speed-fast) ease;
+        }
+
+        .player-info-card img {
+            width: 110px;
+            height: 110px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            background: #222;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+}
+        
+        .modal.is-visible .player-info-card {
+            animation: cardEntry 0.5s var(--transition-speed-fast) forwards cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        @keyframes cardEntry {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
 
 @media (max-width: 480px) {
     .container {
@@ -2853,4 +2993,101 @@ window.StraysTeamWebsite = {
     initPlayerCards,
     initNewsletterForm
 };
+</script>
+
+ <script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Atualize os nomes das chaves para bater com os data-team dos cards
+    const teamsData = {
+        'principal': {
+            name: 'STRAYS PRINCIPAL',
+            players: [
+                { name: 'Jogador Principal 1', role: 'Duelista', image: '/img/icone.png' },
+                { name: 'Jogador Principal 2', role: 'Sentinela', image: '/img/icone.png' },
+                { name: 'Jogador Principal 3', role: 'Iniciador', image: '/img/icone.png' },
+                { name: 'Jogador Principal 4', role: 'Controlador', image: '/img/icone.png' },
+                { name: 'Jogador Principal 5', role: 'Flex', image: '/img/icone.png' }
+            ]
+        },
+        'core': {
+            name: 'STRAYS CORE',
+            players: [
+                { name: 'Jogador Core 1', role: 'Duelista', image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxnYW1pbmd8ZW58MHx8fHwxNzU3MDk5NjAyfDA&ixlib=rb-4.1.0&q=85&w=400&h=400&fit=crop' },
+                { name: 'Jogador Core 2', role: 'Sentinela', image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxnYW1pbmd8ZW58MHx8fHwxNzU3MDk5NjAyfDA&ixlib=rb-4.1.0&q=85&w=400&h=400&fit=crop' },
+                { name: 'Jogador Core 3', role: 'Iniciador', image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxnYW1pbmd8ZW58MHx8fHwxNzU3MDk5NjAyfDA&ixlib=rb-4.1.0&q=85&w=400&h=400&fit=crop' },
+                { name: 'Jogador Core 4', role: 'Controlador', image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxnYW1pbmd8ZW58MHx8fHwxNzU3MDk5NjAyfDA&ixlib=rb-4.1.0&q=85&w=400&h=400&fit=crop' },
+                { name: 'Jogador Core 5', role: 'Flex', image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxnYW1pbmd8ZW58MHx8fHwxNzU3MDk5NjAyfDA&ixlib=rb-4.1.0&q=85&w=400&h=400&fit=crop' }
+            ]
+        },
+        'feminina': {
+            name: 'STRAYS FEMININA',
+            players: [
+                { name: 'Rissa', role: 'Iniciadora', image: '/img/Strays Feminina Icone.jpg' },
+                { name: 'Luna', role: 'Controladora IGL', image: '/img/Strays Feminina Icone.jpg' },
+                { name: 'Stehff', role: 'Sentinela', image: '/img/Strays Feminina Icone.jpg' },
+                { name: 'Ishtar', role: 'Flex', image: '/img/Strays Feminina Icone.jpg' },
+                { name: 'Cold', role: 'Duelista', image: '/img/Strays Feminina Icone.jpg' }
+            ]
+        },
+        'academy': {
+            name: 'STRAYS ACADEMY',
+            players: [
+                { name: 'Academy 1', role: 'Duelista', image: '/img/Strays Academy Icone.jpg' },
+                { name: 'Academy 2', role: 'Sentinela', image: '/img/Strays Academy Icone.jpg' },
+                { name: 'Academy 3', role: 'Iniciador', image: '/img/Strays Academy Icone.jpg' },
+                { name: 'Academy 4', role: 'Controlador', image: '/img/Strays Academy Icone.jpg' },
+                { name: 'Academy 5', role: 'Flex', image: '/img/Strays Academy Icone.jpg' }
+            ]
+        }
+    };
+
+    // --- LÓGICA DO MODAL ---
+    const modal = document.getElementById('teamModal');
+    if (modal) {
+        const teamCards = document.querySelectorAll('.player-card');
+        const modalTeamName = document.getElementById('modal-team-name');
+        const modalPlayersContainer = document.getElementById('modal-players-container');
+        const closeModalButton = modal.querySelector('.close-button');
+        let lastFocusedElement;
+
+        const openModal = (teamId) => {
+            const teamInfo = teamsData[teamId];
+            if (!teamInfo) { 
+                modalTeamName.textContent = 'Line não cadastrada';
+                modalPlayersContainer.innerHTML = '<p style="color:#FFD700">Nenhum jogador cadastrado para esta line.</p>';
+                modal.classList.add('is-visible');
+                document.body.style.overflow = 'hidden';
+                closeModalButton.focus();
+                return;
+            }
+            lastFocusedElement = document.activeElement;
+            modalTeamName.textContent = teamInfo.name;
+            modalPlayersContainer.innerHTML = '';
+            teamInfo.players.forEach((player, index) => {
+                const playerCardHTML = `<div class="player-info-card" style="animation-delay: ${index * 0.07}s"><img src="${player.image}" alt="Foto de ${player.name}"><h4>${player.name}</h4><p>${player.role}</p></div>`;
+                modalPlayersContainer.insertAdjacentHTML('beforeend', playerCardHTML);
+            });
+            modal.classList.add('is-visible');
+            document.body.style.overflow = 'hidden';
+            closeModalButton.focus();
+        };
+
+        const closeModal = () => {
+            modal.classList.remove('is-visible');
+            document.body.style.overflow = '';
+            if (lastFocusedElement) { lastFocusedElement.focus(); }
+        };
+
+        teamCards.forEach(card => {
+            card.addEventListener('click', () => openModal(card.dataset.team));
+            card.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openModal(card.dataset.team); }
+            });
+        });
+
+        closeModalButton.addEventListener('click', closeModal);
+        modal.addEventListener('click', (event) => { if (event.target === modal) closeModal(); });
+        document.addEventListener('keydown', (event) => { if (event.key === "Escape" && modal.classList.contains('is-visible')) { closeModal(); } });
+    }
+});
 </script>
