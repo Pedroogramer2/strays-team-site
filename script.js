@@ -638,54 +638,103 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Seleciona todos os botões "Leia mais"
-    const newsLinks = document.querySelectorAll('.news-link');
+    // ...outros inits...
+
+    // Dados das notícias
+    const newsData = [
+        {
+            title: "Adquira agora a jersey da Strays",
+            date: "2025-09-10",
+            image: "/img/Strays Jersey gif.gif",
+            excerpt: "Depois de muitos pedidos, a Strays finalmente coloca em produção a Jersey da Strays. Garanta agora a sua na pré-venda, e fique ligado. Em breve, o Manguito estará entre nós!",
+        },
+        {
+            title: "Reformulação do Academy",
+            date: "2025-09-09",
+            image: "/img/Strays Academy Icone.jpg",
+            excerpt: "O Academy abre suas portas para novos talentos. Para aqueles que tem foco e muita sede de vitória, entre em contato caso queira fazer parte e aprender com profissionais.",
+        },
+        {
+            title: "Taisuke é orgulho da Strays!!!",
+            date: "2025-09-11",
+            image: "img/Noticia Taisuke.png",
+            excerpt: "Taisuke é um jogador excepcional, sempre se destacando em suas partidas e trazendo orgulho para a equipe Strays. Agora mais do que nunca, sendo o 6° colocado dos top 10 players contender do premier",
+        },
+        {
+            title: "A STRAYS ESTÁ NO VALORANT!",
+            date: "2025-01-05",
+            image: "/img/Chamada Strays para todas as Lines.png",
+            excerpt: "🔥 Lineup Principal, 💥 Lineup Feminina, 🚀 Lineup Academy. Cada lineup foi construída com dedicação, visão e paixão pelo jogo. A Strays não veio para brincar — veio para vencer.",
+        }
+    ];
+
+    // Ordena por data (mais recente primeiro)
+    newsData.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    // Função para formatar a data (corrigida)
+    function formatDate(dateStr) {
+        const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+        const d = new Date(dateStr + 'T12:00:00');
+        return `${d.getDate()} ${meses[d.getMonth()]}`;
+    }
+
+    // Monta o HTML das notícias
+    const newsCarousel = document.getElementById('newsCarousel');
+    if (newsCarousel) {
+        newsCarousel.innerHTML = newsData.map((news, idx) => `
+            <article class="news-card card-premium fade-in stagger-${idx+1}">
+                <div class="news-image image-container">
+                    <img src="${news.image}" alt="News">
+                    <div class="news-date glass-effect">
+                        <i class="fas fa-calendar"></i>
+                        <span>${formatDate(news.date)}</span>
+                    </div>
+                </div>
+                <div class="news-content">
+                    <h3 class="news-title">${news.title}</h3>
+                    <p class="news-excerpt">${news.excerpt}</p>
+                    <button class="news-link">
+                        <span>Leia mais</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </article>
+        `).join('');
+    }
+
+    // Modal de notícia
     const newsModal = document.getElementById('newsModal');
     const newsModalTitle = document.getElementById('news-modal-title');
     const newsModalBody = document.getElementById('news-modal-body');
     const closeNewsModalBtn = newsModal ? newsModal.querySelector('.close-button') : null;
 
-    // Exemplo de dados completos das notícias (você pode adaptar para buscar de outro lugar)
-    const newsData = [
-        {
-            title: "Adquira agora a jersey da Strays",
-            image: "/img/Strays Jersey gif.gif",
-            content: "Depois de muitos pedidos, a Strays finalmente coloca em produção a Jersey da Strays. Garanta agora a sua na pré-venda, e fique ligado. Em breve, o Manguito estará entre nós!<br><br><img src='/img/Strays Jersey gif.gif' alt='Jersey' style='width:100%;border-radius:8px;'>"
-        },
-        {
-            title: "Reformulação do Academy",
-            image: "/img/Strays Academy Icone.jpg",
-            content: "O Academy abre suas portas para novos talentos. Para aqueles que tem foco e muita sede de vitória, entre em contato caso queira fazer parte e aprender com profissionais.<br><br><img src='/img/Strays Academy Icone.jpg' alt='Academy' style='width:100%;border-radius:8px;'>"
-        },
-        {
-            title: "A STRAYS ESTÁ NO VALORANT!",
-            image: "/img/Chamada Strays para todas as Lines.png",
-            content: "🔥 Lineup Principal, 💥 Lineup Feminina, 🚀 Lineup Academy. Cada lineup foi construída com dedicação, visão e paixão pelo jogo. A Strays não veio para brincar — veio para vencer.<br><br><img src='/img/Chamada Strays para todas as Lines.png' alt='Valorant' style='width:100%;border-radius:8px;'>"
-        }
-    ];
-
-    newsLinks.forEach((btn, idx) => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const data = newsData[idx];
-            if (data && newsModal && newsModalTitle && newsModalBody) {
-                newsModalTitle.textContent = data.title;
-                newsModalBody.innerHTML = `
-  <div class="news-modal-flex">
-    <div class="news-modal-text">
-      <p>${data.content.split('<br><br><img')[0]}</p>
-    </div>
-    <div class="news-modal-media">
-      <img src="${data.image}" alt="${data.title}" style="width:100%;border-radius:8px;">
-    </div>
-  </div>
-`;
-                newsModal.classList.add('is-visible');
-                document.body.style.overflow = 'hidden';
-                closeNewsModalBtn && closeNewsModalBtn.focus();
+    // Delegação de evento para os botões "Leia mais"
+    if (newsCarousel) {
+        newsCarousel.addEventListener('click', function(e) {
+            const btn = e.target.closest('.news-link');
+            if (btn) {
+                const article = btn.closest('.news-card');
+                const idx = Array.from(newsCarousel.children).indexOf(article);
+                const data = newsData[idx];
+                if (data && newsModal && newsModalTitle && newsModalBody) {
+                    newsModalTitle.textContent = data.title;
+                    newsModalBody.innerHTML = `
+                        <div class="news-modal-flex">
+                            <div class="news-modal-text">
+                                <p>${data.excerpt}</p>
+                            </div>
+                            <div class="news-modal-media">
+                                <img src="${data.image}" alt="${data.title}" style="width:100%;border-radius:8px;">
+                            </div>
+                        </div>
+                    `;
+                    newsModal.classList.add('is-visible');
+                    document.body.style.overflow = 'hidden';
+                    closeNewsModalBtn && closeNewsModalBtn.focus();
+                }
             }
         });
-    });
+    }
 
     if (closeNewsModalBtn) {
         closeNewsModalBtn.addEventListener('click', function() {
