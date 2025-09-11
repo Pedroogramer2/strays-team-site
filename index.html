@@ -15,7 +15,7 @@
             <div class="nav-wrapper">
                 <!-- Logo -->
                 <div class="logo-section">
-                    <img src="img/icone.png" alt="Logo Strays" class="footer-brand-logo">
+                    <img id="headerLogo" src="img/icone.png" alt="Logo Strays" class="footer-brand-logo">
                     <div class="brand-info fade-in">
                         <h1 class="brand-name text-glow">STRAYS</h1>
                         <p class="brand-slogan">O Esforço vence o Talento</p>
@@ -68,6 +68,7 @@
         <div class="container hero-content">
             <div class="hero-logo fade-in">
               <br><br><br><br>
+              <img src="img/icone.png" alt="Logo Strays" class="footer-brand-logo-title">
                 <h1 class="hero-title">STRAYS</h1>
                 <p class="hero-slogan text-glow">O Esforço vence o Talento</p>
             </div>
@@ -538,7 +539,7 @@
                 <!-- Brand Section -->
                 <div class="footer-brand fade-in">
                     <div class="footer-logo-section">
-    <img src="img/icone.png" alt="Logo Strays" class="footer-brand-logo">
+    <img src="img/icone.png" alt="Logo Strays" class="footer-brand-logo-normal">
     <div class="footer-brand-info">
         <h3 class="footer-brand-name text-glow">STRAYS</h3>
         <p class="footer-brand-slogan">O Esforço vence o Talento</p>
@@ -575,7 +576,7 @@ o cenário de eSports e inspirar a próxima geração de jogadores.
                         <li><a href="#team" class="nav-link">Nossas Lines</a></li>
                         <li><a href="#" class="nav-link">Marcar Scrim</a></li>
                         <li><a href="#" class="nav-link">Merchandise</a></li>
-                        <li><a href="#" class="nav-link">Players</a></li>
+                        <li><a href="#team" class="nav-link">Players</a></li>
                     </ul>
                 </div>
 
@@ -1312,7 +1313,7 @@ body {
 
 .hero-slogan {
     font-size: clamp(1.5rem, 4vw, 3rem);
-    color: var(--primary-gold);
+    color: var(--secondary-gold);
     font-weight: bold;
     margin-bottom: 48px;
     letter-spacing: 0.05em;
@@ -2077,9 +2078,28 @@ body {
     display: block;
 }
 
+.footer-brand-logo.visible {
+    opacity: 1;
+}
+
 
 .footer-brand-logo {
     width: 60px; 
+    height: auto; 
+    margin-right: 16px; 
+     opacity: 0;
+    transition: opacity 0.4s;
+    
+}
+
+.footer-brand-logo-normal {
+    width: 60px; 
+    height: auto; 
+    margin-right: 16px; 
+}
+
+.footer-brand-logo-title {
+    width: 360px; 
     height: auto; 
     margin-right: 16px; 
 }
@@ -2513,11 +2533,10 @@ body {
 }
 
 /* Focus improvements for accessibility */
-button:focus,
-input:focus,
-a:focus {
-    outline: 2px solid var(--primary-gold);
-    outline-offset: 2px;
+button:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+a:focus:not(:focus-visible) {
+    outline: none;
 }
 
 /* Improved contrast for better readability */
@@ -3023,10 +3042,11 @@ document.addEventListener('DOMContentLoaded', () => {
             name: 'STRAYS FEMININA',
             players: [
                 { name: 'Rissa', role: 'Iniciadora', image: '/img/Strays Feminina Icone.jpg' },
-                { name: 'Luna', role: 'Controladora IGL', image: '/img/Strays Feminina Icone.jpg' },
+                { name: 'Luna', role: 'Controladora IGL', image: '/img/Luna lol.jpg' },
                 { name: 'Stehff', role: 'Sentinela', image: '/img/Strays Feminina Icone.jpg' },
                 { name: 'Ishtar', role: 'Flex', image: '/img/Strays Feminina Icone.jpg' },
-                { name: 'Cold', role: 'Duelista', image: '/img/Strays Feminina Icone.jpg' }
+                { name: 'Cold', role: 'Duelista', image: '/img/Strays Feminina Icone.jpg' },
+                { name: 'Sexto', role: 'Sexto', image: '/img/Strays Feminina Icone.jpg' }
             ]
         },
         'academy': {
@@ -3089,5 +3109,32 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.addEventListener('click', (event) => { if (event.target === modal) closeModal(); });
         document.addEventListener('keydown', (event) => { if (event.key === "Escape" && modal.classList.contains('is-visible')) { closeModal(); } });
     }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const logo = document.getElementById('headerLogo');
+    const teamSection = document.getElementById('team');
+
+    function checkLogoVisibility() {
+        if (!logo || !teamSection) return;
+        const rect = teamSection.getBoundingClientRect();
+        const sectionTop = rect.top + window.scrollY;
+        const sectionHalf = sectionTop + rect.height / 600;
+        const scrollY = window.scrollY + window.innerHeight / 2;
+
+        if (scrollY >= sectionHalf) {
+            logo.classList.add('visible');
+        } else {
+            logo.classList.remove('visible');
+        }
+    }
+
+    // Esconde o logo inicialmente
+    logo.classList.remove('visible');
+    window.addEventListener('scroll', checkLogoVisibility);
+    window.addEventListener('resize', checkLogoVisibility);
+    checkLogoVisibility();
 });
 </script>
