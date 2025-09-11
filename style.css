@@ -1029,6 +1029,10 @@ body {
 
 .news-card {
     overflow: hidden;
+    display: flex;
+    flex-direction: column; /* empilha os elementos em coluna */
+    justify-content: space-between; /* força o botão pro fim */
+    height: 100%; /* garante que ocupe o quadrado inteiro */
 }
 
 .news-image {
@@ -1060,6 +1064,9 @@ body {
 
 .news-content {
     padding: 24px;
+    flex: 1;                /* ocupa todo o espaço vertical */
+    display: flex;
+    flex-direction: column; /* empilha título, texto e botão */
 }
 
 .news-title {
@@ -1091,6 +1098,8 @@ body {
     align-items: center;
     gap: 8px;
     transition: all 0.3s ease;
+    margin-top: auto; 
+    align-self: flex-start; 
 }
 
 .news-link:hover {
@@ -1158,6 +1167,7 @@ body {
     padding-bottom: 16px;
     scrollbar-width: thin;
     scrollbar-color: var(--primary-gold) var(--medium-gray);
+    align-items: stretch;
 }
 
 .news-card {
@@ -1166,6 +1176,9 @@ body {
     flex: 0 0 auto;
     scroll-snap-align: start;
     transition: transform 0.3s;
+    height: 480px; /* ajusta conforme seu design */
+    display: flex;
+    flex-direction: column;
 }
 
 .news-carousel::-webkit-scrollbar {
@@ -1627,6 +1640,7 @@ body {
     align-items: flex-start;
     gap: 12px;
     color: #ccc;
+    text-decoration: none;
 }
 
 .contact-item i {
@@ -1645,6 +1659,17 @@ body {
 }
 
 .contact-item:hover p {
+    color: var(--primary-gold);
+}
+
+.contact-item a {
+    margin: 0;
+    transition: color 0.3s ease;
+    text-decoration: none;
+    color: #ccc;
+}
+
+.contact-item:hover a {
     color: var(--primary-gold);
 }
 
