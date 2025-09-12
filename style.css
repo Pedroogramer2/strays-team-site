@@ -443,6 +443,11 @@ body {
     padding: 15px 0;
 }
 
+#headerLogo {
+  height: 60px; /* Define uma altura fixa para a imagem */
+  width: auto; /* O "width: auto" faz com que a largura se ajuste automaticamente, mantendo a proporção */
+}
+
 .header.scrolled {
     background: rgba(0, 0, 0, 0.95);
     backdrop-filter: blur(15px);

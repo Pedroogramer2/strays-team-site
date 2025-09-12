@@ -21,6 +21,8 @@ function initAll() {
     initGalleryModal();        // Nova função para o modal da galeria
     initHighlightsButton();    // Nova função para o botão de destaques
     initHeaderLogoVisibility(); // Nova função para a visibilidade do logo
+    initLogoHoverEffect();      // Adiciona esta linha para o efeito de hover
+    initLogoHoverEffect2();
 
     // Mostra que o carregamento foi concluído
     console.log('🎉 STRAYS TEAM website loaded successfully!');
@@ -702,6 +704,44 @@ function initNewsSystem() {
         }
     });
 }
+
+function initLogoHoverEffect() {
+    const headerLogo = document.getElementById('headerLogo');
+    // Salva o caminho da imagem original para poder voltar depois
+    const originalSrc = headerLogo.src;
+    // Defina o caminho para o seu arquivo GIF aqui
+    const gifSrc = 'img/Logo strays animada.gif';
+
+    if (headerLogo) {
+        headerLogo.addEventListener('mouseenter', () => {
+            headerLogo.src = gifSrc;
+        });
+
+        headerLogo.addEventListener('mouseleave', () => {
+            headerLogo.src = originalSrc;
+        });
+    }
+}
+
+function initLogoHoverEffect2() {
+    const headerLogo = document.getElementById('headerLogo2');
+    // Salva o caminho da imagem original para poder voltar depois
+    const originalSrc = headerLogo.src;
+    // Defina o caminho para o seu arquivo GIF aqui
+    const gifSrc = 'img/Logo strays animada.gif';
+
+    if (headerLogo) {
+        headerLogo.addEventListener('mouseenter', () => {
+            headerLogo.src = gifSrc;
+        });
+
+        headerLogo.addEventListener('mouseleave', () => {
+            headerLogo.src = originalSrc;
+        });
+    }
+}
+
+
 
 // Gallery Modal
 function initGalleryModal() {
