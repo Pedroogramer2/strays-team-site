@@ -1,3 +1,15 @@
+@font-face {
+    font-family: 'Raider Crusader Semi-Straight';
+    src: url('/fonts/raidercrusadersemistraight.woff2') format('woff2'), /* Caminho corrigido */
+         url('/fonts/raidercrusadersemistraight.woff') format('woff'),  /* Caminho corrigido */
+         url('/fonts/raidercrusadersemistraight.ttf') format('truetype'); /* Caminho corrigido */
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap; /* Melhoria de performance */
+}
+
+
+
 /* Premium E-sports Website Styles */
 * {
     margin: 0;
@@ -55,6 +67,7 @@
     --medium-gray: #333333;
     --light-gray: #666666;
     --white: #ffffff;
+    --strays-font: 'Raider Crusader Semi-Straight';
 }
 
 body {
@@ -490,6 +503,7 @@ body {
     font-weight: bold;
     color: var(--primary-gold);
     margin: 0;
+    font-family: var(--strays-font);
 }
 
 .brand-slogan {
@@ -673,6 +687,7 @@ body {
     background-clip: text;
     margin-bottom: 16px;
     letter-spacing: 0.1em;
+    font-family: var(--strays-font);
 }
 
 .hero-slogan {
@@ -1568,6 +1583,7 @@ body {
     font-weight: bold;
     color: var(--primary-gold);
     margin: 0;
+    font-family: var(--strays-font);
 }
 
 .footer-brand-slogan {
