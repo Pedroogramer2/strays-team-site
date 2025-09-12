@@ -88,7 +88,7 @@ function initScrollEffects() {
 // Gallery Carousel
 function initGalleryCarousel() {
     const slides = [{
-            image: '/img/Strays Feminina Icone.jpg',
+            image: 'img/Strays Feminina Icone.jpg',
             caption: 'Logo da Feminina'
         },
         {
@@ -420,12 +420,12 @@ function initTeamModals() {
         'principal': {
             name: 'STRAYS',
             players: [
-                { name: 'Jogador Principal 1', role: 'Duelista', image: '/img/icone.png' },
-                { name: 'Jogador Principal 2', role: 'Sentinela', image: '/img/icone.png' },
-                { name: 'Jogador Principal 3', role: 'Iniciador', image: '/img/icone.png' },
-                { name: 'Jogador Principal 4', role: 'Controlador', image: '/img/icone.png' },
-                { name: 'Jogador Principal 5', role: 'Flex', image: '/img/icone.png' },
-                { name: 'Jogador Principal 6', role: 'Flex', image: '/img/icone.png' }
+                { name: 'Jogador Principal 1', role: 'Duelista', image: 'img/icone.png' },
+                { name: 'Jogador Principal 2', role: 'Sentinela', image: 'img/icone.png' },
+                { name: 'Jogador Principal 3', role: 'Iniciador', image: 'img/icone.png' },
+                { name: 'Jogador Principal 4', role: 'Controlador', image: 'img/icone.png' },
+                { name: 'Jogador Principal 5', role: 'Flex', image: 'img/icone.png' },
+                { name: 'Jogador Principal 6', role: 'Flex', image: 'img/icone.png' }
             ]
         },
         'core': {
@@ -442,23 +442,23 @@ function initTeamModals() {
         'feminina': {
             name: 'STRAYS FEMININA',
             players: [
-                { name: 'Rissa', role: 'Iniciadora', image: '/img/Strays Feminina Icone.jpg' },
-                { name: 'Luna', role: 'Controladora IGL', image: '/img/Luna lol.jpg' },
-                { name: 'Stehff', role: 'Sentinela', image: '/img/Strays Feminina Icone.jpg' },
-                { name: 'Ishtar', role: 'Flex', image: '/img/Strays Feminina Icone.jpg' },
-                { name: 'Cold', role: 'Duelista', image: '/img/Strays Feminina Icone.jpg' },
-                { name: 'Sexto', role: 'Sexto', image: '/img/Strays Feminina Icone.jpg' }
+                { name: 'Rissa', role: 'Iniciadora', image: 'img/Strays Feminina Icone.jpg' },
+                { name: 'Luna', role: 'Controladora IGL', image: 'img/Luna lol.jpg' },
+                { name: 'Stehff', role: 'Sentinela', image: 'img/Strays Feminina Icone.jpg' },
+                { name: 'Ishtar', role: 'Flex', image: 'img/Strays Feminina Icone.jpg' },
+                { name: 'Cold', role: 'Duelista', image: 'img/Strays Feminina Icone.jpg' },
+                { name: 'Sexto', role: 'Sexto', image: 'img/Strays Feminina Icone.jpg' }
             ]
         },
         'academy': {
             name: 'STRAYS ACADEMY',
             players: [
-                { name: 'Virgula', role: 'Iniciador', image: '/img/Virgula teste player card.jpg' },
-                { name: 'Academy 2', role: 'Sentinela', image: '/img/Strays Academy Icone.jpg' },
-                { name: 'Academy 3', role: 'Duelista', image: '/img/Strays Academy Icone.jpg' },
-                { name: 'Academy 4', role: 'Controlador', image: '/img/Strays Academy Icone.jpg' },
-                { name: 'Academy 5', role: 'Flex', image: '/img/Strays Academy Icone.jpg' },
-                { name: 'Academy 6', role: 'Flex', image: '/img/Strays Academy Icone.jpg' }
+                { name: 'Virgula', role: 'Iniciador', image: 'img/Virgula teste player card.jpg' },
+                { name: 'Academy 2', role: 'Sentinela', image: 'img/Strays Academy Icone.jpg' },
+                { name: 'Academy 3', role: 'Duelista', image: 'img/Strays Academy Icone.jpg' },
+                { name: 'Academy 4', role: 'Controlador', image: 'img/Strays Academy Icone.jpg' },
+                { name: 'Academy 5', role: 'Flex', image: 'img/Strays Academy Icone.jpg' },
+                { name: 'Academy 6', role: 'Flex', image: 'img/Strays Academy Icone.jpg' }
             ]
         }
     };
@@ -595,13 +595,13 @@ function initNewsSystem() {
     const newsData = [{
             title: "Adquira agora a jersey da Strays",
             date: "2025-09-10",
-            image: "/img/Strays Jersey gif.gif",
+            image: "img/Strays Jersey gif.gif",
             excerpt: "Depois de muitos pedidos, a Strays finalmente coloca em produção a Jersey da Strays. Garanta agora a sua na pré-venda, e fique ligado. Em breve, o Manguito estará entre nós!",
         },
         {
             title: "Reformulação do Academy",
             date: "2025-09-09",
-            image: "/img/Strays Academy Icone.jpg",
+            image: "img/Strays Academy Icone.jpg",
             excerpt: "O Academy abre suas portas para novos talentos. Para aqueles que tem foco e muita sede de vitória, entre em contato caso queira fazer parte e aprender com profissionais.",
         },
         {
@@ -613,7 +613,7 @@ function initNewsSystem() {
         {
             title: "A STRAYS ESTÁ NO VALORANT!",
             date: "2025-01-05",
-            image: "/img/Chamada Strays para todas as Lines.png",
+            image: "img/Chamada Strays para todas as Lines.png",
             excerpt: "🔥 Lineup Principal, 💥 Lineup Feminina, 🚀 Lineup Academy. Cada lineup foi construída com dedicação, visão e paixão pelo jogo. A Strays não veio para brincar — veio para vencer.",
         }
     ];
