@@ -23,6 +23,7 @@ function initAll() {
     initHeaderLogoVisibility(); // Nova função para a visibilidade do logo
     initLogoHoverEffect();      // Adiciona esta linha para o efeito de hover
     initLogoHoverEffect2();
+    initGalleryGridModal();
 
     // Mostra que o carregamento foi concluído
     console.log('🎉 STRAYS TEAM website loaded successfully!');
@@ -780,6 +781,84 @@ function initGalleryModal() {
     document.addEventListener('keydown', function(event) {
         if (event.key === "Escape" && galleryModal && galleryModal.classList.contains('is-visible')) {
             galleryModal.classList.remove('is-visible');
+            document.body.style.overflow = '';
+        }
+    });
+}
+
+function initGalleryGridModal() {
+    const galleryImages = [
+        { src: 'img/Strays Feminina Icone.jpg', alt: 'Logo da Feminina' },
+        { src: 'https://images.unsplash.com/photo-1633545495735-25df17fb9f31?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzh8MHwxfHNlYXJjaHw0fHxlc3BvcnRzfGVufDB8fHx8MTc1NzE5MTM1Nnww&ixlib=rb-4.1.0&q=85&w=1200&h=600&fit=crop', alt: 'State-of-the-art practice facility' },
+        { src: 'https://images.unsplash.com/photo-1636036824578-d0d300a4effb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzh8MHwxfHNlYXJjaHwzfHxlc3BvcnRzfGVufDB8fHx8MTc1NzE5MTM1Nnww&ixlib=rb-4.1.0&q=85&w=1200&h=600&fit=crop', alt: 'Professional gaming setup' },
+        { src: 'https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg?w=1200&h=600&fit=crop', alt: 'Team training session' }
+    ];
+
+    const gridModal = document.getElementById('galleryGridModal');
+    const gridBody = document.getElementById('gallery-grid-body');
+    const closeBtn = gridModal ? gridModal.querySelector('.close-button') : null;
+
+    const openGridBtn = document.querySelector('.gallery-actions .btn-premium');
+    if (openGridBtn && gridModal && gridBody) {
+        openGridBtn.addEventListener('click', function() {
+            gridBody.innerHTML = galleryImages.map(img => `
+                <img src="${img.src}" alt="${img.alt}" class="gallery-thumb-grid" style="width:180px; height:120px; object-fit:cover; border-radius:8px; cursor:pointer; transition:transform .2s;">
+            `).join('');
+            gridModal.classList.add('is-visible');
+            document.body.style.overflow = 'hidden';
+        });
+
+        gridBody.addEventListener('click', function(e) {
+            if (e.target.classList.contains('gallery-thumb-grid')) {
+                const galleryModal = document.getElementById('galleryModal');
+                const galleryModalBody = document.getElementById('gallery-modal-body');
+                if (galleryModal && galleryModalBody) {
+
+                    // 1. Fecha o modal de grade ANTES de abrir o outro
+                    gridModal.classList.remove('is-visible');
+
+                    // 2. Cria a imagem para o modal grande
+                    const modalImage = document.createElement('img');
+                    modalImage.src = e.target.src;
+                    modalImage.alt = e.target.alt;
+                    modalImage.style.cssText = "max-width:100%; max-height:70vh; border-radius:12px; cursor:pointer;";
+
+                    // Limpa o conteúdo anterior e adiciona a nova imagem
+                    galleryModalBody.innerHTML = '';
+                    galleryModalBody.appendChild(modalImage);
+
+                    // Adiciona um ouvinte de evento para fechar o modal ao clicar na imagem
+                    modalImage.addEventListener('click', function(e) {
+                        e.stopPropagation(); // Evita que o clique seja capturado pelo modal
+                        galleryModal.classList.remove('is-visible');
+                        document.body.style.overflow = '';
+                    });
+
+                    // 3. Mostra o modal da imagem grande
+                    galleryModal.classList.add('is-visible');
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+        });
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            gridModal.classList.remove('is-visible');
+            document.body.style.overflow = '';
+        });
+    }
+    if (gridModal) {
+        gridModal.addEventListener('click', function(event) {
+            if (event.target === gridModal) {
+                gridModal.classList.remove('is-visible');
+                document.body.style.overflow = '';
+            }
+        });
+    }
+    document.addEventListener('keydown', function(event) {
+        if (event.key === "Escape" && gridModal && gridModal.classList.contains('is-visible')) {
+            gridModal.classList.remove('is-visible');
             document.body.style.overflow = '';
         }
     });

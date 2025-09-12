@@ -1880,6 +1880,11 @@ body {
             align-items: center;
             justify-content: center;
         }
+
+        .modal-content-gallery-grid {
+            width: 80%;
+            height: 80%;
+        }
         
         .modal.is-visible {
             visibility: visible;
