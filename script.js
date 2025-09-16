@@ -515,7 +515,7 @@ function initTeamModals() {
         'academy': {
             name: 'STRAYS ACADEMY',
             players: [
-                { name: 'Virgula', role: 'Iniciador', image: 'img/Virgula teste player card.jpg' },
+                { name: 'Virgula', role: 'Iniciador', image: 'img/Pedro Line (1).png' },
                 { name: 'Academy 2', role: 'Sentinela', image: 'img/Strays Academy Icone.jpg' },
                 { name: 'Academy 3', role: 'Duelista', image: 'img/Strays Academy Icone.jpg' },
                 { name: 'Academy 4', role: 'Controlador', image: 'img/Strays Academy Icone.jpg' },

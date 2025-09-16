@@ -339,6 +339,7 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    text-decoration: none;
 }
 
 .btn-secondary:hover {
@@ -2070,7 +2071,6 @@ body {
             height: 550px;
             object-fit: cover;
             margin-top: 190px;
-            background: #222;
             display: block;
             margin-left: auto;
             margin-right: auto;
