@@ -152,11 +152,11 @@
             <h2 id="modal-team-name">Nome do Time</h2>
         </div>
         <div class="carousel-player-modal">
-            <button class="player-prev-btn btn-premium" aria-label="Anterior" style="min-width:40px;">&#8592;</button>
+            <button class="carousel-nav prev-btn-players glass-effect"><i class="fas fa-chevron-left"></i></button>
             <div id="modal-player-container" class="modal-player-container"></div>
-            <button class="player-next-btn btn-premium" aria-label="Próximo" style="min-width:40px;">&#8594;</button>
+            <button class="carousel-nav next-btn-players glass-effect"><i class="fas fa-chevron-right"></i></button>
         </div>
-        <div id="carousel-indicator" style="text-align:center; margin-top:12px; color:var(--primary-gold); font-weight:bold;"></div>
+        <div id="carousel-indicator" style="text-align:center; margin-top:12px; color:var(--primary-gold); font-weight:bold; opacity: 0;"></div>
     </div>
 </div>
 
@@ -305,26 +305,22 @@
 
             <!-- Team Stats Summary -->
             <div class="team-summary glass-effect fade-in">
-                <h3 class="summary-title text-glow">Estatísticas das Lines</h3>
-                <div class="summary-stats">
-                    <div class="summary-stat tooltip">
-                        <div class="summary-value">6215</div>
-                        <div class="summary-label">Total de kills dos times</div>
-                        <span class="tooltiptext">Contagem de kills combinadas</span>
-                    </div>
-                    <div class="summary-stat tooltip">
-                        <div class="summary-value">1.41</div>
-                        <div class="summary-label">K/D médio</div>
-                        <span class="tooltiptext">Média de kill/death ratio dos times</span>
-                    </div>
-                    <div class="summary-stat tooltip">
-                        <div class="summary-value">4736</div>
-                        <div class="summary-label">Total de Assistências</div>
-                        <span class="tooltiptext">Contagem de assistência combinadas</span>
-                    </div>
-                </div>
-            </div>
+    <h3 class="summary-title text-glow">Estatísticas das Lines</h3>
+    <div class="summary-stats">
+        <div class="summary-stat">
+            <div class="summary-value" data-target="6215">0</div>
+            <div class="summary-label">Total de Kills</div>
         </div>
+        <div class="summary-stat">
+            <div class="summary-value" data-target="141">0</div>
+            <div class="summary-label">K/D Médio</div>
+        </div>
+        <div class="summary-stat">
+            <div class="summary-value" data-target="4736">0</div>
+            <div class="summary-label">Total de Assistências</div>
+        </div>
+    </div>
+</div>
     </section>
     
     <!-- Store Section -->
@@ -627,7 +623,7 @@ o cenário de eSports e inspirar a próxima geração de jogadores.
 </div>
 
 <div id="galleryGridModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="gallery-grid-modal-title">
-  <div class="modal-content-gallery-grid" style="background:#181818;">
+  <div class="modal-content-gallery-grid">
     <button class="close-button" aria-label="Fechar modal">&times;</button>
     <div class="modal-header">
       <h2 id="gallery-grid-modal-title">STRAYS Gallery</h2>

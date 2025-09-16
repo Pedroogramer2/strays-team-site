@@ -573,7 +573,7 @@ body {
 
 /* Hero Section */
 .hero-section {
-    min-height: 100vh;
+    min-height: 800px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1018,6 +1018,37 @@ body {
     text-align: center;
 }
 
+/* --- Novos estilos para os contadores animados --- */
+.summary-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+}
+
+.summary-stat {
+    text-align: center;
+}
+
+.summary-value {
+    font-size: 48px;
+    font-weight: bold;
+    color: var(--white);
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.summary-stat:hover .summary-value {
+    color: var(--primary-gold);
+    transform: scale(1.1);
+}
+
+.summary-label {
+    color: var(--primary-gold);
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
 .summary-title {
     font-size: 36px;
     font-weight: bold;
@@ -1388,6 +1419,14 @@ body {
 
 .next-btn {
     right: 16px;
+}
+
+.prev-btn-players {
+    right: 800px;
+}
+
+.next-btn-players {
+    left: 800px;
 }
 
 .image-counter {
@@ -1968,17 +2007,12 @@ body {
         }
 
         .modal-content {
-            background-color: var(--medium-gray);
             margin: 32px auto;
             padding: 35px;
-            border-top: 3px solid var(--primary-gold);
-            width: 30%;
-            border-radius: 10px;
             position: relative;
-            box-shadow: 0 5px 30px rgba(0,0,0,0.8);
             transform: translateY(-30px);
             transition: transform var(--transition-speed-slow) cubic-bezier(0.165, 0.84, 0.44, 1);
-            max-height: 80vh; 
+            height: 800px; 
         }
 
         .modal.is-visible .modal-content {
@@ -1989,7 +2023,6 @@ body {
             text-align: center;
             margin-bottom: 30px;
             padding-bottom: 20px;
-            border-bottom: 1px solid var(--light-gray);
         }
         
         .modal-header h2 {
@@ -2003,7 +2036,7 @@ body {
             color: var(--light-gray);
             position: absolute;
             top: 15px;
-            right: 20px;
+            left: 800px;
             font-size: 40px;
             line-height: 1;
             transition: color var(--transition-speed-fast) ease, transform var(--transition-speed-fast) ease;
@@ -2029,15 +2062,14 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center; /* Centraliza verticalmente */
-    height: 100%;
 
         }
 
         .player-info-card img {
-            width: 235px;
-            height: 280px;
+            width: 300px;
+            height: 550px;
             object-fit: cover;
-            margin-bottom: 10px;
+            margin-top: 190px;
             background: #222;
             display: block;
             margin-left: auto;
@@ -2055,7 +2087,6 @@ body {
 
         .modal-player-container {
             flex: 1;
-            min-width: 220px;
             display: flex;
             flex-direction: column;
             align-items: center;

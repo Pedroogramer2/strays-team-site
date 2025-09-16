@@ -25,6 +25,7 @@ function initAll() {
     initLogoHoverEffect();
     initLogoHoverEffect2();
     initGalleryGridModal();
+    initNumberCounters();
 
     // Mostra que o carregamento foi concluído
     console.log('🎉 STRAYS TEAM website loaded successfully!');
@@ -530,8 +531,8 @@ function initTeamModals() {
         const modalTeamName = document.getElementById('modal-team-name');
         const modalPlayerContainer = document.getElementById('modal-player-container');
         const closeModalButton = modal.querySelector('.close-button');
-        const prevBtn = modal.querySelector('.player-prev-btn');
-        const nextBtn = modal.querySelector('.player-next-btn');
+        const prevBtn = modal.querySelector('.carousel-nav.prev-btn-players.glass-effect');
+        const nextBtn = modal.querySelector('.carousel-nav.next-btn-players.glass-effect');
         const indicator = document.getElementById('carousel-indicator');
         let lastFocusedElement;
         let currentPlayers = [];
@@ -932,6 +933,54 @@ function initGalleryGridModal() {
             gridModal.classList.remove('is-visible');
             document.body.style.overflow = '';
         }
+    });
+}
+
+// Função para iniciar a animação dos contadores numéricos
+function initNumberCounters() {
+    const counters = document.querySelectorAll('.summary-value');
+    const speed = 300;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const counter = entry.target;
+                const target = +counter.getAttribute('data-target');
+                const isDecimal = target.toString().length > 5;
+
+                const animate = () => {
+                    const count = +counter.innerText.replace('.', '');
+                    const increment = target / speed;
+
+                    if (count < target) {
+                        const newCount = Math.ceil(count + increment);
+                        if (isDecimal) {
+                            counter.innerText = (newCount / 100).toFixed(2);
+                        } else {
+                            counter.innerText = newCount;
+                        }
+                        setTimeout(animate, 10);
+                    } else {
+                        if (isDecimal) {
+                            counter.innerText = (target / 100).toFixed(2);
+                        } else {
+                            counter.innerText = target;
+                        }
+                    }
+                };
+
+                animate();
+                observer.unobserve(counter); // Para a animação após a primeira vez
+            }
+        });
+    }, {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.5
+    });
+
+    counters.forEach(counter => {
+        observer.observe(counter);
     });
 }
 
