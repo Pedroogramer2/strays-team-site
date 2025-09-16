@@ -20,6 +20,7 @@ function initAll() {
     initNewsSystem();          // Nova função para as notícias
     initGalleryModal();        // Nova função para o modal da galeria
     initHighlightsButton();    // Nova função para o botão de destaques
+    initLojaButton()
     initHeaderLogoVisibility(); // Nova função para a visibilidade do logo
     initLogoHoverEffect();      // Adiciona esta linha para o efeito de hover
     initLogoHoverEffect2();
@@ -369,7 +370,7 @@ function initMouseEffects() {
         });
     }
 
-    const interactiveElements = document.querySelectorAll('button, a, .player-card, .news-card, .sponsor-card');
+    const interactiveElements = document.querySelectorAll('button, a, .player-card, .news-card, .sponsor-card, .store-banner');
     interactiveElements.forEach(element => {
         element.addEventListener('mouseenter', function() {
             this.style.transition = 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
@@ -393,7 +394,7 @@ function initIntersectionObserver() {
         });
     }, observerOptions);
 
-    const animatedElements = document.querySelectorAll('.player-card, .news-card, .sponsor-card, .section-header');
+    const animatedElements = document.querySelectorAll('.player-card, .news-card, .sponsor-card, .section-header, .store-banner');
     animatedElements.forEach(el => observer.observe(el));
 }
 
@@ -589,6 +590,16 @@ function initHighlightsButton() {
     if (highlightsBtn) {
         highlightsBtn.addEventListener('click', function() {
             window.open('https://www.youtube.com/@STRAYSTEAM', '_blank');
+        });
+    }
+}
+
+// Loja Button
+function initLojaButton() {
+    const LojaBtn = document.getElementById('LojaBtn');
+    if (LojaBtn) {
+        LojaBtn.addEventListener('click', function() {
+            window.open('https://minidrop.com.br/loja/times/', '_blank');
         });
     }
 }
