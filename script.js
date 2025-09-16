@@ -15,14 +15,14 @@ function initAll() {
     initParallaxEffects();
     initTooltips();
     initMouseEffects();
-    initIntersectionObserver(); // Nova função para o IntersectionObserver
-    initTeamModals();          // Nova função para os modais de time
-    initNewsSystem();          // Nova função para as notícias
-    initGalleryModal();        // Nova função para o modal da galeria
-    initHighlightsButton();    // Nova função para o botão de destaques
-    initLojaButton()
-    initHeaderLogoVisibility(); // Nova função para a visibilidade do logo
-    initLogoHoverEffect();      // Adiciona esta linha para o efeito de hover
+    initIntersectionObserver();
+    initTeamModals();
+    initNewsSystem();
+    initGalleryModal();
+    initHighlightsButton();
+    initLojaButton();
+    initHeaderLogoVisibility();
+    initLogoHoverEffect();
     initLogoHoverEffect2();
     initGalleryGridModal();
 
@@ -89,90 +89,147 @@ function initScrollEffects() {
     });
 }
 
+// Galeria de dados centralizada (AGORA COM SUPORTE A VÍDEOS)
+const galleryData = [
+    { src: 'media/Strays bg.mp4', alt: 'Logo da Line Feminina', caption: 'Logo da Line Feminina', type: 'video' },
+    { src: 'https://images.unsplash.com/photo-1633545495735-25df17fb9f31?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzh8MHwxfHNlYXJjaHw0fHxlc3BvcnRzfGVufDB8fHx8MTc1NzE5MTM1Nnww&ixlib=rb-4.1.0&q=85&w=1200&h=600&fit=crop', alt: 'Instalação de treino de ponta', caption: 'Instalação de treino de ponta', type: 'image' },
+    { src: 'https://images.unsplash.com/photo-1636036824578-d0d300a4effb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzh8MHwxfHNlYXJjaHwzfHxlc3BvcnRzfGVufDB8fHx8MTc1NzE5MTM1Nnww&ixlib=rb-4.1.0&q=85&w=1200&h=600&fit=crop', alt: 'Configuração de jogo profissional', caption: 'Configuração de jogo profissional', type: 'image' },
+    { src: 'https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg?w=1200&h=600&fit=crop', alt: 'Sessão de treino do time', caption: 'Sessão de treino do time', type: 'image' }
+    // EXEMPO DE COMO ADICIONAR VÍDEOS:
+    // { src: 'media/seu_video_aqui.mp4', alt: 'Descrição do vídeo', caption: 'Legenda do vídeo', type: 'video' },
+    // { src: 'media/outro_video.mp4', alt: 'Outra descrição', caption: 'Outra legenda', type: 'video' }
+];
+
 // Gallery Carousel
 function initGalleryCarousel() {
-    const slides = [{
-            image: 'img/Strays Feminina Icone.jpg',
-            caption: 'Logo da Feminina'
-        },
-        {
-            image: 'https://images.unsplash.com/photo-1633545495735-25df17fb9f31?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzh8MHwxfHNlYXJjaHw0fHxlc3BvcnRzfGVufDB8fHx8MTc1NzE5MTM1Nnww&ixlib=rb-4.1.0&q=85&w=1200&h=600&fit=crop',
-            caption: 'State-of-the-art practice facility'
-        },
-        {
-            image: 'https://images.unsplash.com/photo-1636036824578-d0d300a4effb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzh8MHwxfHNlYXJjaHwzfHxlc3BvcnRzfGVufDB8fHx8MTc1NzE5MTM1Nnww&ixlib=rb-4.1.0&q=85&w=1200&h=600&fit=crop',
-            caption: 'Professional gaming setup'
-        },
-        {
-            image: 'https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg?w=1200&h=600&fit=crop',
-            caption: 'Team training session'
-        }
-    ];
-
-    let currentSlide = 0;
     const carouselContainer = document.querySelector('.carousel-container');
-    const dots = document.querySelectorAll('.dot');
-    const thumbnails = document.querySelectorAll('.thumbnail');
-    const prevBtn = document.querySelector('.prev-btn');
-    const nextBtn = document.querySelector('.next-btn');
-    const currentImageSpan = document.querySelector('.current-image');
+    const dotsContainer = document.querySelector('.carousel-dots');
+    const thumbnailsContainer = document.querySelector('.gallery-thumbnails');
     const totalImagesSpan = document.querySelector('.total-images');
 
-    if (carouselContainer && totalImagesSpan) {
-        totalImagesSpan.textContent = slides.length;
-
-        function updateCarousel() {
-            const slide = carouselContainer.querySelector('.carousel-slide');
-            if (slide) {
-                const img = slide.querySelector('img');
-                const title = slide.querySelector('.caption-title');
-
-                if (img) img.src = slides[currentSlide].image;
-                if (title) title.textContent = slides[currentSlide].caption;
-            }
-
-            dots.forEach((dot, index) => {
-                dot.classList.toggle('active', index === currentSlide);
-            });
-
-            thumbnails.forEach((thumb, index) => {
-                thumb.classList.toggle('active', index === currentSlide);
-            });
-
-            if (currentImageSpan) {
-                currentImageSpan.textContent = currentSlide + 1;
-            }
-        }
-
-        function nextSlide() {
-            currentSlide = (currentSlide + 1) % slides.length;
-            updateCarousel();
-        }
-
-        function prevSlide() {
-            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
-            updateCarousel();
-        }
-
-        function goToSlide(index) {
-            currentSlide = index;
-            updateCarousel();
-        }
-
-        if (nextBtn) nextBtn.addEventListener('click', nextSlide);
-        if (prevBtn) prevBtn.addEventListener('click', prevSlide);
-
-        dots.forEach((dot, index) => {
-            dot.addEventListener('click', () => goToSlide(index));
-        });
-
-        thumbnails.forEach((thumb, index) => {
-            thumb.addEventListener('click', () => goToSlide(index));
-        });
-
-        setInterval(nextSlide, 5000);
-        updateCarousel();
+    if (!carouselContainer || !dotsContainer || !thumbnailsContainer || !totalImagesSpan) {
+        console.error('Um ou mais elementos da galeria não foram encontrados.');
+        return;
     }
+
+    // Limpa o conteúdo existente para recriar dinamicamente
+    carouselContainer.innerHTML = '';
+    dotsContainer.innerHTML = '';
+    thumbnailsContainer.innerHTML = '';
+    totalImagesSpan.textContent = galleryData.length;
+
+    // Cria os slides e os pontos (dots)
+    galleryData.forEach((item, index) => {
+        // Conteúdo do slide (imagem ou vídeo)
+        let mediaContent = '';
+        if (item.type === 'video') {
+            mediaContent = `<video src="${item.src}" alt="${item.alt}" autoplay muted loop></video>`;
+        } else {
+            mediaContent = `<img src="${item.src}" alt="${item.alt}">`;
+        }
+
+        // Cria o slide principal
+        const slide = document.createElement('div');
+        slide.className = `carousel-slide${index === 0 ? ' active' : ''}`;
+        slide.innerHTML = `
+            ${mediaContent}
+            <div class="slide-caption">
+                <h3 class="caption-title text-glow">${item.caption}</h3>
+                <div class="caption-actions">
+                    <button class="btn-premium">
+                        <i class="fas fa-play"></i>
+                        Veja completo
+                    </button>
+                    <button class="btn-secondary">
+                        <i class="fas fa-expand"></i>
+                        Expandir
+                    </button>
+                </div>
+            </div>
+        `;
+        carouselContainer.appendChild(slide);
+
+        // Cria o ponto (dot) de navegação
+        const dot = document.createElement('button');
+        dot.className = `dot${index === 0 ? ' active' : ''}`;
+        dot.dataset.slide = index;
+        dotsContainer.appendChild(dot);
+    });
+
+    // Adiciona os botões de navegação e o contador
+    carouselContainer.innerHTML += `
+        <button class="carousel-nav prev-btn glass-effect" aria-label="Anterior">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="carousel-nav next-btn glass-effect" aria-label="Próximo">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="image-counter glass-effect">
+            <span class="current-image">1</span> / <span class="total-images">${galleryData.length}</span>
+        </div>
+    `;
+
+    // Cria as miniaturas (thumbnails)
+    galleryData.forEach((item, index) => {
+        let mediaContent = '';
+        if (item.type === 'video') {
+            mediaContent = `<video src="${item.src}" muted autoplay loop></video>`;
+        } else {
+            mediaContent = `<img src="${item.src}" alt="${item.alt}">`;
+        }
+
+        const thumbnail = document.createElement('div');
+        thumbnail.className = `thumbnail glass-effect${index === 0 ? ' active' : ''}`;
+        thumbnail.dataset.slide = index;
+        thumbnail.innerHTML = `
+            ${mediaContent}
+            <div class="thumbnail-overlay">
+                <i class="fas fa-play"></i>
+            </div>
+        `;
+        thumbnailsContainer.appendChild(thumbnail);
+    });
+
+    // Pega as referências dos novos elementos criados
+    const slides = document.querySelectorAll('.carousel-slide');
+    const dots = document.querySelectorAll('.dot');
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    const prevBtnNew = document.querySelector('.carousel-container .prev-btn');
+    const nextBtnNew = document.querySelector('.carousel-container .next-btn');
+    const currentImageSpan = document.querySelector('.current-image');
+    
+    let currentSlide = 0;
+
+    const updateCarousel = () => {
+        slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+        dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+        thumbnails.forEach((t, i) => t.classList.toggle('active', i === currentSlide));
+        if (currentImageSpan) currentImageSpan.textContent = currentSlide + 1;
+
+        // Pausa todos os vídeos e depois inicia o do slide ativo
+        document.querySelectorAll('.carousel-slide video').forEach(video => {
+            video.pause();
+        });
+        const activeVideo = document.querySelector('.carousel-slide.active video');
+        if (activeVideo) {
+            activeVideo.currentTime = 0; // Reinicia o vídeo
+            activeVideo.play();
+        }
+    };
+
+    const goToSlide = (index) => {
+        currentSlide = index;
+        updateCarousel();
+    };
+
+    prevBtnNew.addEventListener('click', () => goToSlide((currentSlide - 1 + galleryData.length) % galleryData.length));
+    nextBtnNew.addEventListener('click', () => goToSlide((currentSlide + 1) % galleryData.length));
+
+    dots.forEach((dot, index) => dot.addEventListener('click', () => goToSlide(index)));
+    thumbnails.forEach((thumb, index) => thumb.addEventListener('click', () => goToSlide(index)));
+
+    setInterval(() => nextBtnNew.click(), 5000);
+    updateCarousel(); // Inicializa o carrossel
 }
 
 // Player Card Interactions
@@ -753,8 +810,6 @@ function initLogoHoverEffect2() {
     }
 }
 
-
-
 // Gallery Modal
 function initGalleryModal() {
     const galleryModal = document.getElementById('galleryModal');
@@ -762,9 +817,19 @@ function initGalleryModal() {
     const closeGalleryModalBtn = galleryModal ? galleryModal.querySelector('.close-button') : null;
 
     function openGalleryModal() {
-        const activeSlide = document.querySelector('.gallery-carousel .carousel-slide.active img');
-        if (activeSlide && galleryModal && galleryModalBody) {
-            galleryModalBody.innerHTML = `<img src="${activeSlide.src}" alt="${activeSlide.alt}" style="max-width:100%;max-height:70vh;border-radius:12px;">`;
+        const activeSlide = document.querySelector('.gallery-carousel .carousel-slide.active');
+        const slideIndex = Array.from(document.querySelectorAll('.carousel-slide')).indexOf(activeSlide);
+        const item = galleryData[slideIndex];
+
+        if (item && galleryModal && galleryModalBody) {
+            let mediaContent = '';
+            if (item.type === 'video') {
+                mediaContent = `<video src="${item.src}" controls autoplay style="max-width:100%; max-height:70vh; border-radius:12px;"></video>`;
+            } else {
+                mediaContent = `<img src="${item.src}" alt="${item.alt}" style="max-width:100%;max-height:70vh;border-radius:12px;">`;
+            }
+
+            galleryModalBody.innerHTML = mediaContent;
             galleryModal.classList.add('is-visible');
             document.body.style.overflow = 'hidden';
             closeGalleryModalBtn && closeGalleryModalBtn.focus();
@@ -798,13 +863,6 @@ function initGalleryModal() {
 }
 
 function initGalleryGridModal() {
-    const galleryImages = [
-        { src: 'img/Strays Feminina Icone.jpg', alt: 'Logo da Feminina' },
-        { src: 'https://images.unsplash.com/photo-1633545495735-25df17fb9f31?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzh8MHwxfHNlYXJjaHw0fHxlc3BvcnRzfGVufDB8fHx8MTc1NzE5MTM1Nnww&ixlib=rb-4.1.0&q=85&w=1200&h=600&fit=crop', alt: 'State-of-the-art practice facility' },
-        { src: 'https://images.unsplash.com/photo-1636036824578-d0d300a4effb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzh8MHwxfHNlYXJjaHwzfHxlc3BvcnRzfGVufDB8fHx8MTc1NzE5MTM1Nnww&ixlib=rb-4.1.0&q=85&w=1200&h=600&fit=crop', alt: 'Professional gaming setup' },
-        { src: 'https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg?w=1200&h=600&fit=crop', alt: 'Team training session' }
-    ];
-
     const gridModal = document.getElementById('galleryGridModal');
     const gridBody = document.getElementById('gallery-grid-body');
     const closeBtn = gridModal ? gridModal.querySelector('.close-button') : null;
@@ -812,40 +870,42 @@ function initGalleryGridModal() {
     const openGridBtn = document.querySelector('.gallery-actions .btn-premium');
     if (openGridBtn && gridModal && gridBody) {
         openGridBtn.addEventListener('click', function() {
-            gridBody.innerHTML = galleryImages.map(img => `
-                <img src="${img.src}" alt="${img.alt}" class="gallery-thumb-grid" style="width:180px; height:120px; object-fit:cover; border-radius:8px; cursor:pointer; transition:transform .2s;">
-            `).join('');
+            gridBody.innerHTML = galleryData.map(item => {
+                let mediaElement = '';
+                if (item.type === 'video') {
+                    mediaElement = `<video src="${item.src}" muted style="width:100%; height:100%; object-fit:cover;"></video>`;
+                } else {
+                    mediaElement = `<img src="${item.src}" alt="${item.alt}" style="width:100%; height:100%; object-fit:cover;">`;
+                }
+                return `
+                    <div class="gallery-thumb-grid-wrapper" style="width:180px; height:120px; border-radius:8px; overflow:hidden; cursor:pointer; transition:transform .2s;">
+                        ${mediaElement}
+                    </div>
+                `;
+            }).join('');
             gridModal.classList.add('is-visible');
             document.body.style.overflow = 'hidden';
         });
 
         gridBody.addEventListener('click', function(e) {
-            if (e.target.classList.contains('gallery-thumb-grid')) {
+            if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO') {
                 const galleryModal = document.getElementById('galleryModal');
                 const galleryModalBody = document.getElementById('gallery-modal-body');
                 if (galleryModal && galleryModalBody) {
-
-                    // 1. Fecha o modal de grade ANTES de abrir o outro
+                    const src = e.target.src;
+                    const alt = e.target.alt;
+                    
                     gridModal.classList.remove('is-visible');
 
-                    // 2. Cria a imagem para o modal grande
-                    const modalImage = document.createElement('img');
-                    modalImage.src = e.target.src;
-                    modalImage.alt = e.target.alt;
-                    modalImage.style.cssText = "max-width:100%; max-height:70vh; border-radius:12px; cursor:pointer;";
-
-                    // Limpa o conteúdo anterior e adiciona a nova imagem
-                    galleryModalBody.innerHTML = '';
-                    galleryModalBody.appendChild(modalImage);
-
-                    // Adiciona um ouvinte de evento para fechar o modal ao clicar na imagem
-                    modalImage.addEventListener('click', function(e) {
-                        e.stopPropagation(); // Evita que o clique seja capturado pelo modal
-                        galleryModal.classList.remove('is-visible');
-                        document.body.style.overflow = '';
-                    });
-
-                    // 3. Mostra o modal da imagem grande
+                    let modalContent = '';
+                    if (e.target.tagName === 'VIDEO') {
+                        modalContent = `<video src="${src}" controls autoplay style="max-width:100%; max-height:70vh; border-radius:12px;"></video>`;
+                    } else {
+                        modalContent = `<img src="${src}" alt="${alt}" style="max-width:100%; max-height:70vh; border-radius:12px;">`;
+                    }
+                    
+                    galleryModalBody.innerHTML = modalContent;
+                    
                     galleryModal.classList.add('is-visible');
                     document.body.style.overflow = 'hidden';
                 }
