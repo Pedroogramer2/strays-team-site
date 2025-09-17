@@ -93,9 +93,9 @@ function initScrollEffects() {
 // Galeria de dados centralizada (AGORA COM SUPORTE A VÍDEOS)
 const galleryData = [
     { src: 'media/Strays bg.mp4', alt: 'Logo da Line Feminina', caption: 'Logo da Line Feminina', type: 'video' },
-    { src: 'https://images.unsplash.com/photo-1633545495735-25df17fb9f31?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzh8MHwxfHNlYXJjaHw0fHxlc3BvcnRzfGVufDB8fHx8MTc1NzE5MTM1Nnww&ixlib=rb-4.1.0&q=85&w=1200&h=600&fit=crop', alt: 'Instalação de treino de ponta', caption: 'Instalação de treino de ponta', type: 'image' },
-    { src: 'https://images.unsplash.com/photo-1636036824578-d0d300a4effb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzh8MHwxfHNlYXJjaHwzfHxlc3BvcnRzfGVufDB8fHx8MTc1NzE5MTM1Nnww&ixlib=rb-4.1.0&q=85&w=1200&h=600&fit=crop', alt: 'Configuração de jogo profissional', caption: 'Configuração de jogo profissional', type: 'image' },
-    { src: 'https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg?w=1200&h=600&fit=crop', alt: 'Sessão de treino do time', caption: 'Sessão de treino do time', type: 'image' }
+    { src: 'img/camisa_time.png', alt: 'Camisa time', caption: 'Jersey do time', type: 'image' },
+    { src: 'img/Strays jersey gif.gif', alt: 'Jersey animada', caption: 'Jersey da Strays in gif', type: 'image' },
+    { src: 'img/Noticia Taisuke.png', alt: 'Lista dos melhores semanais', caption: 'Top 10 players, segunda semana', type: 'image' }
     // EXEMPO DE COMO ADICIONAR VÍDEOS:
     // { src: 'media/seu_video_aqui.mp4', alt: 'Descrição do vídeo', caption: 'Legenda do vídeo', type: 'video' },
     // { src: 'media/outro_video.mp4', alt: 'Outra descrição', caption: 'Outra legenda', type: 'video' }
@@ -137,10 +137,6 @@ function initGalleryCarousel() {
             <div class="slide-caption">
                 <h3 class="caption-title text-glow">${item.caption}</h3>
                 <div class="caption-actions">
-                    <button class="btn-premium">
-                        <i class="fas fa-play"></i>
-                        Veja completo
-                    </button>
                     <button class="btn-secondary">
                         <i class="fas fa-expand"></i>
                         Expandir
