@@ -841,6 +841,12 @@ body {
     margin: 0 auto;
 }
 
+.section-subtitle-politica {
+    color: #ccc;
+    font-size: 18px;
+    max-width: 900px;
+}
+
 /* Team Section */
 .team-section {
     padding: 80px 0;
