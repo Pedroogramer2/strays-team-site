@@ -841,6 +841,11 @@ body {
     margin: 0 auto;
 }
 
+.section-subtitle-campeonato{
+    color: #ccc;
+    font-size: 18px;
+}
+
 .section-subtitle-politica {
     color: #ccc;
     font-size: 18px;
@@ -1097,6 +1102,18 @@ body {
     margin-bottom: 16px;
     text-align: center;
     font-family: var(--strays-font);
+}
+
+.section-title-campeonato {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 900;
+    background: linear-gradient(45deg, var(--primary-gold), var(--secondary-gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+    text-align: center;
+
 }
 
 .store-cta {

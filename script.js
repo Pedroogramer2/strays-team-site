@@ -26,6 +26,7 @@ function initAll() {
     initLogoHoverEffect2();
     initGalleryGridModal();
     initNumberCounters();
+    initHeaderLogoVisibility2();
 
     // Mostra que o carregamento foi concluído
     console.log('🎉 STRAYS TEAM website loaded successfully!');
@@ -619,6 +620,29 @@ function initTeamModals() {
 function initHeaderLogoVisibility() {
     const logo = document.getElementById('headerLogo');
     const teamSection = document.getElementById('team');
+    if (!logo || !teamSection) return;
+
+    function checkLogoVisibility() {
+        const rect = teamSection.getBoundingClientRect();
+        const sectionTop = rect.top + window.scrollY;
+        const sectionHalf = sectionTop + rect.height / 600;
+        const scrollY = window.scrollY + window.innerHeight / 2;
+        if (scrollY >= sectionHalf) {
+            logo.classList.add('visible');
+        } else {
+            logo.classList.remove('visible');
+        }
+    }
+    logo.classList.remove('visible');
+    window.addEventListener('scroll', checkLogoVisibility);
+    window.addEventListener('resize', checkLogoVisibility);
+    checkLogoVisibility();
+}
+
+// Logo Visibility on scroll
+function initHeaderLogoVisibility2() {
+    const logo = document.getElementById('headerLogo');
+    const teamSection = document.getElementById('campeonato');
     if (!logo || !teamSection) return;
 
     function checkLogoVisibility() {
