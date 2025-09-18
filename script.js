@@ -479,45 +479,45 @@ function initTeamModals() {
         'principal': {
             name: 'STRAYS',
             players: [
-                { name: 'Jogador Principal 1', role: 'Duelista', image: 'img/icone.png' },
-                { name: 'Jogador Principal 2', role: 'Sentinela', image: 'img/icone.png' },
-                { name: 'Jogador Principal 3', role: 'Iniciador', image: 'img/icone.png' },
-                { name: 'Jogador Principal 4', role: 'Controlador', image: 'img/icone.png' },
-                { name: 'Jogador Principal 5', role: 'Flex', image: 'img/icone.png' },
+                { name: 'Brenno7', role: 'Sentinela', image: 'img/10.png' },
+                { name: 'Kitsu', role: 'Iniciador', image: 'img/11.png' },
+                { name: 'NeskWgA', role: 'Controlador', image: 'img/12.png' },
+                { name: 'Ecypse', role: 'Duelista', image: 'img/13.png' },
+                { name: 'Jubzin', role: 'Controlador', image: 'img/Jubzinn.png' },
                 { name: 'Jogador Principal 6', role: 'Flex', image: 'img/icone.png' }
             ]
         },
         'core': {
             name: 'STRAYS CORE',
             players: [
-                { name: 'Jogador Core 1', role: 'Duelista', image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxnYW1pbmd8ZW58MHx8fHwxNzU3MDk5NjAyfDA&ixlib=rb-4.1.0&q=85&w=400&h=400&fit=crop' },
-                { name: 'Jogador Core 2', role: 'Sentinela', image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxnYW1pbmd8ZW58MHx8fHwxNzU3MDk5NjAyfDA&ixlib=rb-4.1.0&q=85&w=400&h=400&fit=crop' },
-                { name: 'Jogador Core 3', role: 'Iniciador', image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxnYW1pbmd8ZW58MHx8fHwxNzU3MDk5NjAyfDA&ixlib=rb-4.1.0&q=85&w=400&h=400&fit=crop' },
-                { name: 'Jogador Core 4', role: 'Controlador', image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxnYW1pbmd8ZW58MHx8fHwxNzU3MDk5NjAyfDA&ixlib=rb-4.1.0&q=85&w=400&h=400&fit=crop' },
-                { name: 'Jogador Core 5', role: 'Flex', image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxnYW1pbmd8ZW58MHx8fHwxNzU3MDk5NjAyfDA&ixlib=rb-4.1.0&q=85&w=400&h=400&fit=crop' },
-                { name: 'Jogador Core 6', role: 'Flex', image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxnYW1pbmd8ZW58MHx8fHwxNzU3MDk5NjAyfDA&ixlib=rb-4.1.0&q=85&w=400&h=400&fit=crop' }
+                { name: 'Venites', role: 'Flex', image: 'img/3.png' },
+                { name: 'Taisuke', role: 'Iniciador', image: 'img/4.png' },
+                { name: 'Theuzin', role: 'Flex', image: 'img/5.png' },
+                { name: 'Higu66', role: 'Flex', image: 'img/6.png' },
+                { name: 'Aattack', role: 'Controlador', image: 'img/7.png' },
+                { name: 'Juca', role: 'Controlador', image: 'img/8.png' },
+                { name: 'Death', role: 'Controlador', image: 'img/9.png' }
             ]
         },
         'feminina': {
             name: 'STRAYS FEMININA',
             players: [
-                { name: 'Rissa', role: 'Iniciadora', image: 'img/Strays Feminina Icone.jpg' },
-                { name: 'Luna', role: 'Controladora IGL', image: 'img/Luna lol.jpg' },
-                { name: 'Stehff', role: 'Sentinela', image: 'img/Strays Feminina Icone.jpg' },
-                { name: 'Ishtar', role: 'Flex', image: 'img/Strays Feminina Icone.jpg' },
-                { name: 'Cold', role: 'Duelista', image: 'img/Strays Feminina Icone.jpg' },
-                { name: 'Sexto', role: 'Sexto', image: 'img/Strays Feminina Icone.jpg' }
+                { name: 'Rissa', role: 'Iniciador', image: 'img/14.png' },
+                { name: 'Cold', role: 'Duelista', image: 'img/15.png' },
+                { name: 'Stehff', role: 'Sentinela', image: 'img/16.png' },
+                { name: 'Luna', role: 'Flex', image: 'img/17.png' },
+                { name: 'Ishtar', role: 'Controlador', image: 'img/18.png' }
             ]
         },
         'academy': {
             name: 'STRAYS ACADEMY',
             players: [
                 { name: 'Virgula', role: 'Iniciador', image: 'img/Pedro Line (1).png' },
-                { name: 'Academy 2', role: 'Sentinela', image: 'img/Strays Academy Icone.jpg' },
-                { name: 'Academy 3', role: 'Duelista', image: 'img/Strays Academy Icone.jpg' },
-                { name: 'Academy 4', role: 'Controlador', image: 'img/Strays Academy Icone.jpg' },
-                { name: 'Academy 5', role: 'Flex', image: 'img/Strays Academy Icone.jpg' },
-                { name: 'Academy 6', role: 'Flex', image: 'img/Strays Academy Icone.jpg' }
+                { name: 'Academy 2', role: 'Sentinela', image: 'img/Strays Academy Icone.png' },
+                { name: 'Academy 3', role: 'Duelista', image: 'img/Strays Academy Icone.png' },
+                { name: 'Academy 4', role: 'Controlador', image: 'img/Strays Academy Icone.png' },
+                { name: 'Academy 5', role: 'Flex', image: 'img/Strays Academy Icone.png' },
+                { name: 'Academy 6', role: 'Flex', image: 'img/Strays Academy Icone.png' }
             ]
         }
     };
