@@ -1,8 +1,8 @@
 @font-face {
     font-family: 'Raider Crusader Semi-Straight';
-    src: url('/fonts/raidercrusadersemistraight.woff2') format('woff2'), /* Caminho corrigido */
-         url('/fonts/raidercrusadersemistraight.woff') format('woff'),  /* Caminho corrigido */
-         url('/fonts/raidercrusadersemistraight.ttf') format('truetype'); /* Caminho corrigido */
+    src: url('fonts/raidercrusadersemistraight.woff2') format('woff2'), /* Caminho corrigido */
+         url('fonts/raidercrusadersemistraight.woff') format('woff'),  /* Caminho corrigido */
+         url('fonts/raidercrusadersemistraight.ttf') format('truetype'); /* Caminho corrigido */
     font-weight: normal;
     font-style: normal;
     font-display: swap; /* Melhoria de performance */
@@ -858,14 +858,19 @@ body {
 }
 
 .players-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    /* Remove grid properties */
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
     gap: 32px;
-    margin-bottom: 64px;
+    padding-bottom: 20px;
 }
 
 .player-card {
-    transition: all 0.4s ease;
+    /* Use flex properties to control the size */
+    flex: 0 0 auto; 
+    scroll-snap-align: start; 
+    width: 260px; /* Or whatever fixed width you prefer */
 }
 
 .player-card:hover {

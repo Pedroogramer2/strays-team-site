@@ -490,10 +490,10 @@ function initTeamModals() {
         'core': {
             name: 'STRAYS CORE',
             players: [
-                { name: 'Venites', role: 'Flex', image: 'img/3.png' },
+                { name: 'Venites', role: 'Duelista', image: 'img/3.png' },
                 { name: 'Taisuke', role: 'Iniciador', image: 'img/4.png' },
                 { name: 'Theuzin', role: 'Flex', image: 'img/5.png' },
-                { name: 'Higu66', role: 'Flex', image: 'img/6.png' },
+                { name: 'Higu66', role: 'Duelista', image: 'img/6.png' },
                 { name: 'Aattack', role: 'Controlador', image: 'img/7.png' },
                 { name: 'Juca', role: 'Controlador', image: 'img/8.png' },
                 { name: 'Death', role: 'Controlador', image: 'img/9.png' }
