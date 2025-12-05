@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Privacidade - Strays Legends</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-[#0f1116] text-white font-sans selection:bg-yellow-500 selection:text-black">
+
+    <aside class="sidebar">
+        <div class="logo"><h1>STRAYS<span class="logo-accent"> LEGENDS</span></h1></div>
+        <nav class="menu">
+            <a href="index.html" class="menu-item"><i data-lucide="arrow-left"></i><span>Voltar</span></a>
+            <a href="index.html#home" class="menu-item"><i data-lucide="home"></i><span>Home</span></a>
+        </nav>
+        <div class="sidebar-footer" style="margin-top: auto; padding: 24px; border-top: 1px solid rgba(255,255,255,0.05);">
+            <div class="footer-links" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+                <a href="ajuda.html" style="font-size: 11px; color: #9ca3af; font-weight: 500;">Ajuda</a>
+                <a href="termos.html" style="font-size: 11px; color: #9ca3af; font-weight: 500;">Termos de Uso</a>
+                <a href="privacidade.html" style="font-size: 11px; color: #9ca3af; font-weight: 500;">Política de Privacidade</a>
+            </div>
+            <p class="copyright" style="font-size: 10px; color: #555;">© 2025 Strays Legends.</p>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="top-bar"></div>
+
+        <div class="max-w-4xl mx-auto px-6 py-12 animate-fadeIn">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-black text-white mb-2 tracking-tight">Política de Privacidade</h1>
+                <p class="text-gray-500 text-sm">Última atualização: 10 de Março de 2025</p>
+            </div>
+
+            <div class="relative bg-[#15171e] rounded-2xl border border-yellow-500/20 p-8 mb-10 overflow-hidden shadow-[0_0_30px_rgba(234,179,8,0.1)] group hover:shadow-[0_0_40px_rgba(234,179,8,0.2)] transition-shadow">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-yellow-600/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+                
+                <div class="flex items-center gap-4 mb-6 relative z-10">
+                    <div class="p-3 bg-yellow-500/10 rounded-xl text-yellow-500 border border-yellow-500/20">
+                        <i data-lucide="shield-check" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white text-lg">Resumo da Nossa Política</h3>
+                        <p class="text-xs text-yellow-500 font-bold uppercase tracking-wider">Transparência Total</p>
+                    </div>
+                </div>
+                
+                <p class="text-gray-400 text-sm mb-6 leading-relaxed relative z-10">
+                    Valorizamos sua privacidade e estamos comprometidos em proteger seus dados pessoais. Esta Política de Privacidade explica como coletamos, usamos e protegemos suas informações quando você utiliza nossa plataforma de campeonatos de jogos eletrônicos.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+                    <div class="flex gap-3 items-start">
+                        <div class="mt-1"><i data-lucide="lock" class="w-4 h-4 text-green-500"></i></div>
+                        <p class="text-sm text-gray-300 font-medium">Protegemos seus dados com criptografia</p>
+                    </div>
+                    <div class="flex gap-3 items-start">
+                        <div class="mt-1"><i data-lucide="eye-off" class="w-4 h-4 text-green-500"></i></div>
+                        <p class="text-sm text-gray-300 font-medium">Nunca vendemos suas informações pessoais</p>
+                    </div>
+                    <div class="flex gap-3 items-start">
+                        <div class="mt-1"><i data-lucide="user-check" class="w-4 h-4 text-green-500"></i></div>
+                        <p class="text-sm text-gray-300 font-medium">Você controla seus dados</p>
+                    </div>
+                    <div class="flex gap-3 items-start">
+                        <div class="mt-1"><i data-lucide="server" class="w-4 h-4 text-green-500"></i></div>
+                        <p class="text-sm text-gray-300 font-medium">Armazenamento seguro em servidores protegidos</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+
+                <div class="bg-[#15171e] rounded-2xl border border-white/5 p-6 hover:border-white/10 transition-colors">
+                    <h3 class="font-bold text-white mb-4 text-lg flex items-center gap-3">
+                        <div class="p-2 bg-blue-500/10 rounded-lg"><i data-lucide="database" class="w-5 h-5 text-blue-500"></i></div>
+                        1. Informações que Coletamos
+                    </h3>
+                    
+                    <div class="space-y-2">
+                        <div class="border border-white/5 rounded-xl overflow-hidden bg-[#0f1116]/50">
+                            <button onclick="togglePrivacy('priv-1-1')" class="w-full flex justify-between items-center p-4 text-left hover:bg-white/5 transition-colors">
+                                <span class="text-sm font-bold text-gray-300">1.1 Informações Fornecidas por Você</span>
+                                <i id="icon-priv-1-1" data-lucide="chevron-down" class="w-4 h-4 text-gray-600"></i>
+                            </button>
+                            <div id="priv-1-1" class="hidden px-4 pb-4 text-gray-400 text-sm border-t border-white/5 pt-3 leading-relaxed animate-fadeIn">
+                                Coletamos as seguintes informações que você nos fornece diretamente:<br>
+                                • <strong>Informações de registro:</strong> nome, endereço de e-mail, data de nascimento, nome de usuário<br>
+                                • <strong>Informações de perfil:</strong> foto, biografia, links para redes sociais<br>
+                                • <strong>Informações de pagamento:</strong> dados bancários para pagamento de prêmios<br>
+                                • <strong>Comunicações:</strong> mensagens enviadas através de nossos canais de suporte
+                            </div>
+                        </div>
+
+                        <div class="border border-white/5 rounded-xl overflow-hidden bg-[#0f1116]/50">
+                            <button onclick="togglePrivacy('priv-1-2')" class="w-full flex justify-between items-center p-4 text-left hover:bg-white/5 transition-colors">
+                                <span class="text-sm font-bold text-gray-300">1.2 Informações Coletadas Automaticamente</span>
+                                <i id="icon-priv-1-2" data-lucide="chevron-down" class="w-4 h-4 text-gray-600"></i>
+                            </button>
+                            <div id="priv-1-2" class="hidden px-4 pb-4 text-gray-400 text-sm border-t border-white/5 pt-3 leading-relaxed animate-fadeIn">
+                                • <strong>Dados de uso:</strong> páginas visitadas, tempo gasto na plataforma, ações realizadas<br>
+                                • <strong>Informações do dispositivo:</strong> tipo de dispositivo, sistema operacional, navegador<br>
+                                • <strong>Informações de localização:</strong> país e região baseados no seu endereço IP<br>
+                                • <strong>Cookies:</strong> conforme descrito em nossa Política de Cookies
+                            </div>
+                        </div>
+
+                        <div class="border border-white/5 rounded-xl overflow-hidden bg-[#0f1116]/50">
+                            <button onclick="togglePrivacy('priv-1-3')" class="w-full flex justify-between items-center p-4 text-left hover:bg-white/5 transition-colors">
+                                <span class="text-sm font-bold text-gray-300">1.3 Informações de Terceiros</span>
+                                <i id="icon-priv-1-3" data-lucide="chevron-down" class="w-4 h-4 text-gray-600"></i>
+                            </button>
+                            <div id="priv-1-3" class="hidden px-4 pb-4 text-gray-400 text-sm border-t border-white/5 pt-3 leading-relaxed animate-fadeIn">
+                                Podemos receber informações sobre você de terceiros:<br>
+                                • <strong>Plataformas de jogos:</strong> quando você conecta sua conta de jogo à nossa plataforma<br>
+                                • <strong>Redes sociais:</strong> quando você se registra ou conecta usando contas de redes sociais<br>
+                                • <strong>Parceiros:</strong> informações de parceiros de torneios e patrocinadores
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-[#15171e] rounded-2xl border border-white/5 p-6 hover:border-white/10 transition-colors">
+                    <h3 class="font-bold text-white mb-4 text-lg flex items-center gap-3">
+                        <div class="p-2 bg-yellow-500/10 rounded-lg"><i data-lucide="cpu" class="w-5 h-5 text-yellow-500"></i></div>
+                        2. Como Usamos Suas Informações
+                    </h3>
+                    <ul class="space-y-2 text-gray-400 text-sm pl-2">
+                        <li>• <strong>Fornecer nossos serviços:</strong> gerenciar sua conta, processar inscrições em campeonatos, distribuir prêmios</li>
+                        <li>• <strong>Melhorar nossa plataforma:</strong> analisar o uso, solucionar problemas, desenvolver novos recursos</li>
+                        <li>• <strong>Personalizar sua experiência:</strong> recomendar campeonatos, mostrar conteúdo relevante</li>
+                        <li>• <strong>Comunicação:</strong> enviar notificações sobre campeonatos, atualizações da plataforma, suporte ao cliente</li>
+                        <li>• <strong>Segurança:</strong> detectar e prevenir fraudes, proteger nossa plataforma e usuários</li>
+                        <li>• <strong>Marketing:</strong> promover nossos serviços e campeonatos (com seu consentimento quando exigido por lei)</li>
+                    </ul>
+                </div>
+
+                <div class="bg-[#15171e] rounded-2xl border border-white/5 p-6 hover:border-white/10 transition-colors">
+                    <h3 class="font-bold text-white mb-4 text-lg flex items-center gap-3">
+                        <div class="p-2 bg-green-500/10 rounded-lg"><i data-lucide="share-2" class="w-5 h-5 text-green-500"></i></div>
+                        3. Compartilhamento de Informações
+                    </h3>
+                    
+                    <div class="space-y-2">
+                        <div class="border border-white/5 rounded-xl overflow-hidden bg-[#0f1116]/50">
+                            <button onclick="togglePrivacy('priv-3-1')" class="w-full flex justify-between items-center p-4 text-left hover:bg-white/5 transition-colors">
+                                <span class="text-sm font-bold text-gray-300">3.1 Outros Participantes</span>
+                                <i id="icon-priv-3-1" data-lucide="chevron-down" class="w-4 h-4 text-gray-600"></i>
+                            </button>
+                            <div id="priv-3-1" class="hidden px-4 pb-4 text-gray-400 text-sm border-t border-white/5 pt-3 leading-relaxed animate-fadeIn">
+                                Certas informações, como seu nome de usuário, foto de perfil e estatísticas de jogo, são visíveis para outros usuários da plataforma. Informações adicionais podem ser compartilhadas com membros da sua equipe ou oponentes em campeonatos.
+                            </div>
+                        </div>
+
+                        <div class="border border-white/5 rounded-xl overflow-hidden bg-[#0f1116]/50">
+                            <button onclick="togglePrivacy('priv-3-2')" class="w-full flex justify-between items-center p-4 text-left hover:bg-white/5 transition-colors">
+                                <span class="text-sm font-bold text-gray-300">3.2 Prestadores de Serviços</span>
+                                <i id="icon-priv-3-2" data-lucide="chevron-down" class="w-4 h-4 text-gray-600"></i>
+                            </button>
+                            <div id="priv-3-2" class="hidden px-4 pb-4 text-gray-400 text-sm border-t border-white/5 pt-3 leading-relaxed animate-fadeIn">
+                                Compartilhamos informações com prestadores de serviços terceirizados que nos ajudam a operar, fornecer e melhorar nossos serviços, como provedores de hospedagem, processadores de pagamento, serviços de análise e suporte ao cliente.
+                            </div>
+                        </div>
+
+                        <div class="border border-white/5 rounded-xl overflow-hidden bg-[#0f1116]/50">
+                            <button onclick="togglePrivacy('priv-3-3')" class="w-full flex justify-between items-center p-4 text-left hover:bg-white/5 transition-colors">
+                                <span class="text-sm font-bold text-gray-300">3.3 Parceiros e Patrocinadores</span>
+                                <i id="icon-priv-3-3" data-lucide="chevron-down" class="w-4 h-4 text-gray-600"></i>
+                            </button>
+                            <div id="priv-3-3" class="hidden px-4 pb-4 text-gray-400 text-sm border-t border-white/5 pt-3 leading-relaxed animate-fadeIn">
+                                Com seu consentimento, podemos compartilhar informações com parceiros de torneios e patrocinadores para fins promocionais ou para facilitar a distribuição de prêmios.
+                            </div>
+                        </div>
+
+                        <div class="border border-white/5 rounded-xl overflow-hidden bg-[#0f1116]/50">
+                            <button onclick="togglePrivacy('priv-3-4')" class="w-full flex justify-between items-center p-4 text-left hover:bg-white/5 transition-colors">
+                                <span class="text-sm font-bold text-gray-300">3.4 Requisitos Legais</span>
+                                <i id="icon-priv-3-4" data-lucide="chevron-down" class="w-4 h-4 text-gray-600"></i>
+                            </button>
+                            <div id="priv-3-4" class="hidden px-4 pb-4 text-gray-400 text-sm border-t border-white/5 pt-3 leading-relaxed animate-fadeIn">
+                                Podemos divulgar suas informações quando acreditarmos de boa-fé que a divulgação é necessária para cumprir uma obrigação legal, proteger nossos direitos, proteger sua segurança ou a segurança de outros, investigar fraudes ou responder a uma solicitação governamental.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-[#15171e] rounded-2xl border border-white/5 p-6 hover:border-white/10 transition-colors">
+                    <h3 class="font-bold text-white mb-4 text-lg flex items-center gap-3">
+                        <div class="p-2 bg-red-500/10 rounded-lg"><i data-lucide="lock" class="w-5 h-5 text-red-500"></i></div>
+                        4. Segurança de Dados
+                    </h3>
+                    <p class="text-gray-400 text-sm mb-3">Implementamos medidas de segurança técnicas e organizacionais apropriadas:</p>
+                    <ul class="space-y-1 text-gray-400 text-sm list-disc pl-5 mb-4">
+                        <li>Criptografia de dados sensíveis</li>
+                        <li>Firewalls e sistemas de detecção de intrusão</li>
+                        <li>Acesso restrito a informações pessoais</li>
+                        <li>Monitoramento regular de sistemas para detectar vulnerabilidades</li>
+                        <li>Treinamento de segurança para nossa equipe</li>
+                    </ul>
+                    <p class="text-gray-500 text-xs italic">No entanto, nenhum método de transmissão pela Internet ou método de armazenamento eletrônico é 100% seguro. Portanto, não podemos garantir sua segurança absoluta.</p>
+                </div>
+
+                <div class="bg-[#15171e] rounded-2xl border border-white/5 p-6 hover:border-white/10 transition-colors">
+                    <h3 class="font-bold text-white mb-6 text-lg flex items-center gap-3">
+                        <div class="p-2 bg-purple-500/10 rounded-lg"><i data-lucide="user-check" class="w-5 h-5 text-purple-500"></i></div>
+                        5. Seus Direitos e Escolhas
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-[#1c1f26] p-4 rounded border border-gray-700">
+                            <span class="block text-white font-bold text-sm mb-1">Acesso</span>
+                            <span class="text-gray-500 text-xs">Direito de acessar as informações pessoais que temos sobre você</span>
+                        </div>
+                        <div class="bg-[#1c1f26] p-4 rounded border border-gray-700">
+                            <span class="block text-white font-bold text-sm mb-1">Retificação</span>
+                            <span class="text-gray-500 text-xs">Direito de corrigir informações imprecisas ou incompletas</span>
+                        </div>
+                        <div class="bg-[#1c1f26] p-4 rounded border border-gray-700">
+                            <span class="block text-white font-bold text-sm mb-1">Exclusão</span>
+                            <span class="text-gray-500 text-xs">Direito de solicitar a exclusão de suas informações pessoais</span>
+                        </div>
+                        <div class="bg-[#1c1f26] p-4 rounded border border-gray-700">
+                            <span class="block text-white font-bold text-sm mb-1">Restrição</span>
+                            <span class="text-gray-500 text-xs">Direito de solicitar a restrição do processamento</span>
+                        </div>
+                        <div class="bg-[#1c1f26] p-4 rounded border border-gray-700">
+                            <span class="block text-white font-bold text-sm mb-1">Portabilidade</span>
+                            <span class="text-gray-500 text-xs">Direito de receber suas informações em formato estruturado</span>
+                        </div>
+                        <div class="bg-[#1c1f26] p-4 rounded border border-gray-700">
+                            <span class="block text-white font-bold text-sm mb-1">Objeção</span>
+                            <span class="text-gray-500 text-xs">Direito de se opor ao processamento</span>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm mt-6">Para exercer qualquer um desses direitos, entre em contato conosco através do e-mail <a href="mailto:contatostraysteam@gmail.com" class="text-yellow-500 font-bold">contatostraysteam@gmail.com</a>. Responderemos à sua solicitação dentro do prazo exigido pela lei aplicável.</p>
+                </div>
+
+                <div class="bg-[#15171e] rounded-2xl border border-white/5 p-6 hover:border-white/10 transition-colors space-y-8">
+                    
+                    <div>
+                        <h4 class="font-bold text-white mb-2 text-md">6. Retenção de Dados</h4>
+                        <p class="text-gray-400 text-sm leading-relaxed">Mantemos suas informações pessoais pelo tempo necessário para cumprir os propósitos descritos nesta Política de Privacidade... Os critérios usados para determinar nossos períodos de retenção incluem: período de relacionamento contínuo, obrigações legais, prazos de prescrição e diretrizes de autoridades.</p>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-white mb-2 text-md">7. Transferências Internacionais</h4>
+                        <p class="text-gray-400 text-sm leading-relaxed">Suas informações pessoais podem ser transferidas e processadas em países diferentes daquele em que você reside... Tomamos medidas para garantir que elas recebam um nível adequado de proteção.</p>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-white mb-2 text-md">8. Crianças</h4>
+                        <p class="text-gray-400 text-sm leading-relaxed">Nossa Plataforma não é direcionada a crianças menores de 13 anos... Se tomarmos conhecimento de que coletamos informações pessoais de uma criança menor de 13 anos sem verificação de consentimento parental, tomaremos medidas para remover essas informações.</p>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-white mb-2 text-md">9. Alterações a Esta Política</h4>
+                        <p class="text-gray-400 text-sm leading-relaxed">Podemos atualizar esta Política de Privacidade periodicamente... Incentivamos você a revisar periodicamente esta Política.</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 text-center border-t border-white/5 pt-8">
+                    <p class="text-gray-400 text-sm">Dúvidas sobre privacidade? Fale com a gente:</p>
+                    <a href="mailto:contatostraysteam@gmail.com" class="text-yellow-500 hover:text-white font-bold text-lg transition-colors mt-2 inline-block">contatostraysteam@gmail.com</a>
+                    <p class="text-gray-500 text-xs mt-4">Se você não estiver satisfeito com nossa resposta, você tem o direito de apresentar uma reclamação à autoridade de proteção de dados do seu país.</p>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script src="sidebar-toggle.js"></script>
+    <script>
+        lucide.createIcons();
+
+        function togglePrivacy(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById('icon-' + id);
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.style.transform = "rotate(180deg)";
+            } else {
+                content.classList.add('hidden');
+                icon.style.transform = "rotate(0deg)";
+            }
+        }
+    </script>
+</body>
+</html>

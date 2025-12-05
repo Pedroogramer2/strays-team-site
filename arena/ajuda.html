@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajuda e Suporte - Strays Legends</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Efeito de brilho suave no fundo */
+        .glow-bg {
+            background: radial-gradient(circle at center, rgba(109, 40, 217, 0.15) 0%, transparent 70%);
+        }
+    </style>
+</head>
+<body class="bg-[#0f1116] text-white font-sans selection:bg-yellow-500 selection:text-black">
+
+    <aside class="sidebar">
+        <div class="logo"><h1>STRAYS<span class="logo-accent"> LEGENDS</span></h1></div>
+        <nav class="menu">
+            <a href="index.html" class="menu-item"><i data-lucide="arrow-left"></i><span>Voltar</span></a>
+            <a href="index.html#home" class="menu-item"><i data-lucide="home"></i><span>Home</span></a>
+        </nav>
+        <div class="sidebar-footer" style="margin-top: auto; padding: 24px; border-top: 1px solid rgba(255,255,255,0.05);">
+            <div class="footer-links" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+                <a href="ajuda.html" style="font-size: 11px; color: #9ca3af; font-weight: 500;">Ajuda</a>
+                <a href="termos.html" style="font-size: 11px; color: #9ca3af; font-weight: 500;">Termos de Uso</a>
+                <a href="privacidade.html" style="font-size: 11px; color: #9ca3af; font-weight: 500;">Política de Privacidade</a>
+            </div>
+            <p class="copyright" style="font-size: 10px; color: #555;">© 2025 Strays Legends.</p>
+        </div>
+    </aside>
+
+    <main class="main-content relative overflow-hidden">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] glow-bg pointer-events-none"></div>
+        
+        <div class="top-bar"></div>
+
+        <div class="max-w-5xl mx-auto px-6 py-12 animate-fadeIn relative z-10">
+            
+            <div class="text-center mb-16">
+                <div class="inline-flex items-center justify-center p-3 bg-white/5 rounded-full mb-6 border border-white/10 backdrop-blur-sm">
+                    <i data-lucide="life-buoy" class="w-6 h-6 text-yellow-500"></i>
+                </div>
+                <h1 class="text-5xl font-black text-white mb-4 tracking-tight">Central de <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">Ajuda</span></h1>
+                <p class="text-gray-400 text-lg max-w-2xl mx-auto">Precisa de suporte? Encontre respostas rápidas ou fale diretamente com nossos admins.</p>
+            </div>
+
+            <div class="flex justify-center gap-4 mb-16">
+                <button onclick="switchHelpTab('faq')" id="btn-faq" class="group relative px-8 py-3 rounded-xl font-bold text-sm transition-all overflow-hidden bg-[#6d28d9] text-white shadow-[0_0_20px_rgba(109,40,217,0.4)]">
+                    <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                    <span class="relative flex items-center gap-2"><i data-lucide="help-circle" class="w-4 h-4"></i> Perguntas Frequentes</span>
+                </button>
+                <button onclick="switchHelpTab('contato')" id="btn-contato" class="group relative px-8 py-3 rounded-xl font-bold text-sm transition-all overflow-hidden bg-[#1c1f26] text-gray-400 border border-gray-700 hover:text-white hover:border-gray-500">
+                    <span class="relative flex items-center gap-2"><i data-lucide="mail" class="w-4 h-4"></i> Fale Conosco</span>
+                </button>
+            </div>
+
+            <div id="tab-faq" class="space-y-4 max-w-3xl mx-auto">
+                <div class="group bg-[#15171e]/80 backdrop-blur-md rounded-2xl border border-white/5 hover:border-yellow-500/30 transition-all duration-300 overflow-hidden">
+                    <button onclick="toggleAccordion('faq-1')" class="w-full flex items-center justify-between p-6 text-left">
+                        <span class="font-bold text-white group-hover:text-yellow-500 transition-colors">Como me inscrevo em um campeonato?</span>
+                        <div class="bg-white/5 p-2 rounded-lg group-hover:bg-yellow-500/10 transition-colors">
+                            <i id="icon-faq-1" data-lucide="chevron-down" class="w-5 h-5 text-gray-500 group-hover:text-yellow-500 transition-transform duration-300"></i>
+                        </div>
+                    </button>
+                    <div id="faq-1" class="hidden px-6 pb-8 text-gray-400 text-sm leading-relaxed border-t border-white/5 pt-2 animate-fadeIn">
+                        Para se inscrever em um campeonato, navegue até a página de <strong>Campeonatos</strong> no menu lateral, selecione o evento desejado e clique no botão <span class="text-white font-bold">”Inscrever-se”</span>. É necessário estar logado e, na maioria dos casos, ser capitão de uma equipe.
+                    </div>
+                </div>
+
+                <div class="group bg-[#15171e]/80 backdrop-blur-md rounded-2xl border border-white/5 hover:border-yellow-500/30 transition-all duration-300 overflow-hidden">
+                    <button onclick="toggleAccordion('faq-2')" class="w-full flex items-center justify-between p-6 text-left">
+                        <span class="font-bold text-white group-hover:text-yellow-500 transition-colors">Como formar uma equipe?</span>
+                        <div class="bg-white/5 p-2 rounded-lg group-hover:bg-yellow-500/10 transition-colors">
+                            <i id="icon-faq-2" data-lucide="chevron-down" class="w-5 h-5 text-gray-500 group-hover:text-yellow-500 transition-transform duration-300"></i>
+                        </div>
+                    </button>
+                    <div id="faq-2" class="hidden px-6 pb-8 text-gray-400 text-sm leading-relaxed border-t border-white/5 pt-2 animate-fadeIn">
+                        Acesse a página <strong>Times</strong> e clique em <span class="text-white font-bold">”Criar Time”</span>. Adicione um nome, uma tag e a logo. Depois, vá nas configurações do time para gerar o link de convite ou adicionar jogadores pelo nick.
+                    </div>
+                </div>
+
+                <div class="group bg-[#15171e]/80 backdrop-blur-md rounded-2xl border border-white/5 hover:border-yellow-500/30 transition-all duration-300 overflow-hidden">
+                    <button onclick="toggleAccordion('faq-3')" class="w-full flex items-center justify-between p-6 text-left">
+                        <span class="font-bold text-white group-hover:text-yellow-500 transition-colors">Como funciona a pontuação?</span>
+                        <div class="bg-white/5 p-2 rounded-lg group-hover:bg-yellow-500/10 transition-colors">
+                            <i id="icon-faq-3" data-lucide="chevron-down" class="w-5 h-5 text-gray-500 group-hover:text-yellow-500 transition-transform duration-300"></i>
+                        </div>
+                    </button>
+                    <div id="faq-3" class="hidden px-6 pb-8 text-gray-400 text-sm leading-relaxed border-t border-white/5 pt-2 animate-fadeIn">
+                        Em fase de grupos: Vitória = 3 pts, Empate = 1 pt, Derrota = 0 pts. Em mata-mata (Playoffs), quem perder está fora (ou cai para a Lower Bracket, dependendo do formato).
+                    </div>
+                </div>
+
+                <div class="group bg-[#15171e]/80 backdrop-blur-md rounded-2xl border border-white/5 hover:border-yellow-500/30 transition-all duration-300 overflow-hidden">
+                    <button onclick="toggleAccordion('faq-4')" class="w-full flex items-center justify-between p-6 text-left">
+                        <span class="font-bold text-white group-hover:text-yellow-500 transition-colors">Posso transmitir minhas partidas?</span>
+                        <div class="bg-white/5 p-2 rounded-lg group-hover:bg-yellow-500/10 transition-colors">
+                            <i id="icon-faq-4" data-lucide="chevron-down" class="w-5 h-5 text-gray-500 group-hover:text-yellow-500 transition-transform duration-300"></i>
+                        </div>
+                    </button>
+                    <div id="faq-4" class="hidden px-6 pb-8 text-gray-400 text-sm leading-relaxed border-t border-white/5 pt-2 animate-fadeIn">
+                        Sim! Incentivamos a transmissão (POV). Porém, é obrigatório usar um <strong>delay de 90 segundos</strong> para evitar ghosting, a menos que as regras específicas do campeonato digam o contrário.
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-contato" class="hidden animate-fadeIn">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    
+                    <div class="bg-[#15171e] p-8 rounded-2xl border border-white/5 hover:border-purple-500/50 hover:bg-[#15171e]/80 transition-all duration-300 group hover:-translate-y-2 shadow-lg hover:shadow-purple-900/20 text-center relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-purple-600/10 rounded-bl-full -mr-4 -mt-4 transition-all group-hover:bg-purple-600/20"></div>
+                        <div class="w-14 h-14 rounded-full bg-[#1c1f26] flex items-center justify-center mx-auto mb-6 group-hover:bg-purple-600 group-hover:text-white transition-all text-gray-400 border border-white/5">
+                            <i data-lucide="mail" class="w-7 h-7"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Suporte por Email</h3>
+                        <p class="text-purple-400 font-bold text-sm mb-2 break-all">contatostraysteam@gmail.com</p>
+                        <p class="text-gray-500 text-xs">Resposta em até 24 horas úteis</p>
+                    </div>
+
+                    <div class="bg-[#15171e] p-8 rounded-2xl border border-white/5 hover:border-green-500/50 hover:bg-[#15171e]/80 transition-all duration-300 group hover:-translate-y-2 shadow-lg hover:shadow-green-900/20 text-center relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-green-600/10 rounded-bl-full -mr-4 -mt-4 transition-all group-hover:bg-green-600/20"></div>
+                        <div class="w-14 h-14 rounded-full bg-[#1c1f26] flex items-center justify-center mx-auto mb-6 group-hover:bg-green-500 group-hover:text-black transition-all text-gray-400 border border-white/5">
+                            <i data-lucide="message-circle" class="w-7 h-7"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">WhatsApp Comercial</h3>
+                        <p class="text-green-500 font-bold text-sm mb-2">+55 (11) 21 96620-4758</p>
+                        <p class="text-gray-500 text-xs">Seg à Sab, das 09h às 22h</p>
+                    </div>
+
+                    <a href="https://discord.com/channels/1295057452714430494/1390518363280769124" target="_blank" class="bg-[#15171e] p-8 rounded-2xl border border-white/5 hover:border-[#5865F2]/50 hover:bg-[#15171e]/80 transition-all duration-300 group hover:-translate-y-2 shadow-lg hover:shadow-indigo-900/20 text-center relative overflow-hidden block cursor-pointer">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-[#5865F2]/10 rounded-bl-full -mr-4 -mt-4 transition-all group-hover:bg-[#5865F2]/20"></div>
+                        <div class="w-14 h-14 rounded-full bg-[#1c1f26] flex items-center justify-center mx-auto mb-6 group-hover:bg-[#5865F2] group-hover:text-white transition-all text-gray-400 border border-white/5">
+                            <i data-lucide="ticket" class="w-7 h-7"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Ticket Discord</h3>
+                        <p class="text-[#5865F2] font-bold text-sm mb-2">Abrir Chamado</p>
+                        <p class="text-gray-500 text-xs">Atendimento em tempo real</p>
+                    </a>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+    <script src="sidebar-toggle.js"></script>
+    <script>
+        lucide.createIcons();
+
+        function switchHelpTab(tab) {
+            const faqTab = document.getElementById('tab-faq');
+            const contactTab = document.getElementById('tab-contato');
+            const btnFaq = document.getElementById('btn-faq');
+            const btnContact = document.getElementById('btn-contato');
+
+            // Estilos Ativos/Inativos (atualizados)
+            const activeClass = "group relative px-8 py-3 rounded-xl font-bold text-sm transition-all overflow-hidden bg-[#6d28d9] text-white shadow-[0_0_20px_rgba(109,40,217,0.4)]";
+            const inactiveClass = "group relative px-8 py-3 rounded-xl font-bold text-sm transition-all overflow-hidden bg-[#1c1f26] text-gray-400 border border-gray-700 hover:text-white hover:border-gray-500";
+
+            if(tab === 'faq') {
+                faqTab.classList.remove('hidden');
+                contactTab.classList.add('hidden');
+                btnFaq.className = activeClass;
+                btnContact.className = inactiveClass;
+            } else {
+                faqTab.classList.add('hidden');
+                contactTab.classList.remove('hidden');
+                btnFaq.className = inactiveClass;
+                btnContact.className = activeClass;
+            }
+        }
+
+        function toggleAccordion(id) {
+            const allIds = ['faq-1', 'faq-2', 'faq-3', 'faq-4'];
+            allIds.forEach(itemId => {
+                const content = document.getElementById(itemId);
+                const icon = document.getElementById('icon-' + itemId);
+                if (itemId === id) {
+                    const isHidden = content.classList.contains('hidden');
+                    if (isHidden) {
+                        content.classList.remove('hidden');
+                        icon.style.transform = "rotate(180deg)";
+                    } else {
+                        content.classList.add('hidden');
+                        icon.style.transform = "rotate(0deg)";
+                    }
+                } else {
+                    content.classList.add('hidden');
+                    document.getElementById('icon-' + itemId).style.transform = "rotate(0deg)";
+                }
+            });
+        }
+    </script>
+</body>
+</html>
