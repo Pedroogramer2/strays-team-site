@@ -8,17 +8,16 @@ export function renderTopBar() {
 
     container.innerHTML = '';
 
-    const userJson = localStorage.getItem('u4nted_user');
+    // ATUALIZADO: strays_user
+    const userJson = localStorage.getItem('strays_user');
     const user = userJson ? JSON.parse(userJson) : null;
 
     // 1. Busca Time
     let myTeamHtml = '';
     if (user) {
-        const localTeams = JSON.parse(localStorage.getItem('u4nted_teams_db') || '[]');
-        // Importante: Precisamos acessar TEAMS_LIST_DB. 
-        // Como estamos num módulo separado, podemos importar ou pegar de window se tivermos exposto, 
-        // mas para simplificar vamos ler do localStorage ou usar um placeholder se não achar.
-        // O ideal seria importar { TEAMS_LIST_DB } from './database.js', mas para evitar dependência circular rápida:
+        // ATUALIZADO: strays_teams_db
+        const localTeams = JSON.parse(localStorage.getItem('strays_teams_db') || '[]');
+        
         const myTeam = localTeams.find(t => 
             (t.ownerId === user.uid) || 
             (t.roster && t.roster.some(m => m.uid === user.uid))
@@ -114,7 +113,7 @@ export function renderTopBar() {
     container.innerHTML = htmlContent;
 }
 
-// Funções globais de Toggle (necessárias para o onclick funcionar no HTML)
+// Funções globais de Toggle
 window.toggleUserMenu = function(event) {
     event.stopPropagation();
     const menu = document.getElementById('user-dropdown');

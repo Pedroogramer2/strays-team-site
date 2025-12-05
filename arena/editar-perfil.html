@@ -179,7 +179,8 @@
         });
 
         async function loadUserProfile(uid) {
-            const local = localStorage.getItem('u4nted_user');
+            // ATUALIZADO: strays_user
+            const local = localStorage.getItem('strays_user');
             if(local) fillForm(JSON.parse(local));
 
             try {
@@ -189,7 +190,8 @@
                     fillForm(data);
                     if(local) {
                         const merged = { ...JSON.parse(local), ...data };
-                        localStorage.setItem('u4nted_user', JSON.stringify(merged));
+                        // ATUALIZADO: strays_user
+                        localStorage.setItem('strays_user', JSON.stringify(merged));
                     }
                 }
             } catch (e) { console.error(e); }
@@ -251,9 +253,10 @@
 
                 await updateDoc(doc(db, "users", currentUserUid), newData);
 
-                const localUser = JSON.parse(localStorage.getItem('u4nted_user') || '{}');
+                // ATUALIZADO: strays_user
+                const localUser = JSON.parse(localStorage.getItem('strays_user') || '{}');
                 const updatedUser = { ...localUser, ...newData };
-                localStorage.setItem('u4nted_user', JSON.stringify(updatedUser));
+                localStorage.setItem('strays_user', JSON.stringify(updatedUser));
 
                 alert("Perfil salvo com sucesso!");
                 window.location.href = 'perfil.html';

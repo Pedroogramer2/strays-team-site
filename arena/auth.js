@@ -20,7 +20,7 @@ import {
     getDocs,
     addDoc,
     updateDoc,
-    deleteDoc, // <--- 1. ADICIONEI O IMPORT AQUI
+    deleteDoc, 
     orderBy,
     arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -62,7 +62,7 @@ window.collection = collection;
 window.addDoc = addDoc;
 window.doc = doc;
 window.setDoc = setDoc;
-window.deleteDoc = deleteDoc; // <--- 2. ADICIONEI O EXPORT AQUI
+window.deleteDoc = deleteDoc;
 window.getDoc = getDoc;
 window.getDocs = getDocs;
 window.updateDoc = updateDoc;
@@ -109,7 +109,10 @@ async function saveUserSession(user) {
         role: role,
         riotAccount: riotAccount
     };
-    localStorage.setItem('u4nted_user', JSON.stringify(userData));
+    
+    // --- CORREÇÃO AQUI: Mudado de u4nted_user para strays_user ---
+    localStorage.setItem('strays_user', JSON.stringify(userData));
+    
     window.dispatchEvent(new Event('auth-change'));
     window.location.href = 'perfil.html';
 }
@@ -118,11 +121,6 @@ window.handleGoogleAuth = async () => {
     try {
         const result = await signInWithPopup(auth, googleProvider);
         const user = result.user;
-        if (!isValidEmailDomain(user.email)) {
-            alert("Apenas e-mails Gmail ou Outlook/Hotmail são permitidos.");
-            await signOut(auth);
-            return;
-        }
         await saveUserSession(user);
     } catch (error) {
         console.error("Erro Google:", error);
@@ -138,7 +136,6 @@ window.handleRegisterEmail = async (event) => {
     const senha = document.getElementById('reg-senha').value;
     const confirmSenha = document.getElementById('reg-confirm').value;
 
-    if (!isValidEmailDomain(email)) { alert("Email inválido."); return; }
     if (senha !== confirmSenha) { alert("Senhas não coincidem!"); return; }
     if (!nick) { alert("Preencha o Nick!"); return; }
 
@@ -165,7 +162,8 @@ window.handleLoginEmail = async (event) => {
 
 window.handleLogout = () => {
     signOut(auth).then(() => {
-        localStorage.removeItem('u4nted_user');
+        // --- CORREÇÃO AQUI TAMBÉM ---
+        localStorage.removeItem('strays_user');
         window.dispatchEvent(new Event('auth-change'));
         window.location.href = 'index.html';
     });

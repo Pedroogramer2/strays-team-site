@@ -1,7 +1,6 @@
 // js/pages/tournaments.js
 import { TOURNAMENTS, TEAMS_LIST_DB, OVERVIEW_DATA } from '../database.js';
 import { state } from '../state.js';
-// Cole isso logo abaixo dos imports no topo do tournaments.js
 
 function cleanTextFromHTML(htmlString) {
     if (!htmlString) return "";
@@ -62,7 +61,8 @@ async function uploadImageToFirebase(file, path) {
 export async function renderTournamentsList() {
     const content = document.getElementById('page-content');
     
-    const userJson = localStorage.getItem('u4nted_user');
+    // ATUALIZADO: strays_user
+    const userJson = localStorage.getItem('strays_user');
     const user = userJson ? JSON.parse(userJson) : null;
     const isAdmin = user && (user.role === 'admin' || user.role === 'staff');
 
@@ -146,7 +146,8 @@ export async function renderTournamentPro(tournamentId) {
             state.bracket = generateEmptyBracket(TEAMS_LIST_DB);
         }
 
-        const userJson = localStorage.getItem('u4nted_user');
+        // ATUALIZADO: strays_user
+        const userJson = localStorage.getItem('strays_user');
         const user = userJson ? JSON.parse(userJson) : null;
         const isAdmin = user && (user.role === 'admin' || user.role === 'staff');
 
@@ -156,7 +157,8 @@ export async function renderTournamentPro(tournamentId) {
         let myTeamId = null;
         
         if(user) {
-            const localTeams = JSON.parse(localStorage.getItem('u4nted_teams_db') || '[]');
+            // ATUALIZADO: strays_teams_db
+            const localTeams = JSON.parse(localStorage.getItem('strays_teams_db') || '[]');
             const myTeam = localTeams.find(tm => tm.ownerId === user.uid);
             if(myTeam) myTeamId = myTeam.id;
         }
@@ -562,11 +564,13 @@ export async function saveTournamentChanges(tourId) {
 export async function subscribeTeam(tourId, teamId) {
     if(!confirm("Deseja inscrever seu time?")) return;
     try {
-        const userJson = localStorage.getItem('u4nted_user');
+        // ATUALIZADO: strays_user
+        const userJson = localStorage.getItem('strays_user');
         const user = JSON.parse(userJson);
         const tourRef = window.doc(window.db, "tournaments", tourId);
         
-        const localTeams = JSON.parse(localStorage.getItem('u4nted_teams_db') || '[]');
+        // ATUALIZADO: strays_teams_db
+        const localTeams = JSON.parse(localStorage.getItem('strays_teams_db') || '[]');
         const myTeam = localTeams.find(t => String(t.id) === String(teamId));
         if(!myTeam) throw new Error("Time não encontrado.");
 

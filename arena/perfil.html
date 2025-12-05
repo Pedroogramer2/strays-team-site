@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Perfil - U4nted Cup</title>
+    <title>Meu Perfil - Strays Legends</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -11,7 +11,7 @@
 <body class="bg-[#0f1116] text-white">
 
     <aside class="sidebar">
-        <div class="logo"><h1>U4<span class="logo-accent">NTED CUP</span></h1></div>
+        <div class="logo"><h1>STRAYS<span class="logo-accent"> LEGENDS</span></h1></div>
         <nav class="menu">
             <a href="index.html#home" class="menu-item"><i data-lucide="home"></i><span>Home</span></a>
             <a href="index.html#players" class="menu-item"><i data-lucide="user"></i><span>Players</span></a>
@@ -220,8 +220,10 @@
         </div>
     </div>
 
+    <script src="sidebar-toggle.js"></script>
     <script type="module" src="auth.js"></script>
-    <script src="global-topbar.js"></script>
+    
+    <script type="module" src="js/main.js"></script> 
     
     <script>
         // --- API KEY ORIGINAL ---
@@ -241,7 +243,8 @@
             try {
                 const params = new URLSearchParams(window.location.search);
                 const targetUid = params.get('uid');
-                const loggedUserJson = localStorage.getItem('u4nted_user');
+                // ATUALIZADO: strays_user
+                const loggedUserJson = localStorage.getItem('strays_user');
                 
                 if (!loggedUserJson && !targetUid) {
                     window.location.href = 'login.html';
@@ -464,12 +467,14 @@
                     lastUpdate: new Date().toISOString()
                 };
 
-                const user = JSON.parse(localStorage.getItem('u4nted_user'));
+                // ATUALIZADO: strays_user
+                const user = JSON.parse(localStorage.getItem('strays_user'));
                 const userRef = window.doc(window.db, "users", user.uid);
                 await window.updateDoc(userRef, { riotAccount: riotDataReal });
 
                 user.riotAccount = riotDataReal;
-                localStorage.setItem('u4nted_user', JSON.stringify(user));
+                // ATUALIZADO: strays_user
+                localStorage.setItem('strays_user', JSON.stringify(user));
 
                 showToast(`Conectado: ${riotDataReal.gameName}`);
                 closeLinkModal();
@@ -505,12 +510,14 @@
             const btn = document.getElementById('btn-confirm-unlink');
             btn.innerText = "Removendo..."; btn.disabled = true;
             try {
-                const user = JSON.parse(localStorage.getItem('u4nted_user'));
+                // ATUALIZADO: strays_user
+                const user = JSON.parse(localStorage.getItem('strays_user'));
                 if (!user) return;
                 const userRef = window.doc(window.db, "users", user.uid);
                 await window.updateDoc(userRef, { riotAccount: null });
                 user.riotAccount = null;
-                localStorage.setItem('u4nted_user', JSON.stringify(user));
+                // ATUALIZADO: strays_user
+                localStorage.setItem('strays_user', JSON.stringify(user));
                 showToast("Conta desvinculada.");
                 closeUnlinkModal(); closeManageModal(); loadProfileData();
             } catch(e) { console.error(e); alert("Erro ao desvincular."); } finally { btn.innerText = "Sim, desvincular"; btn.disabled = false; }
@@ -534,7 +541,8 @@
 
         function loadTeamDisplay(userData) {
             if (!userData) return;
-            const localTeams = JSON.parse(localStorage.getItem('u4nted_teams_db') || '[]');
+            // ATUALIZADO: strays_teams_db
+            const localTeams = JSON.parse(localStorage.getItem('strays_teams_db') || '[]');
             const myTeam = localTeams.find(t => (t.ownerId === userData.uid) || (t.roster && t.roster.some(m => m.uid === userData.uid)));
             const teamDisplay = document.getElementById('my-team-display');
             if (teamDisplay) {

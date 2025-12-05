@@ -53,10 +53,12 @@ export function generateTeamCard(t) {
 
 export function renderTeamsPage() {
     const content = document.getElementById('page-content');
-    const userJson = localStorage.getItem('u4nted_user');
+    // ATUALIZADO: strays_user
+    const userJson = localStorage.getItem('strays_user');
     const user = userJson ? JSON.parse(userJson) : null;
     let customTeams = [];
-    try { customTeams = JSON.parse(localStorage.getItem('u4nted_teams_db') || '[]'); } catch (e) { customTeams = []; }
+    // ATUALIZADO: strays_teams_db
+    try { customTeams = JSON.parse(localStorage.getItem('strays_teams_db') || '[]'); } catch (e) { customTeams = []; }
     const myTeam = user ? customTeams.find(t => t.ownerId === user.uid) : null;
     
     const createBtnHtml = (user && !myTeam) ? 
@@ -97,13 +99,15 @@ export function renderTeamsPage() {
 // --- 2. DETALHES DO TIME ---
 export function renderTeamDetailPage(teamId) {
     const content = document.getElementById('page-content');
-    const customTeams = JSON.parse(localStorage.getItem('u4nted_teams_db') || '[]');
+    // ATUALIZADO: strays_teams_db
+    const customTeams = JSON.parse(localStorage.getItem('strays_teams_db') || '[]');
     const allTeams = [...customTeams, ...TEAMS_LIST_DB];
     const t = allTeams.find(team => String(team.id) === String(teamId));
     
     if (!t) return content.innerHTML = `<div class="text-center text-white mt-10">Time não encontrado.</div>`;
     
-    const userJson = localStorage.getItem('u4nted_user');
+    // ATUALIZADO: strays_user
+    const userJson = localStorage.getItem('strays_user');
     const user = userJson ? JSON.parse(userJson) : null;
     const isCaptain = user && String(t.ownerId) === String(user.uid);
     state.currentTeamId = t.id; 
@@ -144,7 +148,8 @@ export function renderTeamDetailPage(teamId) {
 }
 
 export function switchTeamTab(tabName, teamId) {
-    const customTeams = JSON.parse(localStorage.getItem('u4nted_teams_db') || '[]');
+    // ATUALIZADO: strays_teams_db
+    const customTeams = JSON.parse(localStorage.getItem('strays_teams_db') || '[]');
     const allTeams = [...customTeams, ...TEAMS_LIST_DB];
     const t = allTeams.find(team => String(team.id) === String(teamId));
     if(!t) return;
@@ -199,7 +204,8 @@ export function switchTeamTab(tabName, teamId) {
 
 // --- 3. CONFIGURAÇÕES E EDIÇÃO (GERENCIAMENTO) ---
 export function renderTeamSettings(teamId) {
-    const allTeams = JSON.parse(localStorage.getItem('u4nted_teams_db') || '[]');
+    // ATUALIZADO: strays_teams_db
+    const allTeams = JSON.parse(localStorage.getItem('strays_teams_db') || '[]');
     const t = allTeams.find(team => String(team.id) === String(teamId));
     if(!t) return;
     state.currentTeamId = t.id;
@@ -313,7 +319,7 @@ function injectSettingsModals() {
         <div id="delete-team-modal" style="display: none !important;" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm hidden">
             <div class="bg-[#15171e] w-full max-w-md rounded-xl border border-gray-800 shadow-2xl p-6">
                 <h3 class="text-white font-bold text-lg mb-2">Confirmar Saída do Time</h3>
-                <p class="text-gray-400 text-sm mb-6 leading-relaxed">Você tem certeza que deseja deletar o time? Esta ação não poderá ser desfeita.</p>
+                <p class="text-gray-400 text-sm mb-6 leading-relaxed">Você tem certeza que deseja deletar o time? Esta ação não pode ser desfeita.</p>
                 <div class="flex justify-end gap-3"><button onclick="closeDeleteTeamModal()" class="bg-[#1c1f26] hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg text-sm border border-gray-700 transition-colors">Cancelar</button><button onclick="confirmDeleteTeam()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg shadow-red-900/20 transition-colors">Sim, quero sair</button></div>
             </div>
         </div>`;
@@ -386,7 +392,8 @@ export function closeCreateTeamModal() {
 // --- 6. LOGICA DE SUBMIT (REDIRECIONANDO SEM RELOAD) ---
 export async function handleCreateTeamForm(e) {
     e.preventDefault();
-    const userJson = localStorage.getItem('u4nted_user'); 
+    // ATUALIZADO: strays_user
+    const userJson = localStorage.getItem('strays_user'); 
     if(!userJson) { window.showToast("Você precisa estar logado!", "error"); return; }
     const user = JSON.parse(userJson);
 
@@ -402,7 +409,8 @@ export async function handleCreateTeamForm(e) {
 
     try {
         let localTeams = [];
-        try { localTeams = JSON.parse(localStorage.getItem('u4nted_teams_db') || '[]'); } catch(err) { localTeams = []; }
+        // ATUALIZADO: strays_teams_db
+        try { localTeams = JSON.parse(localStorage.getItem('strays_teams_db') || '[]'); } catch(err) { localTeams = []; }
 
         if(localTeams.some(t => t.name.toLowerCase() === name.toLowerCase())) { 
             window.showToast("Já existe um time com este nome!", "error"); 
@@ -433,7 +441,8 @@ export async function handleCreateTeamForm(e) {
         };
         
         localTeams.push(newTeam);
-        localStorage.setItem('u4nted_teams_db', JSON.stringify(localTeams));
+        // ATUALIZADO: strays_teams_db
+        localStorage.setItem('strays_teams_db', JSON.stringify(localTeams));
 
         // Salva Firestore
         if(window.addDoc && window.collection && window.db) { 
@@ -493,7 +502,8 @@ export function previewEditBanner(e) {
 }
 
 export async function saveTeamSettings() {
-    const teams = JSON.parse(localStorage.getItem('u4nted_teams_db') || '[]');
+    // ATUALIZADO: strays_teams_db
+    const teams = JSON.parse(localStorage.getItem('strays_teams_db') || '[]');
     const idx = teams.findIndex(t => String(t.id) === String(state.currentTeamId));
     
     if (idx > -1) {
@@ -516,7 +526,8 @@ export async function saveTeamSettings() {
             teams[idx].socials.twitter = document.getElementById('edit-team-twitter').value;
             teams[idx].socials.instagram = document.getElementById('edit-team-insta').value;
 
-            localStorage.setItem('u4nted_teams_db', JSON.stringify(teams));
+            // ATUALIZADO: strays_teams_db
+            localStorage.setItem('strays_teams_db', JSON.stringify(teams));
             
             selectedLogoFile = null; selectedBannerFile = null;
             window.showToast("Time atualizado!", "success");
@@ -536,9 +547,11 @@ export function closeDeleteTeamModal() {
     if(m) { m.style.display = 'none'; m.classList.add('hidden'); }
 }
 export function confirmDeleteTeam() {
-    let teams = JSON.parse(localStorage.getItem('u4nted_teams_db') || '[]');
+    // ATUALIZADO: strays_teams_db
+    let teams = JSON.parse(localStorage.getItem('strays_teams_db') || '[]');
     teams = teams.filter(t => String(t.id) !== String(state.currentTeamId));
-    localStorage.setItem('u4nted_teams_db', JSON.stringify(teams));
+    // ATUALIZADO: strays_teams_db
+    localStorage.setItem('strays_teams_db', JSON.stringify(teams));
     closeDeleteTeamModal();
     window.navigateToPage('times');
     window.showToast("Time excluído.", "success");
@@ -560,14 +573,16 @@ export function closeEditPlayerModal() {
 }
 export function savePlayerEdit() {
     const uid = document.getElementById('modal-p-uid').value;
-    const teams = JSON.parse(localStorage.getItem('u4nted_teams_db') || '[]');
+    // ATUALIZADO: strays_teams_db
+    const teams = JSON.parse(localStorage.getItem('strays_teams_db') || '[]');
     const idx = teams.findIndex(t => String(t.id) === String(state.currentTeamId));
     if (idx > -1) {
         const pIdx = teams[idx].roster.findIndex(m => String(m.uid) === String(uid));
         if(pIdx > -1) {
             teams[idx].roster[pIdx].role = document.getElementById('modal-p-role').value;
             teams[idx].roster[pIdx].gameRole = document.getElementById('modal-p-gameRole').value;
-            localStorage.setItem('u4nted_teams_db', JSON.stringify(teams));
+            // ATUALIZADO: strays_teams_db
+            localStorage.setItem('strays_teams_db', JSON.stringify(teams));
             closeEditPlayerModal();
             renderTeamSettings(state.currentTeamId);
             setTimeout(() => switchSettingsTab('players'), 50);
@@ -577,11 +592,13 @@ export function savePlayerEdit() {
 }
 export function removePlayer(uid) {
     if(!confirm("Remover jogador?")) return;
-    const teams = JSON.parse(localStorage.getItem('u4nted_teams_db') || '[]');
+    // ATUALIZADO: strays_teams_db
+    const teams = JSON.parse(localStorage.getItem('strays_teams_db') || '[]');
     const idx = teams.findIndex(t => String(t.id) === String(state.currentTeamId));
     if (idx > -1) {
         teams[idx].roster = teams[idx].roster.filter(m => String(m.uid) !== String(uid));
-        localStorage.setItem('u4nted_teams_db', JSON.stringify(teams));
+        // ATUALIZADO: strays_teams_db
+        localStorage.setItem('strays_teams_db', JSON.stringify(teams));
         renderTeamSettings(state.currentTeamId);
         setTimeout(() => switchSettingsTab('players'), 50);
         window.showToast("Jogador removido.", "success");
