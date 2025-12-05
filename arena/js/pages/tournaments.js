@@ -590,11 +590,30 @@ export async function approveTeam(tourId, teamId, teamName) {
         const tourRef = window.doc(window.db, "tournaments", tourId);
         const tourSnap = await window.getDoc(tourRef);
         const tourData = tourSnap.data();
-        const newRequests = tourData.requests.filter(r => String(r.teamId) !== String(teamId));
+        
+        // 1. Encontra o pedido para pegar o ID do capitão ANTES de apagar
+        const requestData = (tourData.requests || []).find(r => String(r.teamId) === String(teamId));
+        
+        const newRequests = (tourData.requests || []).filter(r => String(r.teamId) !== String(teamId));
         const newApproved = tourData.registeredTeamsList || [];
         if(!newApproved.includes(String(teamId))) newApproved.push(String(teamId));
 
-        await window.updateDoc(tourRef, { requests: newRequests, registeredTeamsList: newApproved, registeredTeams: newApproved.length });
+        await window.updateDoc(tourRef, { 
+            requests: newRequests, 
+            registeredTeamsList: newApproved, 
+            registeredTeams: newApproved.length 
+        });
+
+        // 2. ENVIAR NOTIFICAÇÃO (Gatilho)
+        if (requestData && requestData.captainUid && window.NotificationSystem) {
+            await window.NotificationSystem.send(
+                requestData.captainUid,
+                'info',
+                'Inscrição Aprovada! ✅',
+                `Seu time ${teamName} foi aceito no campeonato ${tourData.name}. Prepare-se!`
+            );
+        }
+
         alert("Aprovado!");
         renderTournamentPro(tourId);
     } catch (e) { console.error(e); }
