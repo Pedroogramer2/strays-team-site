@@ -480,46 +480,38 @@ export async function saveTournamentChanges(tourId) {
             ${txtRegras.split('\n').filter(l=>l.trim()).map(l => `<li>${l}</li>`).join('')}
         </ul>`;
 
-        // 4. Transmissão (Versão Compacta e Elegante)
+        // 4. Transmissão (Estilo Botões Lado a Lado - Igual à Imagem)
         let botoesHtml = "";
         
-        // Banner Twitch (Compacto)
+        // Botão Twitch (Roxo, Compacto)
         if(linkTwitch) {
             botoesHtml += `
-            <a href="${linkTwitch}" target="_blank" class="group w-full bg-[#9146FF] hover:bg-[#7c2cf5] rounded-xl p-4 flex items-center gap-4 transition-all duration-300 shadow-lg hover:shadow-[#9146FF]/40 hover:-translate-y-1 relative overflow-hidden border border-white/10">
-                <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                <svg class="w-8 h-8 md:w-10 md:h-10 text-white shrink-0 drop-shadow-md transform group-hover:scale-110 transition-transform duration-300" fill="currentColor" viewBox="0 0 24 24">
+            <a href="${linkTwitch}" target="_blank" class="bg-[#9146FF] hover:bg-[#7c2cf5] text-white px-6 py-3 rounded-lg font-bold flex items-center gap-3 transition-transform hover:scale-105 shadow-lg shadow-purple-900/30">
+                <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
                     <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
                 </svg>
-                <div>
-                    <div class="text-[10px] md:text-xs text-white/90 font-bold uppercase tracking-wider mb-0.5 leading-none">Assista agora na</div>
-                    <div class="text-white font-black text-xl md:text-2xl uppercase tracking-tight leading-none drop-shadow-md">Twitch TV</div>
-                </div>
+                <span class="tracking-wide text-base">Twitch TV</span>
             </a>`;
         }
 
-        // Banner YouTube (Compacto)
+        // Botão YouTube (Vermelho, Compacto)
         if(linkYoutube) {
             botoesHtml += `
-            <a href="${linkYoutube}" target="_blank" class="group w-full bg-[#FF0000] hover:bg-[#cc0000] rounded-xl p-4 flex items-center gap-4 transition-all duration-300 shadow-lg hover:shadow-[#FF0000]/40 hover:-translate-y-1 relative overflow-hidden border border-white/10">
-                <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                 <svg class="w-8 h-8 md:w-10 md:h-10 text-white shrink-0 drop-shadow-md transform group-hover:scale-110 transition-transform duration-300" fill="currentColor" viewBox="0 0 24 24">
+            <a href="${linkYoutube}" target="_blank" class="bg-[#FF0000] hover:bg-[#cc0000] text-white px-6 py-3 rounded-lg font-bold flex items-center gap-3 transition-transform hover:scale-105 shadow-lg shadow-red-900/30">
+                <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
                     <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                 </svg>
-                <div>
-                    <div class="text-[10px] md:text-xs text-white/90 font-bold uppercase tracking-wider mb-0.5 leading-none">Assista agora no</div>
-                    <div class="text-white font-black text-xl md:text-2xl uppercase tracking-tight leading-none drop-shadow-md">YouTube</div>
-                </div>
+                <span class="tracking-wide text-base">Youtube</span>
             </a>`;
         }
 
-        if(!botoesHtml) botoesHtml = '<div class="bg-[#1c1f26] p-4 rounded-xl border border-gray-800 text-center text-gray-400 text-sm font-bold flex items-center justify-center gap-2"><i data-lucide="tv" class="w-4 h-4"></i> Nenhuma transmissão agendada.</div>';
+        if(!botoesHtml) botoesHtml = '<div class="text-gray-500 text-sm font-bold flex items-center gap-2"><i data-lucide="tv" class="w-4 h-4"></i> Nenhuma transmissão.</div>';
 
-        // Container (mantive flex-col para empilhar se tiver os dois)
+        // Container Horizontal (Flex Row)
         const htmlTransmissao = `
             <div class="space-y-4">
-                <p class="leading-relaxed text-gray-300 text-sm">Todas as partidas principais serão transmitidas <strong class="text-white">AO VIVO</strong> em nossos canais oficiais.</p>
-                <div class="flex flex-col gap-3 w-full">${botoesHtml}</div>
+                <p class="leading-relaxed text-gray-300 text-base">Todas as partidas principais serão transmitidas <strong class="text-white">AO VIVO</strong> em nossos canais oficiais.</p>
+                <div class="flex flex-wrap gap-4 items-center">${botoesHtml}</div>
             </div>`;
 
         // Monta o objeto final para o banco
