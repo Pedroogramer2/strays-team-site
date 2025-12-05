@@ -222,362 +222,353 @@
 
     <script type="module" src="auth.js"></script>
     <script src="global-topbar.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Aguarda um pouco para carregar o firebase e evitar erros
-            setTimeout(() => {
-                loadProfileData();
-            }, 600);
-            lucide.createIcons();
-        });
+<script>
+    // --- SUA CHAVE ORIGINAL CORRETA ---
+    const VALORANT_API_KEY = "HDEV-d89e5cc3-c56a-4b8b-8dcd-fe38a88881ec"; 
 
-        let currentProfileData = null;
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => { loadProfileData(); }, 500);
+        lucide.createIcons();
+    });
 
-        // --- 1. CARREGAR DADOS ---
-        async function loadProfileData() {
-            document.getElementById('loading-screen').classList.remove('hidden');
-            document.getElementById('profile-content').classList.add('hidden');
+    let currentProfileData = null;
 
+    // --- 1. CARREGAR DADOS DO PERFIL ---
+    async function loadProfileData() {
+        document.getElementById('loading-screen').classList.remove('hidden');
+        document.getElementById('profile-content').classList.add('hidden');
+
+        try {
             const params = new URLSearchParams(window.location.search);
             const targetUid = params.get('uid');
             const loggedUserJson = localStorage.getItem('u4nted_user');
-            const loggedUser = loggedUserJson ? JSON.parse(loggedUserJson) : null;
+            
+            if (!loggedUserJson && !targetUid) {
+                window.location.href = 'login.html';
+                return;
+            }
 
+            const loggedUser = loggedUserJson ? JSON.parse(loggedUserJson) : null;
             let userData = null;
             let isMe = false;
 
-            try {
-                if (targetUid) {
-                    if (loggedUser && String(loggedUser.uid) === String(targetUid)) {
-                        userData = loggedUser;
-                        isMe = true;
-                    } else {
-                        if(window.doc && window.db && window.getDoc) {
-                            const docRef = window.doc(window.db, "users", targetUid);
-                            const docSnap = await window.getDoc(docRef);
-                            if (docSnap.exists()) {
-                                userData = { uid: docSnap.id, ...docSnap.data() };
-                                isMe = false;
-                            }
-                        }
-                    }
-                } else {
-                    if (!loggedUser) { window.location.href = 'login.html'; return; }
+            if (targetUid) {
+                if (loggedUser && String(loggedUser.uid) === String(targetUid)) {
                     userData = loggedUser;
                     isMe = true;
-                }
-
-                if (!userData) {
-                    document.querySelector('.main-content').innerHTML = "<div class='text-center p-20 text-white'>Usuário não encontrado.</div>";
-                    return;
-                }
-                
-                currentProfileData = userData;
-
-                // --- UI Update ---
-                const editBtn = document.querySelector('a[href="editar-perfil.html"]');
-                if(editBtn) editBtn.style.display = isMe ? 'flex' : 'none';
-
-                document.getElementById('profile-nick').innerText = userData.nick || userData.name;
-                document.getElementById('profile-name').innerText = userData.name;
-                document.getElementById('profile-avatar').src = userData.photo || `https://api.dicebear.com/7.x/initials/svg?seed=${userData.nick}`;
-                document.getElementById('profile-bio').innerText = userData.bio ? `"${userData.bio}"` : '"Sem assinatura definida."';
-
-                if(userData.stats) {
-                    document.getElementById('stat-matches').innerText = userData.stats.matches || 0;
-                    document.getElementById('stat-tourneys').innerText = userData.stats.tournaments || 0;
-                    document.getElementById('stat-mvp').innerText = userData.stats.mvp || 0;
-                }
-
-                const socialContainer = document.getElementById('social-icons-container');
-                if(socialContainer) {
-                    socialContainer.innerHTML = '';
-                    if(userData.socials) {
-                        const addIcon = (url, iconName, colorHover) => {
-                            if (!url || url.trim() === "") return;
-                            let finalLink = url.startsWith('http') ? url : '#'; 
-                            if (!url.startsWith('http')) {
-                                if(iconName === 'twitter') finalLink = `https://twitter.com/${url.replace('@','')}`;
-                                if(iconName === 'instagram') finalLink = `https://instagram.com/${url.replace('@','')}`;
-                                if(iconName === 'twitch') finalLink = `https://twitch.tv/${url}`;
-                                if(iconName === 'youtube') finalLink = `https://youtube.com/@${url}`;
-                            }
-                            socialContainer.innerHTML += `<a href="${finalLink}" target="_blank" class="text-gray-500 ${colorHover} transition-colors p-1 hover:bg-white/5 rounded-full"><i data-lucide="${iconName}" class="w-4 h-4"></i></a>`;
-                        };
-                        addIcon(userData.socials.twitter, 'twitter', 'hover:text-blue-400');
-                        addIcon(userData.socials.instagram, 'instagram', 'hover:text-pink-500');
-                        addIcon(userData.socials.twitch, 'twitch', 'hover:text-purple-500');
-                        addIcon(userData.socials.youtube, 'youtube', 'hover:text-red-500');
+                } else {
+                    if(window.doc && window.db && window.getDoc) {
+                        const docRef = window.doc(window.db, "users", targetUid);
+                        const docSnap = await window.getDoc(docRef);
+                        if (docSnap.exists()) {
+                            userData = { uid: docSnap.id, ...docSnap.data() };
+                            isMe = false;
+                        }
                     }
                 }
-
-                loadTeamDisplay(userData);
-                renderRiotSection(userData, isMe);
-                lucide.createIcons();
-
-            } catch (err) {
-                console.error("Erro ao carregar perfil:", err);
-            } finally {
-                document.getElementById('loading-screen').classList.add('hidden');
-                document.getElementById('profile-content').classList.remove('hidden');
+            } else {
+                userData = loggedUser;
+                isMe = true;
             }
-        }
 
-        // --- 2. FUNÇÕES RIOT ---
-
-        window.connectRiotAccount = async function() {
-            const nick = document.getElementById('riot-nick').value;
-            const tag = document.getElementById('riot-tag').value.replace('#', '');
-            const btn = document.getElementById('btn-connect-riot');
-
-            if (!nick || !tag) { alert("Preencha nick e tag."); return; }
-
-            btn.innerText = "Vinculando..."; btn.disabled = true;
-
-            try {
-                const mockRiotData = {
-                    gameName: nick,
-                    tagLine: tag,
-                    region: 'br',
-                    rank: 'Diamond 2',
-                    rankImage: 'https://media.valorant-api.com/competitivetiers/564d8e2d-c226-317e-4628-eb5263512e37/17/largeicon.png',
-                    elo: 45,
-                    matches: 120,
-                    wins: 65,
-                    card: 'https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/wideart.png'
-                };
-
-                const user = JSON.parse(localStorage.getItem('u4nted_user'));
-                if (!user) return;
-
-                const userRef = window.doc(window.db, "users", user.uid);
-                await window.updateDoc(userRef, { riotAccount: mockRiotData });
-
-                user.riotAccount = mockRiotData;
-                localStorage.setItem('u4nted_user', JSON.stringify(user));
-
-                showToast("Conta vinculada com sucesso!");
-                closeLinkModal();
-                loadProfileData(); 
-
-            } catch (error) {
-                console.error(error);
-                alert("Erro ao vincular: " + error.message);
-            } finally {
-                btn.innerText = "Adicionar Conta"; btn.disabled = false;
+            if (!userData) {
+                document.querySelector('.main-content').innerHTML = "<div class='text-center p-20 text-white'>Usuário não encontrado.</div>";
+                return;
             }
-        }
+            
+            currentProfileData = userData;
 
-        // --- NOVO SISTEMA DE DESVINCULAR ---
+            const editBtn = document.querySelector('a[href="editar-perfil.html"]');
+            if(editBtn) editBtn.style.display = isMe ? 'flex' : 'none';
 
-        // 1. Abrir Modal de Confirmação
-        window.openUnlinkModal = function() {
-            document.getElementById('unlink-confirmation-modal').classList.remove('hidden');
-            document.getElementById('unlink-confirmation-modal').classList.add('flex');
-        }
+            document.getElementById('profile-nick').innerText = userData.nick || userData.name;
+            document.getElementById('profile-name').innerText = userData.name;
+            document.getElementById('profile-avatar').src = userData.photo || `https://api.dicebear.com/7.x/initials/svg?seed=${userData.nick}`;
+            document.getElementById('profile-bio').innerText = userData.bio ? `"${userData.bio}"` : '"Sem assinatura definida."';
 
-        // 2. Fechar Modal de Confirmação
-        window.closeUnlinkModal = function() {
-            document.getElementById('unlink-confirmation-modal').classList.add('hidden');
-            document.getElementById('unlink-confirmation-modal').classList.remove('flex');
-        }
-
-        // 3. Executar Ação Real
-        window.confirmUnlinkRiot = async function() {
-            const btn = document.getElementById('btn-confirm-unlink');
-            btn.innerText = "Removendo..."; btn.disabled = true;
-
-            try {
-                const user = JSON.parse(localStorage.getItem('u4nted_user'));
-                if (!user) return;
-
-                const userRef = window.doc(window.db, "users", user.uid);
-                await window.updateDoc(userRef, { riotAccount: null });
-
-                user.riotAccount = null;
-                localStorage.setItem('u4nted_user', JSON.stringify(user));
-
-                showToast("Conta desvinculada.");
-                
-                // Fecha TUDO
-                closeUnlinkModal();
-                closeManageModal();
-                
-                loadProfileData();
-
-            } catch(e) {
-                console.error(e);
-                alert("Erro ao desvincular.");
-            } finally {
-                btn.innerText = "Sim, desvincular"; btn.disabled = false;
+            if(userData.stats) {
+                document.getElementById('stat-matches').innerText = userData.stats.matches || 0;
+                document.getElementById('stat-tourneys').innerText = userData.stats.tournaments || 0;
+                document.getElementById('stat-mvp').innerText = userData.stats.mvp || 0;
             }
-        }
 
-        // --- FUNÇÕES DE UI ---
-
-        function loadTeamDisplay(userData) {
-            const localTeams = JSON.parse(localStorage.getItem('u4nted_teams_db') || '[]');
-            const myTeam = localTeams.find(t => 
-                (t.ownerId === userData.uid) || 
-                (t.roster && t.roster.some(m => m.uid === userData.uid))
-            );
-
-            const teamDisplay = document.getElementById('my-team-display');
-            if (teamDisplay) {
-                if (myTeam) {
-                    teamDisplay.innerHTML = `
-                        <div onclick="window.location.href='index.html#team-detail-${myTeam.id}'" class="bg-[#1c1f26]/80 border border-purple-500/30 hover:border-yellow-500 rounded-xl p-3 flex items-center gap-3 cursor-pointer group transition-all shadow-lg w-full">
-                            <div class="w-10 h-10 rounded-full bg-[#0f1116] border border-gray-700 overflow-hidden shrink-0 group-hover:scale-105 transition-transform">
-                                <img src="${myTeam.logo}" class="w-full h-full object-cover">
-                            </div>
-                            <div class="overflow-hidden min-w-0">
-                                <h4 class="text-white font-bold text-sm truncate group-hover:text-yellow-500 transition-colors">${myTeam.name}</h4>
-                                <p class="text-gray-500 text-[10px] uppercase font-bold truncate">${myTeam.tag || 'TIME'}</p>
-                            </div>
-                            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-600 ml-auto group-hover:text-yellow-500"></i>
-                        </div>
-                    `;
-                } else {
-                    teamDisplay.innerHTML = `<p class="text-gray-400 text-sm">Não participando de um time no momento</p>`;
+            const socialContainer = document.getElementById('social-icons-container');
+            if(socialContainer) {
+                socialContainer.innerHTML = '';
+                if(userData.socials) {
+                    const addIcon = (url, iconName, colorHover) => {
+                        if (!url || url.trim() === "") return;
+                        let finalLink = url.startsWith('http') ? url : '#'; 
+                        if (!url.startsWith('http')) {
+                            if(iconName === 'twitter') finalLink = `https://twitter.com/${url.replace('@','')}`;
+                            else if(iconName === 'instagram') finalLink = `https://instagram.com/${url.replace('@','')}`;
+                            else if(iconName === 'twitch') finalLink = `https://twitch.tv/${url}`;
+                            else if(iconName === 'youtube') finalLink = `https://youtube.com/@${url}`;
+                        }
+                        socialContainer.innerHTML += `<a href="${finalLink}" target="_blank" class="text-gray-500 ${colorHover} transition-colors p-1 hover:bg-white/5 rounded-full"><i data-lucide="${iconName}" class="w-4 h-4"></i></a>`;
+                    };
+                    addIcon(userData.socials.twitter, 'twitter', 'hover:text-blue-400');
+                    addIcon(userData.socials.instagram, 'instagram', 'hover:text-pink-500');
+                    addIcon(userData.socials.twitch, 'twitch', 'hover:text-purple-500');
+                    addIcon(userData.socials.youtube, 'youtube', 'hover:text-red-500');
                 }
             }
+
+            if(typeof loadTeamDisplay === "function") loadTeamDisplay(userData);
+            renderRiotSection(userData, isMe);
+            lucide.createIcons();
+
+        } catch (err) {
+            console.error("Erro ao carregar perfil:", err);
+        } finally {
+            document.getElementById('loading-screen').classList.add('hidden');
+            document.getElementById('profile-content').classList.remove('hidden');
         }
+    }
 
-        function renderRiotSection(userData, isMe) {
-            const riotSection = document.getElementById('riot-account-section');
-            const riotConnectCard = document.getElementById('riot-connect-card');
+    // --- 2. RENDERIZAR CARD ---
+    function renderRiotSection(userData, isMe) {
+        const riotSection = document.getElementById('riot-account-section');
+        const riotConnectCard = document.getElementById('riot-connect-card');
+        
+        if (riotSection) riotSection.innerHTML = '';
+
+        if (userData.riotAccount) {
+            if(riotConnectCard) riotConnectCard.style.display = 'none'; 
             
-            riotSection.innerHTML = '';
+            const rankStr = userData.riotAccount.rank || "Unranked";
+            let rankColor = 'text-white';
+            if(rankStr.includes('Gold')) rankColor = 'text-[#FFD700]';
+            else if(rankStr.includes('Platinum')) rankColor = 'text-[#00CED1]';
+            else if(rankStr.includes('Diamond')) rankColor = 'text-[#b469ff]';
+            else if(rankStr.includes('Ascendant')) rankColor = 'text-[#4ade80]';
+            else if(rankStr.includes('Immortal')) rankColor = 'text-[#ff4655]';
+            else if(rankStr.includes('Radiant')) rankColor = 'text-[#ffffaa]';
 
-            if (userData.riotAccount) {
-                if(riotConnectCard) riotConnectCard.style.display = 'none'; 
-                
-                let rankTextColor = 'text-white';
-                const rankName = userData.riotAccount.rank || "";
-                if (rankName.includes('Gold')) rankTextColor = 'text-[#FFD700]';
-                if (rankName.includes('Platinum')) rankTextColor = 'text-[#00CED1]';
-                if (rankName.includes('Diamond')) rankTextColor = 'text-[#b469ff]';
-                if (rankName.includes('Ascendant')) rankTextColor = 'text-[#4ade80]';
-                if (rankName.includes('Immortal')) rankTextColor = 'text-[#ff4655]';
-                if (rankName.includes('Radiant')) rankTextColor = 'text-[#ffffaa]';
+            const settingsBtnHtml = isMe 
+                ? `<button onclick="openManageModal()" class="bg-[#1c1f26] hover:bg-gray-700 text-white p-2 rounded-lg border border-gray-700 transition-colors shadow-lg absolute top-4 right-4 z-20" title="Gerenciar Conta"><i data-lucide="settings-2" class="w-5 h-5"></i></button>`
+                : ``;
 
-                const settingsBtnHtml = isMe 
-                    ? `<button onclick="openManageModal()" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/20 transition-all backdrop-blur-md"><i data-lucide="settings-2" class="w-4 h-4"></i></button>`
-                    : ``;
-
-                riotSection.innerHTML = `
-                    <div class="relative w-full max-w-lg mx-auto md:mx-0 rounded-xl overflow-hidden shadow-2xl group animate-fadeIn border border-white/10">
-                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style="background-image: url('${userData.riotAccount.card}');"></div>
-                        <div class="absolute inset-0 bg-black/70 backdrop-blur-[2px]"></div>
-
-                        <div class="relative z-10">
-                            <div class="px-6 pt-5 pb-2 flex justify-between items-start">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Valorant_logo.svg/1200px-Valorant_logo.svg.png" class="w-6 h-6 opacity-70 invert">
-                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest border border-white/10 px-2 py-0.5 rounded bg-black/20">Season Atual</span>
+            riotSection.innerHTML = `
+                <div class="relative w-full h-56 rounded-xl overflow-hidden border border-gray-700 shadow-2xl group animate-fadeIn mt-4">
+                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style="background-image: url('${userData.riotAccount.card}');"></div>
+                    <div class="absolute inset-0 bg-gradient-to-r from-[#0f1116] via-[#0f1116]/80 to-transparent"></div>
+                    ${settingsBtnHtml}
+                    <div class="relative z-10 h-full flex items-center px-8">
+                        <div class="flex items-center gap-6">
+                            <div class="w-28 h-28 bg-black/40 rounded-full border-2 border-white/10 p-4 backdrop-blur-sm shadow-lg flex items-center justify-center">
+                                <img src="${userData.riotAccount.rankImage}" class="w-full h-full object-contain drop-shadow-md">
                             </div>
-                            
-                            <div class="px-6 py-4 grid grid-cols-3 gap-4 items-center border-b border-white/10 pb-6">
-                                <div class="flex flex-col">
-                                    <div class="flex items-center gap-3 mb-1">
-                                        <div class="w-10 h-10 drop-shadow-md"><img src="${userData.riotAccount.rankImage}" class="w-full h-full object-contain"></div>
-                                        <span class="text-sm font-black uppercase ${rankTextColor} leading-tight text-shadow-sm">
-                                            ${userData.riotAccount.rank.split(' ')[0]} <br>
-                                            <span class="text-xs font-medium text-gray-300">${userData.riotAccount.rank.split(' ')[1] || ''}</span>
-                                        </span>
-                                    </div>
-                                    <span class="text-[10px] text-gray-400 font-bold uppercase mt-1 pl-1">Elo ${userData.riotAccount.elo} RR</span>
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="px-2 py-0.5 rounded bg-white/10 text-[10px] font-bold text-gray-300 uppercase border border-white/5">${userData.riotAccount.region || 'BR'}</span>
+                                    <span class="text-[10px] text-gray-500 font-bold uppercase">Nível ${userData.riotAccount.level || 0}</span>
                                 </div>
-
-                                <div class="text-center border-l border-white/10 pl-2">
-                                    <div class="flex items-center justify-center gap-1 text-white font-black text-2xl drop-shadow-md">${userData.riotAccount.matches || 0}</div>
-                                    <span class="text-[9px] text-gray-400 font-bold uppercase tracking-wide">Partidas</span>
+                                <h3 class="text-3xl font-black text-white leading-none mb-2 filter drop-shadow-lg">
+                                    ${userData.riotAccount.gameName} 
+                                    <span class="text-gray-400 text-xl font-medium">#${userData.riotAccount.tagLine}</span>
+                                </h3>
+                                <div class="flex items-center gap-4 bg-black/50 px-4 py-2 rounded-lg border border-white/5 w-fit backdrop-blur-md">
+                                    <p class="font-black text-lg ${rankColor} uppercase tracking-wide">${userData.riotAccount.rank}</p>
+                                    <div class="h-4 w-[1px] bg-gray-600"></div>
+                                    <p class="text-gray-300 text-sm font-bold">${userData.riotAccount.elo} RR</p>
                                 </div>
-
-                                <div class="text-center border-l border-white/10 pl-2">
-                                    <div class="flex items-center justify-center gap-1 text-white font-black text-2xl drop-shadow-md">${userData.riotAccount.wins || 0}</div>
-                                    <span class="text-[9px] text-gray-400 font-bold uppercase tracking-wide">Vitórias</span>
-                                </div>
-                            </div>
-
-                            <div class="bg-black/40 px-6 py-3 flex justify-between items-center border-t border-white/5">
-                                <div>
-                                    <h3 class="text-white font-bold text-base leading-none mb-1 drop-shadow-md">
-                                        ${userData.riotAccount.gameName} <span class="text-gray-400 font-normal">#${userData.riotAccount.tagLine}</span>
-                                    </h3>
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_5px_#22c55e]"></div>
-                                        <span class="text-[10px] text-gray-400 font-medium">Conta Conectada</span>
-                                    </div>
-                                </div>
-                                ${settingsBtnHtml}
                             </div>
                         </div>
                     </div>
-                `;
+                </div>
+            `;
+        } else {
+            if(isMe) {
+                if(riotConnectCard) riotConnectCard.style.display = 'block'; 
             } else {
-                if(isMe) {
-                    if(riotConnectCard) riotConnectCard.style.display = 'block'; 
-                } else {
-                    if(riotConnectCard) riotConnectCard.style.display = 'none'; 
-                    riotSection.innerHTML = `<div class="p-4 border border-gray-800 rounded-lg text-gray-500 text-sm">Este jogador ainda não vinculou o Valorant.</div>`;
+                if(riotConnectCard) riotConnectCard.style.display = 'none'; 
+                riotSection.innerHTML = `<div class="p-4 border border-gray-800 rounded-lg text-gray-500 text-sm text-center italic">Este jogador ainda não vinculou o Valorant.</div>`;
+            }
+        }
+    }
+
+    // --- 3. CONEXÃO COM A API (CORRIGIDA: MODO QUERY PARAMETER) ---
+    window.connectRiotAccount = async function() {
+        const nickInput = document.getElementById('riot-nick').value.trim();
+        const tagInput = document.getElementById('riot-tag').value.replace('#', '').trim();
+        const btn = document.getElementById('btn-connect-riot');
+
+        if (!nickInput || !tagInput) { alert("Preencha nick e tag."); return; }
+
+        btn.innerText = "Buscando..."; btn.disabled = true;
+
+        try {
+            const safeNick = encodeURIComponent(nickInput);
+            const safeTag = encodeURIComponent(tagInput);
+            
+            // --- MUDANÇA CRUCIAL: Usar ?api_key= na URL em vez de Header ---
+            // Isso evita bloqueios de CORS e Headers em navegadores comuns
+            const keyParam = `?api_key=${VALORANT_API_KEY}`;
+
+            let rankData = null;
+            let accountData = null;
+
+            console.log(`Buscando: ${safeNick} #${safeTag} ...`);
+
+            // 1. Tenta pegar MMR (Rank) - Endpoint BR
+            try {
+                const mmrResp = await fetch(`https://api.henrikdev.xyz/valorant/v1/mmr/br/${safeNick}/${safeTag}${keyParam}`);
+                console.log("MMR Status:", mmrResp.status);
+                
+                if (mmrResp.status === 200) {
+                    const mmrJson = await mmrResp.json();
+                    rankData = mmrJson.data;
+                    accountData = {
+                        name: mmrJson.data.name,
+                        tag: mmrJson.data.tag,
+                        region: 'BR',
+                        level: 0,
+                        card: null 
+                    };
+                } else if (mmrResp.status === 429) {
+                     throw new Error("Muitas tentativas. Espere 1 minuto.");
                 }
-            }
-        }
+            } catch (e) { console.warn("Erro MMR:", e); }
 
-        window.openLinkModal = function() {
-            document.getElementById('link-modal').classList.remove('hidden');
-            document.getElementById('link-modal').classList.add('flex');
-        }
-        window.closeLinkModal = function() {
-            document.getElementById('link-modal').classList.add('hidden');
-            document.getElementById('link-modal').classList.remove('flex');
-        }
-        window.openManageModal = function() {
-            const user = currentProfileData;
-            if(user && user.riotAccount) {
-                document.getElementById('mng-nick').value = user.riotAccount.gameName;
-                document.getElementById('mng-tag').value = user.riotAccount.tagLine;
-                document.getElementById('mng-rank').innerText = user.riotAccount.rank;
-            }
-            document.getElementById('manage-riot-modal').classList.remove('hidden');
-            document.getElementById('manage-riot-modal').classList.add('flex');
-        }
-        window.closeManageModal = function() {
-            document.getElementById('manage-riot-modal').classList.add('hidden');
-            document.getElementById('manage-riot-modal').classList.remove('flex');
-        }
+            // 2. Busca Conta (Necessário para pegar o Card)
+            // Se o MMR falhar (ex: usuário NA ou erro 404 de rank), tentamos a conta geral
+            try {
+                const accResp = await fetch(`https://api.henrikdev.xyz/valorant/v1/account/${safeNick}/${safeTag}${keyParam}`);
+                console.log("Account Status:", accResp.status);
 
-        window.switchProfileTab = function(tab) {
-            const overview = document.getElementById('prof-tab-overview');
-            const matches = document.getElementById('prof-tab-matches');
-            const btnOver = document.getElementById('prof-btn-overview');
-            const btnMatch = document.getElementById('prof-btn-matches');
+                if (accResp.status === 200) {
+                    const accJson = await accResp.json();
+                    accountData = {
+                        name: accJson.data.name,
+                        tag: accJson.data.tag,
+                        region: accJson.data.region,
+                        level: accJson.data.account_level,
+                        card: accJson.data.card.wide
+                    };
+                } else if (accResp.status === 429) {
+                    throw new Error("Muitas tentativas. Espere 1 minuto.");
+                } else if (accResp.status === 403 || accResp.status === 401) {
+                    throw new Error("Erro de Chave API (403).");
+                }
+            } catch (e) { console.warn("Erro Account:", e); }
 
-            if(tab === 'overview') {
-                overview.classList.remove('hidden'); matches.classList.add('hidden');
-                btnOver.className = "px-6 py-2 bg-[#5b4dff] text-white text-xs font-bold rounded-lg mb-4 transition-colors";
-                btnMatch.className = "px-6 py-2 text-gray-500 hover:text-white text-xs font-bold mb-4 transition-colors";
-            } else {
-                overview.classList.add('hidden'); matches.classList.remove('hidden');
-                btnMatch.className = "px-6 py-2 bg-[#5b4dff] text-white text-xs font-bold rounded-lg mb-4 transition-colors";
-                btnOver.className = "px-6 py-2 text-gray-500 hover:text-white text-xs font-bold mb-4 transition-colors";
+            // 3. Validação Final
+            if (!accountData && !rankData) {
+                // Se ambos falharam, nenhum dado foi encontrado
+                throw new Error("Jogador não encontrado na Riot. Verifique Nick e Tag.");
             }
-        };
 
-        window.showToast = function(message) {
-            let container = document.querySelector('.toast-container');
-            if (!container) {
-                container = document.createElement('div');
-                container.className = 'toast-container';
-                document.body.appendChild(container);
-            }
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = `<div class="toast-icon"><i data-lucide="check" style="width:14px; height:14px;"></i></div><span>${message}</span>`;
-            container.appendChild(toast);
-            lucide.createIcons();
-            setTimeout(() => { toast.style.animation = 'fadeOutToast 0.4s forwards'; setTimeout(() => toast.remove(), 400); }, 4000);
+            // Monta os dados finais
+            const finalCard = accountData?.card || "https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/wideart.png";
+            const finalRank = rankData ? rankData.currenttierpatched : "Unranked";
+            const finalElo = rankData ? rankData.ranking_in_tier : 0;
+            const finalRankImg = rankData?.images?.large || "https://media.valorant-api.com/competitivetiers/564d8e2d-c226-317e-4628-eb5263512e37/0/largeicon.png";
+
+            const riotDataReal = {
+                gameName: accountData?.name || nickInput,
+                tagLine: accountData?.tag || tagInput,
+                region: accountData?.region || 'BR',
+                level: accountData?.level || 0,
+                card: finalCard,
+                rank: finalRank,
+                rankImage: finalRankImg,
+                elo: finalElo,
+                matches: 0,
+                wins: 0,
+                lastUpdate: new Date().toISOString()
+            };
+
+            // Salva
+            const user = JSON.parse(localStorage.getItem('u4nted_user'));
+            const userRef = window.doc(window.db, "users", user.uid);
+            await window.updateDoc(userRef, { riotAccount: riotDataReal });
+
+            user.riotAccount = riotDataReal;
+            localStorage.setItem('u4nted_user', JSON.stringify(user));
+
+            showToast(`Conectado: ${riotDataReal.gameName}`);
+            closeLinkModal();
+            loadProfileData();
+
+        } catch (error) {
+            console.error(error);
+            alert("Erro: " + error.message);
+        } finally {
+            btn.innerText = "Adicionar Conta"; btn.disabled = false;
         }
-    </script>
+    }
+
+    // --- FUNÇÕES MODAIS (UI) ---
+    window.openLinkModal = () => { document.getElementById('link-modal').classList.remove('hidden'); document.getElementById('link-modal').classList.add('flex'); };
+    window.closeLinkModal = () => { document.getElementById('link-modal').classList.add('hidden'); document.getElementById('link-modal').classList.remove('flex'); };
+    window.openManageModal = () => {
+        const user = currentProfileData;
+        if(user && user.riotAccount) {
+            document.getElementById('mng-nick').value = user.riotAccount.gameName;
+            document.getElementById('mng-tag').value = user.riotAccount.tagLine;
+            document.getElementById('mng-region').innerText = user.riotAccount.region.toUpperCase();
+            document.getElementById('mng-rank').innerText = user.riotAccount.rank;
+            const date = user.riotAccount.lastUpdate ? new Date(user.riotAccount.lastUpdate).toLocaleDateString() : 'Hoje';
+            document.getElementById('mng-update').innerText = "Atualizado em: " + date;
+        }
+        document.getElementById('manage-riot-modal').classList.remove('hidden'); document.getElementById('manage-riot-modal').classList.add('flex');
+    };
+    window.closeManageModal = () => { document.getElementById('manage-riot-modal').classList.add('hidden'); document.getElementById('manage-riot-modal').classList.remove('flex'); };
+    window.openUnlinkModal = () => { document.getElementById('unlink-confirmation-modal').classList.remove('hidden'); document.getElementById('unlink-confirmation-modal').classList.add('flex'); };
+    window.closeUnlinkModal = () => { document.getElementById('unlink-confirmation-modal').classList.add('hidden'); document.getElementById('unlink-confirmation-modal').classList.remove('flex'); };
+
+    window.confirmUnlinkRiot = async () => {
+        const btn = document.getElementById('btn-confirm-unlink');
+        btn.innerText = "Removendo..."; btn.disabled = true;
+        try {
+            const user = JSON.parse(localStorage.getItem('u4nted_user'));
+            if (!user) return;
+            const userRef = window.doc(window.db, "users", user.uid);
+            await window.updateDoc(userRef, { riotAccount: null });
+            user.riotAccount = null;
+            localStorage.setItem('u4nted_user', JSON.stringify(user));
+            showToast("Conta desvinculada.");
+            closeUnlinkModal(); closeManageModal(); loadProfileData();
+        } catch(e) { console.error(e); alert("Erro ao desvincular."); } finally { btn.innerText = "Sim, desvincular"; btn.disabled = false; }
+    };
+
+    window.switchProfileTab = (tab) => {
+        const overview = document.getElementById('prof-tab-overview');
+        const matches = document.getElementById('prof-tab-matches');
+        const btnOver = document.getElementById('prof-btn-overview');
+        const btnMatch = document.getElementById('prof-btn-matches');
+        if(tab === 'overview') {
+            overview.classList.remove('hidden'); matches.classList.add('hidden');
+            btnOver.className = "px-6 py-2 bg-[#5b4dff] text-white text-xs font-bold rounded-lg mb-4 transition-colors";
+            btnMatch.className = "px-6 py-2 text-gray-500 hover:text-white text-xs font-bold mb-4 transition-colors";
+        } else {
+            overview.classList.add('hidden'); matches.classList.remove('hidden');
+            btnMatch.className = "px-6 py-2 bg-[#5b4dff] text-white text-xs font-bold rounded-lg mb-4 transition-colors";
+            btnOver.className = "px-6 py-2 text-gray-500 hover:text-white text-xs font-bold mb-4 transition-colors";
+        }
+    };
+
+    function loadTeamDisplay(userData) {
+        if (!userData) return;
+        const localTeams = JSON.parse(localStorage.getItem('u4nted_teams_db') || '[]');
+        const myTeam = localTeams.find(t => (t.ownerId === userData.uid) || (t.roster && t.roster.some(m => m.uid === userData.uid)));
+        const teamDisplay = document.getElementById('my-team-display');
+        if (teamDisplay) {
+            if (myTeam) {
+                teamDisplay.innerHTML = `<div onclick="window.location.href='index.html#team-detail-${myTeam.id}'" class="bg-[#1c1f26]/80 border border-purple-500/30 hover:border-yellow-500 rounded-xl p-3 flex items-center gap-3 cursor-pointer group transition-all shadow-lg w-full"><div class="w-10 h-10 rounded-full bg-[#0f1116] border border-gray-700 overflow-hidden shrink-0 group-hover:scale-105 transition-transform"><img src="${myTeam.logo}" class="w-full h-full object-cover"></div><div class="overflow-hidden min-w-0"><h4 class="text-white font-bold text-sm truncate group-hover:text-yellow-500 transition-colors">${myTeam.name}</h4><p class="text-gray-500 text-[10px] uppercase font-bold truncate">${myTeam.tag || 'TIME'}</p></div></div>`;
+            } else { teamDisplay.innerHTML = `<p class="text-gray-400 text-sm">Não participando de um time no momento</p>`; }
+        }
+    }
+
+    window.showToast = function(message) {
+        let container = document.querySelector('.toast-container');
+        if (!container) { container = document.createElement('div'); container.className = 'toast-container'; document.body.appendChild(container); }
+        const toast = document.createElement('div'); toast.className = 'toast';
+        toast.innerHTML = `<div class="toast-icon"><i data-lucide="check" style="width:14px; height:14px;"></i></div><span>${message}</span>`;
+        container.appendChild(toast); lucide.createIcons();
+        setTimeout(() => { toast.style.animation = 'fadeOutToast 0.4s forwards'; setTimeout(() => toast.remove(), 400); }, 4000);
+    }
+</script>
 </body>
 </html>
