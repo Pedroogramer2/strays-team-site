@@ -7,11 +7,20 @@
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/png" href="img/icone.png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
+
+    <div id="preloader">
+    <video autoplay muted loop class="preloader-gif">
+        <source src="media/Strayspreloaders.webm" type="video/webm">
+        Your browser does not support the video tag.
+    </video>
+</div>
+
     <!-- Enhanced Header -->
     <header id="header" class="header">
-        <div class="container">
+        
             <div class="nav-wrapper">
                 <!-- Logo -->
                 <div class="logo-section">
@@ -52,13 +61,12 @@
                 <a href="index.html#sponsors" class="mobile-nav-link">Patrocinadores</a>
                 <a href="#contact" class="mobile-nav-link">Contato</a>
             </div>
-        </div>
+        
     </header>
 
 
     
-    <section id="team" class="gallery-section">
-    <div class="container">
+    <section id="politica" class="gallery-section"> <div class="container">
     <h2 class="section-title">POLÍTICA DE PRIVACIDADE</h2>
     <p class="section-subtitle-politica">Data de Vigência: 16/09/2025</p><br>
 
@@ -225,7 +233,8 @@ o cenário de eSports e inspirar a próxima geração de jogadores.
 
 
 
-
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
     <script src="script.js"></script>
 </body>

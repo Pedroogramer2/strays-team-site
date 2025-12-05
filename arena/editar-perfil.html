@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - U4nted Cup</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-[#0f1116] text-white">
+
+    <aside class="sidebar">
+        <div class="logo"><h1>U4<span class="logo-accent">NTED CUP</span></h1></div>
+        <nav class="menu">
+    <a href="index.html#home" class="menu-item"><i data-lucide="home"></i><span>Home</span></a>
+    <a href="index.html#players" class="menu-item"><i data-lucide="user"></i><span>Players</span></a>
+    <a href="index.html#times" class="menu-item"><i data-lucide="shield"></i><span>Times</span></a>
+    <a href="index.html#campeonatos" class="menu-item"><i data-lucide="trophy"></i><span>Campeonatos</span></a>
+</nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="top-bar" id="top-bar-container"></div>
+
+        <div class="max-w-5xl mx-auto px-8 py-12 animate-fadeIn">
+            
+            <h1 class="text-3xl font-black mb-2 uppercase">Configurações da sua conta</h1>
+            <p class="text-gray-500 mb-10">Gerencie todas as informações da sua conta</p>
+
+            <div class="bg-[#15171e] border border-gray-800 rounded-2xl p-8 shadow-xl">
+                
+                <div class="flex items-center gap-6 mb-10 pb-10 border-b border-gray-800">
+                    <div class="w-24 h-24 rounded-full bg-gray-800 border-2 border-gray-700 overflow-hidden relative group">
+                        <img id="edit-avatar-img" src="" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <button class="bg-[#1c1f26] hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-bold border border-gray-700 transition-colors">
+                            Enviar nova foto
+                        </button>
+                        <p class="text-gray-600 text-xs mt-2">Recomendamos uma imagem 500x500.<br>Apenas PNG, JPEG, JPG e WEBP.</p>
+                    </div>
+                </div>
+
+                <form id="edit-form" class="space-y-8">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="flex flex-col gap-2">
+                            <label class="text-xs font-bold text-gray-400 uppercase">Primeiro Nome</label>
+                            <input type="text" id="edit-name" disabled class="w-full bg-[#0f1116] border border-gray-800 text-gray-500 px-4 py-3 rounded-lg focus:outline-none cursor-not-allowed font-medium">
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <label class="text-xs font-bold text-gray-400 uppercase">Seu E-mail</label>
+                            <input type="text" id="edit-email" disabled class="w-full bg-[#0f1116] border border-gray-800 text-gray-500 px-4 py-3 rounded-lg focus:outline-none cursor-not-allowed font-medium">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="flex flex-col gap-2">
+                            <label class="text-xs font-bold text-gray-400 uppercase">Assinatura</label>
+                            <input type="text" id="edit-bio" class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg focus:border-yellow-500 focus:outline-none transition-colors">
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <label class="text-xs font-bold text-gray-400 uppercase">Nick</label>
+                            <input type="text" id="edit-nick" class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg focus:border-yellow-500 focus:outline-none transition-colors">
+                        </div>
+                    </div>
+
+                    <div>
+                        <button type="button" onclick="saveProfile()" class="bg-[#5b4dff] hover:bg-[#4a3ecc] text-white font-bold px-6 py-3 rounded-lg shadow-lg shadow-indigo-900/20 transition-all">
+                            Salvar Alterações
+                        </button>
+                    </div>
+
+                    <div class="pt-8 border-t border-gray-800">
+                        <h3 class="text-gray-300 font-bold mb-6">Redes Sociais</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="flex flex-col gap-2">
+                                <label class="text-xs font-bold text-gray-400 uppercase">Twitter (X)</label>
+                                <div class="relative">
+                                    <i data-lucide="twitter" class="absolute left-4 top-3.5 text-gray-600 w-4 h-4"></i>
+                                    <input type="text" id="edit-twitter" placeholder="@exemplo" class="w-full bg-[#0f1116] border border-gray-800 text-white pl-10 pr-4 py-3 rounded-lg focus:border-blue-500 focus:outline-none transition-colors">
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label class="text-xs font-bold text-gray-400 uppercase">Instagram</label>
+                                <div class="relative">
+                                    <i data-lucide="instagram" class="absolute left-4 top-3.5 text-gray-600 w-4 h-4"></i>
+                                    <input type="text" id="edit-instagram" placeholder="@exemplo" class="w-full bg-[#0f1116] border border-gray-800 text-white pl-10 pr-4 py-3 rounded-lg focus:border-pink-500 focus:outline-none transition-colors">
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label class="text-xs font-bold text-gray-400 uppercase">Twitch</label>
+                                <div class="relative">
+                                    <i data-lucide="twitch" class="absolute left-4 top-3.5 text-gray-600 w-4 h-4"></i>
+                                    <input type="text" id="edit-twitch" placeholder="exemplo123" class="w-full bg-[#0f1116] border border-gray-800 text-white pl-10 pr-4 py-3 rounded-lg focus:border-purple-500 focus:outline-none transition-colors">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button type="button" onclick="saveProfile()" class="bg-[#5b4dff] hover:bg-[#4a3ecc] text-white font-bold px-6 py-3 rounded-lg shadow-lg shadow-indigo-900/20 transition-all">
+                            Salvar Alterações
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="auth.js"></script>
+    <script src="global-topbar.js"></script>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+        
+        // Carregar dados
+        const userJson = localStorage.getItem('u4nted_user');
+        if(userJson) {
+            const user = JSON.parse(userJson);
+            
+            // Preenche Campos
+            setVal('edit-name', user.name);
+            setVal('edit-email', user.email);
+            setVal('edit-nick', user.nick || user.name.split(' ')[0]);
+            setVal('edit-bio', user.bio);
+            
+            const avatar = document.getElementById('edit-avatar-img');
+            if(avatar) avatar.src = user.photo || `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`;
+
+            if (user.socials) {
+                setVal('edit-twitter', user.socials.twitter);
+                setVal('edit-instagram', user.socials.instagram);
+                setVal('edit-twitch', user.socials.twitch);
+            }
+        } else {
+            window.location.href = 'login.html';
+        }
+    });
+
+    // Função auxiliar curta
+    function setVal(id, val) {
+        const el = document.getElementById(id);
+        if(el) el.value = val || '';
+    }
+
+    function saveProfile() {
+        const userJson = localStorage.getItem('u4nted_user');
+        if(!userJson) return;
+
+        let user = JSON.parse(userJson);
+        let changes = []; // Lista de mudanças
+
+        // 1. Verificar Nick
+        const newNick = document.getElementById('edit-nick').value;
+        if (newNick !== user.nick) {
+            user.nick = newNick;
+            changes.push("Nick");
+        }
+
+        // 2. Verificar Assinatura
+        const newBio = document.getElementById('edit-bio').value;
+        if (newBio !== (user.bio || '')) {
+            user.bio = newBio;
+            changes.push("Assinatura");
+        }
+
+        // 3. Verificar Redes Sociais
+        const newSocials = {
+            twitter: document.getElementById('edit-twitter').value,
+            instagram: document.getElementById('edit-instagram').value,
+            twitch: document.getElementById('edit-twitch').value
+        };
+        
+        // Compara objeto antigo com novo
+        if (JSON.stringify(user.socials) !== JSON.stringify(newSocials)) {
+            user.socials = newSocials;
+            changes.push("Redes Sociais");
+        }
+
+        // Salva
+        localStorage.setItem('u4nted_user', JSON.stringify(user));
+
+        // Mostra notificação baseada no que mudou
+        if (changes.length > 0) {
+            // Se mudou muita coisa, mostra genérico, senão especifica
+            if (changes.length > 2) {
+                showToast("Perfil atualizado com sucesso!");
+            } else {
+                changes.forEach(change => {
+                    showToast(`${change} atualizado com sucesso!`);
+                });
+            }
+        } else {
+            showToast("Nenhuma alteração detectada.");
+        }
+    }
+
+    // --- FUNÇÃO DE TOAST (NOTIFICAÇÃO VERDE) ---
+    function showToast(message) {
+        // Cria container se não existir
+        let container = document.querySelector('.toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+        }
+
+        // Cria o Toast
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = `
+            <div class="toast-icon"><i data-lucide="check" style="width:14px; height:14px;"></i></div>
+            <span>${message}</span>
+        `;
+
+        container.appendChild(toast);
+        lucide.createIcons(); // Atualiza ícone do check
+
+        // Remove após 4 segundos
+        setTimeout(() => {
+            toast.style.animation = 'fadeOutToast 0.4s forwards';
+            setTimeout(() => toast.remove(), 400);
+        }, 4000);
+    }
+</script>
+</body>
+</html>

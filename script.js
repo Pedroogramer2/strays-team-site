@@ -4,6 +4,25 @@
  * Funções de Inicialização
  * Agrupadas para melhor organização e rastreamento.
  */
+
+// --- CONFIGURAÇÃO DO FIREBASE ---
+// Cole aqui os dados que você copiou no Passo 1 (console do Firebase)
+ const firebaseConfig = {
+    apiKey: "AIzaSyDaaBVNHZ6UOgHzb-pzT1RJxAT5yiQZLw0",
+    authDomain: "site-strays.firebaseapp.com",
+    projectId: "site-strays",
+    storageBucket: "site-strays.firebasestorage.app",
+    messagingSenderId: "1005872178248",
+    appId: "1:1005872178248:web:36dfa929ab008a4415e47d",
+    measurementId: "G-5FWVKCPRZY"
+  };
+
+// Inicializa o Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+
+
 function initAll() {
     // Inicializa todas as funcionalidades do site
     initMobileMenu();
@@ -17,6 +36,9 @@ function initAll() {
     initMouseEffects();
     initIntersectionObserver();
     initTeamModals();
+    initPlayersPage(); // A função do Passo 2 (NOVA)
+    initMatchWidget();
+    initMatchHistory();
     initNewsSystem();
     initGalleryModal();
     initHighlightsButton();
@@ -27,6 +49,12 @@ function initAll() {
     initGalleryGridModal();
     initNumberCounters();
     initHeaderLogoVisibility2();
+    initThemeToggle();
+    initHeroSlider();       // Inicia o Slider do Hero
+    initScrambleEffects();  // Inicia o efeito de letras do Widget
+    initCalendarWidget(); // <--- ADICIONE ESTA LINHA
+    initFullGallery(); // <--- ADICIONE ISSO
+    
 
     // Mostra que o carregamento foi concluído
     console.log('🎉 STRAYS TEAM website loaded successfully!');
@@ -260,29 +288,60 @@ function initPlayerCards() {
     });
 }
 
-// Newsletter Form
+// Newsletter Form com Firebase Database
 function initNewsletterForm() {
     const form = document.getElementById('newsletterForm');
 
     if (form) {
         form.addEventListener('submit', function(e) {
-            e.preventDefault();
+            e.preventDefault(); // Impede a página de recarregar
 
             const input = this.querySelector('input[type="email"]');
             const button = this.querySelector('button');
 
-            if (input && button) {
-                const email = input.value;
+            // Salva o texto original do botão para restaurar depois
+            const originalText = button.innerHTML; 
+            const emailValue = input.value;
 
-                if (email) {
-                    button.innerHTML = '<i class="fas fa-check"></i> Subscribed!';
+            if (emailValue && button) {
+                // 1. Muda o visual para "Carregando"
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+                button.disabled = true; // Impede cliques múltiplos
+
+                // 2. Envia para o Banco de Dados (Coleção 'newsletter')
+                db.collection("newsletter").add({
+                    email: emailValue,
+                    data_inscricao: new Date().toISOString(), // Salva a data/hora
+                    origem: "Site Principal"
+                })
+                .then((docRef) => {
+                    // --- SUCESSO ---
+                    console.log("Email salvo com ID: ", docRef.id);
+
+                    button.innerHTML = '<i class="fas fa-check"></i> Sucesso!';
                     button.style.background = 'linear-gradient(45deg, #10b981, #059669)';
-                    input.value = '';
+                    input.value = ''; // Limpa o campo
+
+                    // Volta o botão ao normal após 3 segundos
                     setTimeout(() => {
-                        button.innerHTML = '<i class="fas fa-paper-plane"></i> Subscribe';
+                        button.innerHTML = originalText;
                         button.style.background = '';
+                        button.disabled = false;
                     }, 3000);
-                }
+                })
+                .catch((error) => {
+                    // --- ERRO ---
+                    console.error("Erro ao adicionar documento: ", error);
+
+                    button.innerHTML = '<i class="fas fa-exclamation-circle"></i> Erro!';
+                    button.style.background = '#ef4444'; // Vermelho
+
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.style.background = '';
+                        button.disabled = false;
+                    }, 3000);
+                });
             }
         });
     }
@@ -473,146 +532,367 @@ function initPerformanceMonitoring() {
     measureFPS();
 }
 
-// Team Modals and Data
+// Team Modals and Data - VERSÃO: REDIRECIONAMENTO PARA PÁGINAS ESPECÍFICAS
 function initTeamModals() {
-    const teamsData = {
-        'principal': {
-            name: 'STRAYS',
-            players: [
-                { name: 'Brenno7', role: 'Sentinela', image: 'img/10.png' },
-                { name: 'Kitsu', role: 'Iniciador', image: 'img/11.png' },
-                { name: 'NeskWgA', role: 'Controlador', image: 'img/12.png' },
-                { name: 'Ecypse', role: 'Duelista', image: 'img/13.png' },
-                { name: 'Jubzin', role: 'Controlador', image: 'img/Jubzinn.png' },
-                { name: 'Jogador Principal 6', role: 'Flex', image: 'img/icone.png' }
-            ]
-        },
-        'core': {
-            name: 'STRAYS CORE',
-            players: [
-                { name: 'Venites', role: 'Duelista', image: 'img/3.png' },
-                { name: 'Taisuke', role: 'Iniciador', image: 'img/4.png' },
-                { name: 'Theuzin', role: 'Flex', image: 'img/5.png' },
-                { name: 'Higu66', role: 'Duelista', image: 'img/6.png' },
-                { name: 'Aattack', role: 'Controlador', image: 'img/7.png' },
-                { name: 'Juca', role: 'Controlador', image: 'img/8.png' },
-                { name: 'Death', role: 'Controlador', image: 'img/9.png' }
-            ]
-        },
-        'feminina': {
-            name: 'STRAYS FEMININA',
-            players: [
-                { name: 'Rissa', role: 'Iniciador', image: 'img/14.png' },
-                { name: 'Cold', role: 'Duelista', image: 'img/15.png' },
-                { name: 'Stehff', role: 'Sentinela', image: 'img/16.png' },
-                { name: 'Luna', role: 'Flex', image: 'img/17.png' },
-                { name: 'Ishtar', role: 'Controlador', image: 'img/18.png' }
-            ]
-        },
-        'academy': {
-            name: 'STRAYS ACADEMY',
-            players: [
-                { name: 'Virgula', role: 'Iniciador', image: 'img/Pedro Line (1).png' },
-                { name: 'Academy 2', role: 'Sentinela', image: 'img/Strays Academy Icone.png' },
-                { name: 'Academy 3', role: 'Duelista', image: 'img/Strays Academy Icone.png' },
-                { name: 'Academy 4', role: 'Controlador', image: 'img/Strays Academy Icone.png' },
-                { name: 'Academy 5', role: 'Flex', image: 'img/Strays Academy Icone.png' },
-                { name: 'Academy 6', role: 'Flex', image: 'img/Strays Academy Icone.png' }
-            ]
-        }
+    const teamCards = document.querySelectorAll('.player-card');
+
+    const handleRedirect = (card) => {
+        // Pega o tipo do time (ex: "feminina", "principal") do HTML
+        const teamType = card.getAttribute('data-team');
+        
+        // Redireciona para players.html enviando o parâmetro "?line=..."
+        window.location.href = `players.html?line=${teamType}`;
     };
 
-    const modal = document.getElementById('teamModal');
-    if (modal) {
-        const teamCards = document.querySelectorAll('.player-card');
-        const modalTeamName = document.getElementById('modal-team-name');
-        const modalPlayerContainer = document.getElementById('modal-player-container');
-        const closeModalButton = modal.querySelector('.close-button');
-        const prevBtn = modal.querySelector('.carousel-nav.prev-btn-players.glass-effect');
-        const nextBtn = modal.querySelector('.carousel-nav.next-btn-players.glass-effect');
-        const indicator = document.getElementById('carousel-indicator');
-        let lastFocusedElement;
-        let currentPlayers = [];
-        let currentIndex = 0;
+    teamCards.forEach(card => {
+        card.addEventListener('click', () => handleRedirect(card));
+        card.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                handleRedirect(card);
+            }
+        });
+    });
+}
 
-        function renderPlayer(index) {
-            const player = currentPlayers[index];
-            if (!player) return;
-            modalPlayerContainer.innerHTML = `
-                <div class="player-info-card">
-                    <img src="${player.image}" alt="Foto de ${player.name}">
-                    <h4>${player.name}</h4>
-                    <p>${player.role}</p>
-                </div>
-            `;
-            indicator.textContent = `${index + 1} / ${currentPlayers.length}`;
+// --- DADOS DAS LINES ---
+// Aqui você edita, adiciona ou remove jogadores sem mexer no HTML
+
+const teamBanners = {
+    "principal": "img/lines/projeto site principal_Prancheta.svg",
+    "mobile": "img/lines/projeto site mobile_Prancheta.svg",
+    "Strays GC": "img/lines/projeto site GC_Prancheta.svg",    
+    "Academy": "img/lines/projeto site academy_Prancheta.svg"
+};
+
+// Configuração de alinhamento da foto para cada line
+// Valores: "top center", "center center", "bottom center" ou porcentagem "50% 20%"
+const teamBannerPositions = {
+    "principal": "75% 30%",      // Em pé: foca nos rostos lá em cima
+    "mobile": "center center",      // Sentados: foca no meio (sofá)
+    "Strays GC": "center center",      // Geralmente em pé
+    "academy": "50% 25%"            // Um meio termo (testar)
+};
+
+const teamsDatabase = {
+    "principal": [
+        { nick: "Analu", age: "18 ANOS", nac: "Brasileira", role: "IGL", img: "img/Analustrays-Photoroom.png", insta: "#", x: "#" },
+        { nick: "Mecci", age: "16 ANOS", nac: "Brasileira", role: "CONTROLLER", img: "img/Playerpreto.png", insta: "#", x: "#" },
+        { nick: "Art", age: "16 ANOS", nac: "Brasileira", role: "DUELIST", img: "img/Playerpreto.png", insta: "#", x: "#" },
+        { nick: "Youz", age: "16 ANOS", nac: "Brasileira", role: "CONTROLLER", img: "img/Playerpreto.png", insta: "#", x: "#" },
+        { nick: "canezera", age: "16 ANOS", nac: "Brasileira", role: "DUELIST", img: "img/Playerpreto.png", insta: "#", x: "#" },
+        { nick: "b1w", age: "17 ANOS", nac: "Brasileira", role: "COACH", img: "img/Playerpreto.png", insta: "#", x: "#" },
+        { nick: "silverlive", age: "16 ANOS", nac: "Brasileira", role: "MANAGER", img: "img/Playerpreto.png", insta: "#", x: "#" },
+        // Adicione mais jogadores aqui...
+    ],
+    "Strays GC": [
+        { nick: "Rissa", age: "24 ANOS", nac: "Brasileira", role: "SENTINEL", img: "img/Playerpreto.png", insta: "https://instagram.com/...", x: "#" },
+        { nick: "Rissa", age: "21 ANOS", nac: "Brasileira", role: "SENTINEL", img: "img/Playerpreto.png", insta: "#", x: "#" },
+        { nick: "Rissa", age: "21 ANOS", nac: "Brasileira", role: "SENTINEL", img: "img/Playerpreto.png", insta: "#", x: "#" },
+        { nick: "Rissa", age: "21 ANOS", nac: "Brasileira", role: "SENTINEL", img: "img/Playerpreto.png", insta: "#", x: "#" },
+        { nick: "Rissa", age: "21 ANOS", nac: "Brasileira", role: "SENTINEL", img: "img/Playerpreto.png", insta: "#", x: "#" },
+        // Adicione mais jogadores aqui...
+    ],
+    "mobile": [
+        { nick: "iFix", age: "19 ANOS", nac: "Brasileira", role: "FLEX", img: "img/Playerpreto.png", insta: "#", x: "#" },
+        { nick: "rikutaki", age: "19 ANOS", nac: "Brasileira", role: "CONTROLADOR", img: "img/Playerpreto.png", insta: "#", x: "#" },
+        { nick: "zenn1", age: "19 ANOS", nac: "Brasileira", role: "IGL", img: "img/Playerpreto.png", insta: "#", x: "#" },
+        { nick: "leans", age: "19 ANOS", nac: "Brasileira", role: "INICIADOR", img: "img/Playerpreto.png", insta: "#", x: "#" },
+        { nick: "icezin", age: "19 ANOS", nac: "Brasileira", role: "SENTINELA", img: "img/Playerpreto.png", insta: "#", x: "#" },
+        { nick: "vinizy", age: "19 ANOS", nac: "Brasileira", role: "DUELISTA", img: "img/Playerpreto.png", insta: "#", x: "#" },
+        { nick: "Paty", age: "19 ANOS", nac: "Brasileira", role: "MANAGER", img: "img/Playerpreto.png", insta: "#", x: "#" },
+    ],
+    "academy": [
+        { nick: "Juca", age: "17 ANOS", nac: "Brasileira", role: "FLEX", img: "img/Playerpreto.png", insta: "#", x: "#" },
+        { nick: "GBK", age: "17 ANOS", nac: "Brasileira", role: "IGL", img: "img/Playerpreto.png", insta: "#", x: "#" },
+        { nick: "Takeshi", age: "17 ANOS", nac: "Brasileira", role: "DUELISTA", img: "img/Playerpreto.png", insta: "#", x: "#" },
+        { nick: "YUDI", age: "17 ANOS", nac: "Brasileira", role: "DUELISTA", img: "img/Playerpreto.png", insta: "#", x: "#" },
+        { nick: "Novato", age: "17 ANOS", nac: "Brasileira", role: "DUELISTA", img: "img/Playerpreto.png", insta: "#", x: "#" },
+    ]
+};
+
+// --- FUNÇÃO QUE CARREGA OS JOGADORES NA TELA (ATUALIZADA) ---
+function initPlayersPage() {
+    // Só roda se estivermos na página players.html e se existir o container
+    const container = document.querySelector('.container-player');
+    if (!container) return;
+
+    // 1. Ler o parâmetro da URL
+    const params = new URLSearchParams(window.location.search);
+    const lineParam = params.get('line'); // Pega o que está na URL (ex: "batata")
+
+    // --- NOVA LÓGICA DE VALIDAÇÃO ---
+    // Verifica se o parâmetro está vazio OU se não existe no seu 'teamsDatabase'
+    if (!lineParam || !teamsDatabase[lineParam]) {
+        
+        // A. Esconde o Banner do topo para não confundir o usuário
+        const bannerSection = document.querySelector('.player-profile-banner');
+        if (bannerSection) {
+            bannerSection.style.display = 'none';
         }
 
-        const openModal = (teamId) => {
-            const teamInfo = teamsData[teamId];
-            if (!teamInfo) {
-                modalTeamName.textContent = 'Line não cadastrada';
-                modalPlayerContainer.innerHTML = '<p style="color:#FFD700">Nenhum jogador cadastrado para esta line.</p>';
-                indicator.textContent = '';
-                modal.classList.add('is-visible');
-                document.body.style.overflow = 'hidden';
-                closeModalButton.focus();
-                return;
-            }
-            lastFocusedElement = document.activeElement;
-            modalTeamName.textContent = teamInfo.name;
-            currentPlayers = teamInfo.players;
-            currentIndex = 0;
-            renderPlayer(currentIndex);
-            modal.classList.add('is-visible');
-            document.body.style.overflow = 'hidden';
-            closeModalButton.focus();
-        };
+        // B. Mostra a mensagem de erro bonita dentro do container
+        // Usamos style inline aqui para centralizar e usar suas cores variáveis
+        container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 100px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: var(--primary-gold); margin-bottom: 20px; animation: pulse-glow 2s infinite;"></i>
+                <h2 class="text-glow" style="font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 10px; color: var(--white);">LINE NÃO ENCONTRADA</h2>
+                <p style="color: var(--text-secondary); font-size: 1.2rem; max-width: 600px;">
+                    Desculpe, a line "<strong>${lineParam || 'Desconhecida'}</strong>" não consta em nossos registros.
+                </p>
+                <div style="margin-top: 30px;">
+                    <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 15px;">Redirecionando para a base...</p>
+                    <div class="store-image-container" style="width: 200px; height: 4px; background: var(--medium-gray); border-radius: 2px; overflow: hidden;">
+                        <div style="width: 100%; height: 100%; background: var(--primary-gold); animation: slideInLeft 3s linear reverse;"></div>
+                    </div>
+                </div>
+            </div>
+        `;
 
-        const closeModal = () => {
-            modal.classList.remove('is-visible');
-            document.body.style.overflow = '';
-            if (lastFocusedElement) {
-                lastFocusedElement.focus();
-            }
-        };
+        // C. Redireciona após 3 segundos (3000 milissegundos)
+        setTimeout(() => {
+            window.location.href = 'index.html#team';
+        }, 3000);
 
-        teamCards.forEach(card => {
-            card.addEventListener('click', () => openModal(card.dataset.team));
-            card.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    openModal(card.dataset.team);
-                }
-            });
-        });
+        return; // IMPORTANTE: Para a execução aqui. Nada abaixo roda.
+    }
+    
+    // Se passou da validação, a line existe!
+    const lineName = lineParam;
 
-        closeModalButton.addEventListener('click', closeModal);
-        modal.addEventListener('click', (event) => {
-            if (event.target === modal) closeModal();
-        });
-        document.addEventListener('keydown', (event) => {
-            if (event.key === "Escape" && modal.classList.contains('is-visible')) {
-                closeModal();
-            }
-            if (modal.classList.contains('is-visible')) {
-                if (event.key === "ArrowLeft") prevBtn.click();
-                if (event.key === "ArrowRight") nextBtn.click();
-            }
-        });
+   // 2. Configurar o BANNER (Imagem e Posição)
+    const bannerImg = document.querySelector('.player-profile-banner img');
+    if (bannerImg) {
+        // Define a imagem
+        const bannerSrc = teamBanners[lineName] || teamBanners['principal'];
+        bannerImg.src = bannerSrc;
 
-        prevBtn.addEventListener('click', () => {
-            if (currentPlayers.length) {
-                currentIndex = (currentIndex - 1 + currentPlayers.length) % currentPlayers.length;
-                renderPlayer(currentIndex);
-            }
-        });
-        nextBtn.addEventListener('click', () => {
-            if (currentPlayers.length) {
-                currentIndex = (currentIndex + 1) % currentPlayers.length;
-                renderPlayer(currentIndex);
-            }
-        });
+        // Define a POSIÇÃO (Foco) baseada na line
+        // Se não tiver configuração específica, usa 'center center' como padrão
+        const bannerPos = teamBannerPositions[lineName] || 'center center';
+        bannerImg.style.objectPosition = bannerPos;
+    }
+
+    // Configurar o TÍTULO DO BANNER
+    const bannerTitle = document.getElementById('lineTitle');
+    if (bannerTitle) {
+        bannerTitle.textContent = lineName.toUpperCase();
+    }
+
+    // 3. Selecionar os dados corretos da database
+    const playersList = teamsDatabase[lineName];
+
+    // 4. Limpar o container
+    container.innerHTML = '';
+
+    // 5. Criar o HTML para cada jogador
+    playersList.forEach(player => {
+        const playerHTML = `
+            <div class="player-profile fade-in">
+                <div class="player-info-profile">
+                    <div class="player-nickname text-glow">${player.nick}</div>
+                    <div class="details-section">
+                        <div class="detail-item">
+                            <span class="detail-label">Idade</span>
+                            <span class="detail-value">${player.age}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Nacionalidade</span>
+                            <span class="detail-value">${player.nac}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Role</span>
+                            <span class="detail-value">${player.role}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="player-photo-container">
+                    <img src="${player.img}" alt="Foto de ${player.nick}" class="player-photo">
+                </div>
+
+                <div class="player-social">
+                    <a href="${player.insta}" target="_blank" class="social-link social-link-instagram glass-effect">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="${player.x}" target="_blank" class="social-link social-link-twitter glass-effect">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                </div>
+            </div>
+        `;
+        container.innerHTML += playerHTML;
+    });
+    
+    // Atualiza o título da aba do navegador
+    document.title = `STRAYS - ${lineName.toUpperCase()}`;
+}   
+
+// --- DADOS DAS PARTIDAS POR LINE ---
+const matchesDatabase = {
+    "principal": {
+        hasMatch: true, // Se false, esconde o widget
+        date: "21 NOV 2025 • 19:00",
+        tourneyName: "VEXACUP: FINAL",
+        tourneyLogo: "img/temp/Vexacup.png",
+        map: "HAVEN",
+        status: "FINALIZADO",
+        home: { name: "Strays Principal", logo: "img/icone.png", score: "1" },
+        away: { name: "Valoriza", logo: "img/temp/Valoriza.png", score: "3" }
+    },
+    "mobile": {
+        hasMatch: false,
+        date: "25 NOV 2025 • 20:00",
+        tourneyName: "MOBILE LEGENDS CUP",
+        tourneyLogo: "img/icone.png", // Coloque a logo do camp mobile
+        map: "BERMUDA", // Exemplo
+        status: "AO VIVO",
+        home: { name: "Strays Mobile", logo: "img/icone.png", score: "2" },
+        away: { name: "Fluxo", logo: "img/icone.png", score: "1" } // Exemplo
+    },
+    "academy": {
+        hasMatch: false,
+        date: "02 DEZ 2025 • 15:00",
+        tourneyName: "ACADEMY SERIES",
+        tourneyLogo: "img/icone.png",
+        map: "ASCENT",
+        status: "AGENDADO",
+        home: { name: "Strays Academy", logo: "img/icone.png", score: "-" },
+        away: { name: "Loud Academy", logo: "img/icone.png", score: "-" }
+    },
+    "Strays GC": {
+        hasMatch: false, // Exemplo: Line GC não tem jogo marcado, o widget vai sumir
+        date: "02 DEZ 2025 • 15:00",
+        tourneyName: "ACADEMY SERIES",
+        tourneyLogo: "img/icone.png",
+        map: "ASCENT",
+        status: "AGENDADO",
+        home: { name: "Strays Academy", logo: "img/icone.png", score: "-" },
+        away: { name: "Loud Academy", logo: "img/icone.png", score: "-" }
+        
+    }
+};
+
+// --- NOVO BANCO DE DADOS: HISTÓRICO ---
+const historyDatabase = {
+    "principal": [
+        { date: "9 OUT", event: "VEXACUP FINAL", opponent: "Valoriza", logo: "img/temp/Valoriza.png", score: "1 - 3", result: "loss" },
+        { date: "10 OUT", event: "VEXACUP Semifinal", opponent: "SERAPH", logo: "img/temp/Vexacup.png", score: "2 - 1", result: "win" },
+        { date: "28 SET", event: "VEXACUP Quartas", opponent: "Rune", logo: "img/temp/Vexacup.png", score: "2 - 0", result: "win" },
+        { date: "21 SET", event: "VEXACUP Oitavas", opponent: "GROW GAMING", logo: "img/temp/growgaming.png", score: "2 - 0", result: "win" }
+    ],
+    "mobile": [
+
+    ],
+    // Se a line não tiver histórico, o código vai lidar com isso
+    "academy": [{ date: "20 NOV", event: "VEXACUP Oitavas", opponent: "Tribo", logo: "img/temp/Vexacup.png", score: "2 - 0", result: "win" },] 
+};
+
+// --- FUNÇÃO PARA INICIAR O HISTÓRICO ---
+function initMatchHistory() {
+    const listContainer = document.getElementById('matchHistoryList');
+    if (!listContainer) return; // Se não tiver o container (ex: página inicial), sai.
+
+    // 1. Pega a Line da URL
+    const params = new URLSearchParams(window.location.search);
+    const lineName = params.get('line') || 'principal';
+
+    // 2. Pega os dados
+    const history = historyDatabase[lineName];
+
+    // 3. Limpa a lista atual
+    listContainer.innerHTML = '';
+
+    // 4. Se não tiver histórico
+    if (!history || history.length === 0) {
+        listContainer.innerHTML = `
+            <div style="text-align:center; padding: 20px; color: var(--text-secondary);">
+                <i class="fas fa-ghost" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                <p>Nenhum histórico registrado para 2025.</p>
+            </div>
+        `;
+        return;
+    }
+
+    // 5. Gera os itens
+    history.forEach(match => {
+        // Traduz o resultado para português na exibição
+        const resultText = match.result === 'win' ? 'VITÓRIA' : (match.result === 'loss' ? 'DERROTA' : 'EMPATE');
+        
+        const html = `
+            <div class="history-item ${match.result}">
+                <div class="h-date">${match.date}</div>
+                <div class="h-matchup">
+                    <span style="font-size: 0.8rem; color: var(--primary-gold); margin-right:5px;">VS</span>
+                    <img src="${match.logo}" alt="${match.opponent}">
+                    <span>${match.opponent}</span>
+                </div>
+                <div class="h-score">${match.score}</div>
+                <div class="h-result ${match.result}">${resultText}</div>
+            </div>
+        `;
+        listContainer.innerHTML += html;
+    });
+}
+
+// --- FUNÇÃO QUE ATUALIZA O WIDGET DE PARTIDA ---
+function initMatchWidget() {
+    // 1. Verifica se estamos na página correta e se o widget existe
+    const widget = document.getElementById('matchWidgetContainer');
+    if (!widget) return;
+
+    // 2. Pega a line da URL (igual fazemos com os jogadores)
+    const params = new URLSearchParams(window.location.search);
+    const lineName = params.get('line') || 'principal';
+
+    // 3. Busca os dados na matchesDatabase
+    // Se não achar a line específica, tenta pegar a 'principal', ou retorna nulo
+    const matchData = matchesDatabase[lineName] || matchesDatabase['principal'];
+
+    // 4. Se não tiver dados ou "hasMatch" for false, esconde o widget e sai
+    if (!matchData || matchData.hasMatch === false) {
+        widget.style.display = 'none';
+        return;
+    }
+
+    // Garante que o widget esteja visível
+    widget.style.display = 'block';
+
+    // 5. Preenche o HTML com os dados do JavaScript
+    document.getElementById('match-date').textContent = matchData.date;
+    
+    // Atualiza nome do torneio (e o data-text pro efeito scramble)
+    const tourneyNameEl = document.getElementById('match-tourney-name');
+    tourneyNameEl.textContent = matchData.tourneyName;
+    tourneyNameEl.setAttribute('data-text', matchData.tourneyName);
+    
+    document.getElementById('match-tourney-logo').src = matchData.tourneyLogo;
+    document.getElementById('match-map').textContent = matchData.map;
+    document.getElementById('match-status').textContent = matchData.status;
+
+    // Time da Casa
+    document.getElementById('match-team-home-name').textContent = matchData.home.name;
+    document.getElementById('match-team-home-logo').src = matchData.home.logo;
+    document.getElementById('match-score-home').textContent = matchData.home.score;
+
+    // Time Visitante
+    document.getElementById('match-team-away-name').textContent = matchData.away.name;
+    document.getElementById('match-team-away-logo').src = matchData.away.logo;
+    document.getElementById('match-score-away').textContent = matchData.away.score;
+
+    // Cores do Status (Lógica simplificada)
+    const statusEl = document.getElementById('match-status');
+    
+    // Remove a classe 'live-active' e 'pulse-dot' antiga para limpar o estado anterior
+    statusEl.classList.remove('live-active', 'pulse-dot');
+    
+    // Reseta estilos manuais caso tenham sobrado
+    statusEl.style.color = "";
+    statusEl.style.background = "";
+
+    if (matchData.status === "AO VIVO") {
+        // Adiciona a nossa nova classe que cuida de tudo (cor, fundo e bolinha)
+        statusEl.classList.add('live-active');
     }
 }
 
@@ -800,7 +1080,7 @@ function initLogoHoverEffect() {
     // Salva o caminho da imagem original para poder voltar depois
     const originalSrc = headerLogo.src;
     // Defina o caminho para o seu arquivo GIF aqui
-    const gifSrc = 'img/Logo strays animada.gif';
+    const gifSrc = 'img/straysgifnopng3.gif';
 
     if (headerLogo) {
         headerLogo.addEventListener('mouseenter', () => {
@@ -818,7 +1098,7 @@ function initLogoHoverEffect2() {
     // Salva o caminho da imagem original para poder voltar depois
     const originalSrc = headerLogo.src;
     // Defina o caminho para o seu arquivo GIF aqui
-    const gifSrc = 'img/Logo strays animada.gif';
+    const gifSrc = 'img/straysgifnopng3.gif';
 
     if (headerLogo) {
         headerLogo.addEventListener('mouseenter', () => {
@@ -1016,6 +1296,449 @@ window.StraysTeamWebsite = {
 // Seção de inicialização principal
 if (window.location.hostname === 'localhost') {
     initPerformanceMonitoring();
+}
+
+window.addEventListener('load', function() {
+    const preloader = document.getElementById('preloader');
+    
+    // Define o tempo mínimo em milissegundos (2000ms = 2 segundos)
+    const tempoMinimo = 2000; 
+
+    // Calcula o tempo que precisamos esperar (código da resposta anterior)
+    const tempoFinalCarregamento = Date.now();
+    const tempoInicial = performance.timing.navigationStart;
+    const tempoDecorrido = tempoFinalCarregamento - tempoInicial;
+    let tempoExtra = tempoMinimo - tempoDecorrido;
+
+    if (tempoExtra < 0) {
+        tempoExtra = 0;
+    }
+
+    // Espera pelo tempo restante (tempoExtra)
+    setTimeout(function() {
+        // 1. ADICIONA A CLASSE 'slide-out' para iniciar o efeito CSS de deslizar
+        preloader.classList.add('slide-out');
+        
+        // 2. Espera o efeito de transição terminar (0.5s, conforme definido no CSS)
+        setTimeout(function() {
+            preloader.style.display = 'none'; // Remove após o slide-out
+        }, 500); // 500ms é o tempo da nossa transição no CSS
+        
+    }, tempoExtra); 
+});
+
+// Adicione esta nova função de inicialização para carregar o tema
+function initThemeToggle() {
+    const button = document.getElementById("theme-toggle");
+    if (!button) return; // Sai se o botão não for encontrado
+
+    // REMOVIDO: const themeText = document.getElementById("theme-text");
+    const moonIcon = document.getElementById("moon-icon");
+    const sunIcon = document.getElementById("sun-icon");
+
+    const isLightMode = localStorage.getItem('theme') === 'light';
+
+    const updateUI = (isLight) => {
+        if (isLight) {
+            document.body.classList.add("light-mode");
+            if (moonIcon) moonIcon.style.display = 'none';
+            if (sunIcon) sunIcon.style.display = 'inline-block';
+        } else {
+            document.body.classList.remove("light-mode");
+            if (moonIcon) moonIcon.style.display = 'inline-block';
+            if (sunIcon) sunIcon.style.display = 'none';
+        }
+    };
+
+    // 1. Aplica o tema salvo ao carregar
+    updateUI(isLightMode);
+
+    // 2. Adiciona o listener para alternar
+    button.addEventListener("click", () => {
+        const isCurrentlyLight = document.body.classList.toggle("light-mode");
+        
+        if (isCurrentlyLight) {
+            localStorage.setItem('theme', 'light');
+        } else {
+            localStorage.setItem('theme', 'dark');
+        }
+        updateUI(isCurrentlyLight);
+    });
+}
+
+ const config = {
+            // Tempo que cada imagem fica na tela (em milissegundos). 3000 = 3 segundos.
+            slideInterval: 4000, 
+            
+            // Tempo que demora a transição de fade (em segundos). Ex: '1s', '1.5s', '0.5s'
+            transitionDuration: '1.2s',
+            
+            // Lista de Imagens (Substitua pelas URLs das suas fotos de Jersey)
+            images: [
+                {
+                    src: "img/straysft1.png",
+                    alt: "Jersey de Futebol Close-up"
+                },
+                {
+                    src: "img/straysft2.png",
+                    alt: "Time reunido com uniformes"
+                },
+                {
+                    src: "img/straysft3.jpeg",
+                    alt: "Jersey Dobrada Detalhe"
+                },
+                {
+                    src: "img/straysft4.png",
+                    alt: "Jersey Esportiva em Ação"
+                }
+            ]
+        };
+
+        // --- LÓGICA DO SLIDESHOW ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('slides-container');
+            const indicatorsContainer = document.getElementById('indicators-container');
+            let currentIndex = 0;
+            let slides = [];
+            let indicators = [];
+
+            // 1. Inicializar as imagens e indicadores
+            config.images.forEach((imgData, index) => {
+                // Criar Imagem
+                const imgElement = document.createElement('img');
+                imgElement.src = imgData.src;
+                imgElement.alt = imgData.alt;
+                imgElement.classList.add('slide-image');
+                imgElement.style.transitionDuration = config.transitionDuration; // Aplica o tempo de transição
+                
+                if (index === 0) imgElement.classList.add('active'); // A primeira começa visível
+                
+                container.appendChild(imgElement);
+                slides.push(imgElement);
+
+                // Criar Indicador (Bolinha)
+                const dot = document.createElement('button');
+                dot.className = `w-3 h-3 rounded-full transition-all duration-300 ${index === 0 ? 'bg-white scale-125' : 'bg-white/40 hover:bg-white/70'}`;
+                dot.ariaLabel = `Ir para slide ${index + 1}`;
+                
+                // Clique na bolinha para mudar manualmente (opcional)
+                dot.addEventListener('click', () => {
+                    resetTimer();
+                    changeSlide(index);
+                });
+
+                indicatorsContainer.appendChild(dot);
+                indicators.push(dot);
+            });
+
+            // 2. Função para mudar o slide
+            const changeSlide = (nextIndex) => {
+                // Remove classe ativa do atual
+                slides[currentIndex].classList.remove('active');
+                indicators[currentIndex].classList.remove('bg-white', 'scale-125');
+                indicators[currentIndex].classList.add('bg-white/40');
+
+                // Atualiza índice
+                currentIndex = nextIndex;
+
+                // Se passar do total, volta para 0
+                if (currentIndex >= slides.length) currentIndex = 0;
+                // Se for menor que 0 (caso implemente botão voltar), vai para o último
+                if (currentIndex < 0) currentIndex = slides.length - 1;
+
+                // Adiciona classe ativa no novo
+                slides[currentIndex].classList.add('active');
+                indicators[currentIndex].classList.remove('bg-white/40');
+                indicators[currentIndex].classList.add('bg-white', 'scale-125');
+            };
+
+            // 3. Configurar o Loop Infinito
+            let slideTimer = setInterval(() => {
+                changeSlide(currentIndex + 1);
+            }, config.slideInterval);
+
+            // Função para reiniciar o timer se o usuário interagir (clicar nas bolinhas)
+            const resetTimer = () => {
+                clearInterval(slideTimer);
+                slideTimer = setInterval(() => {
+                    changeSlide(currentIndex + 1);
+                }, config.slideInterval);
+            };
+        });
+
+
+        // --- SISTEMA DE GALERIA COMPLETA (PÁGINA DEDICADA) ---
+
+// 1. O Banco de Dados da Galeria (Pode ter quantos itens quiser)
+const fullGalleryDatabase = [
+    // Seus 6 primeiros (Exemplo misturando foto e vídeo)
+    { type: 'image', src: 'img/Chamada Strays para todas as Lines.png', caption: 'Strays chamada' },
+    { type: 'video', src: 'media/Strays bg.mp4', caption: 'Strays background' },
+    { type: 'image', src: 'img/icone.png', caption: 'Icone Strays' },
+    { type: 'image', src: 'img/Logo Strays.png', caption: 'Strays Icon gif' },
+    { type: 'video', src: 'media/Strayspreloader.mp4', caption: 'Strayspreloadr' },
+    { type: 'image', src: 'img/okay.png', caption: 'Raze' },
+
+    // Os próximos que vão aparecer quando clicar em "Ver Mais"
+    { type: 'image', src: 'img/foto5.jpg', caption: 'MVP da Partida' },
+    { type: 'image', src: 'img/foto6.jpg', caption: 'Setup Gaming' },
+    { type: 'video', src: 'media/clip3.mp4', caption: 'Highlights' },
+    { type: 'image', src: 'img/foto7.jpg', caption: 'Treino Tático' },
+    { type: 'image', src: 'img/foto8.jpg', caption: 'Media Day' },
+    { type: 'image', src: 'img/foto9.jpg', caption: 'Uniforme Novo' },
+    
+    // Adicione mais itens aqui...
+];
+
+let itemsShown = 0;
+const itemsPerPage = 6; // Quantos aparecem por vez
+
+function initFullGallery() {
+    const grid = document.getElementById('gallery-grid');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+
+    // Se não estiver na página de galeria, para a função
+    if (!grid || !loadMoreBtn) return;
+
+    // Função interna para renderizar itens
+    function loadItems() {
+        const total = fullGalleryDatabase.length;
+        const end = itemsShown + itemsPerPage;
+        
+        // Pega o pedaço do array que queremos mostrar agora
+        const itemsToLoad = fullGalleryDatabase.slice(itemsShown, end);
+
+        itemsToLoad.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'gallery-item-rect fade-in'; // Adiciona animação
+            
+            // Verifica se é imagem ou vídeo para criar a tag certa
+            let mediaTag = '';
+            let iconClass = '';
+            
+            if (item.type === 'video') {
+                mediaTag = `<video src="${item.src}" muted loop onmouseover="this.play()" onmouseout="this.pause()"></video>`;
+                iconClass = 'fa-play-circle';
+            } else {
+                mediaTag = `<img src="${item.src}" alt="${item.caption}">`;
+                iconClass = 'fa-camera';
+            }
+
+            el.innerHTML = `
+                ${mediaTag}
+                <div class="item-overlay">
+                    <span class="item-caption text-glow">${item.caption}</span>
+                    <i class="fas ${iconClass} item-icon"></i>
+                </div>
+            `;
+
+            // Adiciona evento de clique para abrir o Lightbox (Modal de visualização)
+            el.addEventListener('click', () => openLightbox(item));
+
+            grid.appendChild(el);
+        });
+
+        itemsShown += itemsPerPage;
+
+        // Se mostrou tudo, esconde o botão "Ver Mais"
+        if (itemsShown >= total) {
+            loadMoreBtn.style.display = 'none';
+        }
+    }
+
+    // Carrega os primeiros 6 logo de cara
+    loadItems();
+
+    // Evento do botão
+    loadMoreBtn.addEventListener('click', loadItems);
+}
+
+// Função Auxiliar para abrir a foto grande (Lightbox)
+function openLightbox(item) {
+    const modal = document.getElementById('lightboxModal');
+    const body = document.getElementById('lightbox-body');
+    const closeBtn = modal.querySelector('.close-button');
+
+    if (!modal) return;
+
+    let content = '';
+    if (item.type === 'video') {
+        content = `<video src="${item.src}" controls autoplay style="max-width:90%; max-height:80vh; border-radius:8px; box-shadow:0 0 20px rgba(255,215,0,0.2);"></video>`;
+    } else {
+        content = `<img src="${item.src}" style="max-width:90%; max-height:80vh; border-radius:8px; box-shadow:0 0 20px rgba(255,215,0,0.2);">`;
+    }
+
+    body.innerHTML = content;
+    modal.classList.add('is-visible');
+
+    // Fechar
+    closeBtn.onclick = () => modal.classList.remove('is-visible');
+    modal.onclick = (e) => {
+        if(e.target === modal) modal.classList.remove('is-visible');
+    }
+}
+
+        /* --- NOVAS FUNCIONALIDADES (SLIDER & WIDGET) --- */
+
+// 1. Configuração e Inicialização do Hero Slider
+function initHeroSlider() {
+    const container = document.getElementById('slides-container');
+    const indicatorsContainer = document.getElementById('indicators-container');
+    
+    // Se não achar o container (ex: página players.html), para a função
+    if (!container || !indicatorsContainer) return;
+
+    const config = {
+        slideInterval: 4000, 
+        transitionDuration: '1.2s',
+        images: [
+            { src: "img/straysft1.png", alt: "Jersey de Futebol Close-up" },
+            { src: "img/straysft2.png", alt: "Time reunido com uniformes" },
+            { src: "img/straysft3.jpeg", alt: "Jersey Dobrada Detalhe" },
+            { src: "img/straysft4.png", alt: "Jersey Esportiva em Ação" }
+        ]
+    };
+
+    let currentIndex = 0;
+    let slides = [];
+    let indicators = [];
+
+    // Limpa containers antes de criar
+    container.innerHTML = '';
+    indicatorsContainer.innerHTML = '';
+
+    // Cria as imagens e indicadores
+    config.images.forEach((imgData, index) => {
+        // Imagem
+        const imgElement = document.createElement('img');
+        imgElement.src = imgData.src;
+        imgElement.alt = imgData.alt;
+        imgElement.className = 'slide-image';
+        if (index === 0) imgElement.classList.add('active');
+        container.appendChild(imgElement);
+        slides.push(imgElement);
+
+        // Indicador (Bolinha)
+        const dot = document.createElement('button');
+        // Usando classes do seu CSS ou inline styles para garantir
+        dot.style.cssText = `
+            width: 12px; height: 12px; border-radius: 50%; border: none;
+            background: ${index === 0 ? 'var(--white)' : 'rgba(255,255,255,0.4)'};
+            transition: all 0.3s ease; cursor: pointer;
+        `;
+        dot.addEventListener('click', () => {
+            resetTimer();
+            changeSlide(index);
+        });
+        indicatorsContainer.appendChild(dot);
+        indicators.push(dot);
+    });
+
+    const changeSlide = (nextIndex) => {
+        // Remove ativo atual
+        slides[currentIndex].classList.remove('active');
+        indicators[currentIndex].style.background = 'rgba(255,255,255,0.4)';
+        indicators[currentIndex].style.transform = 'scale(1)';
+
+        // Calcula novo índice
+        currentIndex = nextIndex;
+        if (currentIndex >= slides.length) currentIndex = 0;
+
+        // Ativa novo
+        slides[currentIndex].classList.add('active');
+        indicators[currentIndex].style.background = 'var(--white)';
+        indicators[currentIndex].style.transform = 'scale(1.2)';
+    };
+
+    let slideTimer = setInterval(() => changeSlide(currentIndex + 1), config.slideInterval);
+
+    const resetTimer = () => {
+        clearInterval(slideTimer);
+        slideTimer = setInterval(() => changeSlide(currentIndex + 1), config.slideInterval);
+    };
+}
+
+// 2. Lógica do Efeito Scramble (Letras Rolando)
+class ScrambleText {
+    constructor(el) {
+        this.el = el;
+        this.chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*';
+        this.targetText = el.getAttribute('data-text');
+        this.delay = parseInt(el.getAttribute('data-delay') || 0);
+        this.duration = 2000;
+        this.frame = 0;
+        this.queue = [];
+        this.timer = null;
+        this.init();
+    }
+    init() {
+        const totalFrames = this.duration / 50;
+        for (let i = 0; i < this.targetText.length; i++) {
+            const char = this.targetText[i];
+            this.queue.push({
+                from: this.chars[Math.floor(Math.random() * this.chars.length)],
+                to: char,
+                start: Math.floor(Math.random() * (totalFrames - 10)),
+                end: totalFrames
+            });
+        }
+        setTimeout(() => {
+            this.timer = setInterval(() => this.update(), 50);
+        }, this.delay);
+    }
+    update() {
+        let output = '';
+        let complete = 0;
+        for (let i = 0; i < this.queue.length; i++) {
+            let { from, to, start, end } = this.queue[i];
+            if (this.frame >= end) {
+                complete++;
+                output += to;
+            } else if (this.frame >= start) {
+                if (!to || to === ' ') output += ' ';
+                else output += this.chars[Math.floor(Math.random() * this.chars.length)];
+            } else {
+                output += from;
+            }
+        }
+        this.el.innerText = output;
+        if (complete === this.queue.length) clearInterval(this.timer);
+        else this.frame++;
+    }
+}
+
+function initScrambleEffects() {
+    document.querySelectorAll('.scramble-text').forEach(el => {
+        new ScrambleText(el);
+    });
+}
+
+function initCalendarWidget() {
+    const menu = document.getElementById('calendarMenu');
+    const trigger = document.getElementById('calendarTrigger');
+
+    if (!menu || !trigger) return;
+
+    let isOpen = false;
+
+    // Clique no botão do calendário
+    trigger.addEventListener('click', (e) => {
+        e.stopPropagation(); // Impede que o clique feche o menu imediatamente
+        isOpen = !isOpen;
+        if (isOpen) {
+            menu.classList.add('open');
+        } else {
+            menu.classList.remove('open');
+        }
+    });
+
+    // Fechar se clicar fora
+    document.addEventListener('click', (e) => {
+        if (isOpen && !menu.contains(e.target) && !trigger.contains(e.target)) {
+            isOpen = false;
+            menu.classList.remove('open');
+        }
+    });
 }
 
 document.addEventListener('DOMContentLoaded', initAll);

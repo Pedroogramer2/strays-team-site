@@ -1,13 +1,50 @@
-@font-face {
-    font-family: 'Raider Crusader Semi-Straight';
-    src: url('fonts/raidercrusadersemistraight.woff2') format('woff2'), /* Caminho corrigido */
-         url('fonts/raidercrusadersemistraight.woff') format('woff'),  /* Caminho corrigido */
-         url('fonts/raidercrusadersemistraight.ttf') format('truetype'); /* Caminho corrigido */
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap; /* Melhoria de performance */
+img, video, svg {
+    max-width: 100%;
+    height: auto;
+    display: block; /* Remove espaços brancos estranhos abaixo de imagens */
+    overflow-x: hidden; /* Impede que o site "dance" para os lados */
+    width: 100%;
 }
 
+@font-face {
+    font-family: 'Strays'; /* Dê um nome único e seu */
+    /* Garanta que o caminho (URL) e o nome do arquivo estão EXATOS */
+    src: url('fonts/blasteri.eot') format('eot'),
+         url('fonts/blasteri.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap; /* Mantém a performance alta */
+}
+
+
+/* 1. Tela de fundo do Preloader (Fundo Preto) */
+#preloader {
+    position: fixed; /* Fixa o preloader na tela */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--background-color);
+    z-index: 99999; /* Garante que fique acima de todo o conteúdo */
+    display: flex; /* Para centralizar a GIF */
+    justify-content: center;
+    align-items: center;
+    /* MUDANÇA AQUI: Transiciona a opacidade E o transform. */
+    transition: opacity 0.5s ease-in, transform 0.5s ease-in; 
+}
+
+#preloader.slide-out {
+    
+    /* Move o preloader para baixo, para fora da tela */
+    transform: translateY(100vh); 
+}
+
+/* 2. Estilo da GIF */
+.preloader-gif {
+    max-width: 1500px;  /* Largura máxima da sua GIF */
+    height: auto;      /* Mantém a proporção */
+    /* Você pode adicionar mais estilos aqui, como border-radius se quiser cantos arredondados */
+}
 
 
 /* Premium E-sports Website Styles */
@@ -67,13 +104,99 @@
     --medium-gray: #333333;
     --light-gray: #666666;
     --white: #ffffff;
-    --strays-font: 'Raider Crusader Semi-Straight';
+    --strays-font: 'Strays';
+
+    --static-gold: #222222;
+    --hover-bg-dark: #9C7E30; /* Fundo mais escuro que a linha */
+    --hover-line-light: #FFD700; /* Linha mais clara */
+    --card-bg-light: #000000;
+    --text-dark: #ffffff;
+    --text-light: white;
+
+    /* VARIAVEIS GERAIS (Modo Noturno - PADRÃO) */
+    --background-color: #111111;         /* Fundo da página (Preto puro) */
+    --section-background: #000000;       /* Fundo de seções/áreas (Cinza escuro) */
+    --text-color: #ffffff;               /* Cor do texto principal (Branco) */
+    --text-secondary: #cccccc;           /* Cor do texto secundário/cinza (Cinza claro) */
+    --card-background: rgba(0, 0, 0, 0.8); /* Fundo dos cards (Preto transparente) */
+    --border-color: rgba(255, 215, 0, 0.2); /* Borda dos cards (Dourado sutil) */
+    --overlay-color: rgba(0, 0, 0, 0.95); /* Cor da overlay/header (Preto quase opaco) */
+    
+    /* Scrollbar */
+    --scrollbar-track: #111111;
+    --scrollbar-thumb-start: var(--primary-gold);
+    --scrollbar-thumb-end: var(--secondary-gold);   
+}
+
+
+.light-mode {
+    --background-color: #f0f2f5;       /* Um cinza bem clarinho é melhor que branco puro para os olhos */
+    --section-background: #ffffff;     /* O branco fica nos cards/seções */
+    --primary-gold: #b8860b;           
+    --secondary-gold: #daa520;
+    --text-color: #111111;               /* Preto Forte */
+    --text-secondary: #444444;           /* Cinza Escuro (MUITO MELHOR para ler em fundo claro) */
+    --card-background: rgba(255, 255, 255, 0.95); /* Fundo dos cards (Branco quase opaco) */
+    --border-color: rgba(0, 0, 0, 0.1);  /* Borda dos cards (Preto sutil) */
+    --overlay-color: #ffffff; /* Overlay/Header clara */
+    --static-gold: #b8b5af;
+    --hover-bg-dark: #9C7E30; /* Fundo mais escuro que a linha */
+    --hover-line-light: #FFD700; /* Linha mais clara */
+    --card-bg-light: #f5f5f5;
+    --text-dark: #333;
+    --text-light: white;
+
+    /* Scrollbar Invertida para Contraste */
+    --scrollbar-track: #e0e0e0;
+    --scrollbar-thumb-start: #444444;
+    --scrollbar-thumb-end: #777777;
+}
+
+/* --- ESTILO PARA O BOTÃO DE ÍCONE DE TEMA (SEM CAIXA) --- */
+.theme-icon-button {
+    /* Remove todo o estilo visual de botão */
+    background: none;
+    border: none;
+    padding: 0 15px; /* Um pequeno padding para facilitar o clique */
+    cursor: pointer;
+    
+    /* Configura a cor do ícone com base no tema */
+    color: var(--primary-gold); /* Ícone Dourado no Modo Noturno */
+    
+    /* Garante que o ícone esteja no centro do clique */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Transição para suavizar a mudança de cor */
+    transition: color 0.3s ease;
+}
+
+/* Efeito de hover no Modo Noturno */
+.theme-icon-button:hover {
+    color: var(--secondary-gold);
+    transform: scale(1.1);
+}
+
+/* Configuração de cor para o Modo Diurno (Light Mode) */
+.light-mode .theme-icon-button {
+    color: var(--primary-gold); /* Ícone Cinza Escuro no Modo Diurno */
+}
+
+/* Efeito de hover no Modo Diurno */
+.light-mode .theme-icon-button:hover {
+    color: var(--secondary-gold); /* Fica Preto no hover */
+}
+
+/* Certifica-se de que o ícone SVG usa a cor definida acima */
+.theme-icon-button .theme-icon {
+    stroke: currentColor; 
 }
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--black);
-    color: var(--white);
+    background-color: var(--background-color); /* Usa a nova variável */
+    color: var(--text-color); /* Usa a nova variável */
     line-height: 1.6;
     overflow-x: hidden;
 }
@@ -84,6 +207,24 @@ body {
     padding: 0 20px;
 }
 
+.container-player {
+    /* Em telas de celular (padrão), apenas 1 item por linha: */
+    display: grid;
+    grid-template-columns: 1fr;
+    max-width: 1900px;
+    /* MUDE ISTO: */
+    margin: 0 auto;    /* Centraliza sem forçar 100px */
+    padding: 50px 20px; /* Padding interno resolve o respiro */
+    gap: 30px;
+    justify-items: center;
+}
+
+/* Em telas maiores que 768px (tablets e desktop), ativamos 2 itens por linha: */
+@media (min-width: 768px) {
+    .container-player {
+        grid-template-columns: repeat(2, 1fr); 
+    }
+}
 /* Scrollbar Styles */
 ::-webkit-scrollbar {
     width: 12px;
@@ -177,15 +318,14 @@ body {
 @keyframes text-glow-pulse {
     from {
         text-shadow: 
+            0 0 0px currentColor,
             0 0 1px currentColor,
-            0 0 2px currentColor,
-            0 0 4px currentColor;
+            0 0 2px currentColor;
     }
     to {
         text-shadow: 
-            0 0 2px currentColor,
-            0 0 5px currentColor,
-            0 0 7px currentColor;
+            0 0 1px currentColor,
+            0 0 3px currentColor;
     }
 }
 
@@ -194,17 +334,27 @@ body {
     100% { background-position: 20px 20px; }
 }
 
+ /* Animações customizadas */
+@keyframes pulse-fast {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
 /* Visual Effects */
+.animate-pulse-fast {
+            animation: pulse-fast 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
 .glow-gold {
     animation: pulse-glow 2s ease-in-out infinite;
 }
 
 .text-glow {
     text-shadow: 
-        0 0 5px currentColor,
-        0 0 10px currentColor,
-        0 0 15px currentColor;
-    animation: text-glow-pulse 1s ease-in-out infinite alternate;
+        0 0 2px rgba(255, 215, 0, 0.5), 
+        0 0 5px rgba(255, 215, 0, 0.3);
+
+    animation: text-glow-pulse 2s ease-in-out infinite alternate;
 }
 
 .glass-effect {
@@ -252,9 +402,9 @@ body {
 
 /* Card Effects */
 .card-premium {
-    background: rgba(0, 0, 0, 0.8);
+    background: var(--card-background);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 215, 0, 0.2);
+    border: 1px solid var(--border-color);
     border-radius: 16px;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
@@ -385,7 +535,7 @@ body {
 /* Navigation Links */
 .nav-link {
     position: relative;
-    color: #ccc;
+    color: var(--text-secondary);
     text-decoration: none;
     font-weight: 500;
     transition: all 0.3s ease;
@@ -473,9 +623,9 @@ body {
 }
 
 .header.scrolled {
-    background: rgba(0, 0, 0, 0.95);
+    background: var(--overlay-color); /* Mudei de rgba(0, 0, 0, 0.95) para a variável */
     backdrop-filter: blur(15px);
-    border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+    border-bottom: 1px solid var(--border-color); /* Mudei para a variável de borda */
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
@@ -483,12 +633,14 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 0 20px;
 }
 
 .logo-section {
     display: flex;
     align-items: center;
     gap: 12px;
+    margin: 0;
 }
 
 .logo {
@@ -526,6 +678,7 @@ body {
 .desktop-nav {
     display: flex;
     gap: 32px;
+    margin-left: 0;
 }
 
 .mobile-menu-btn {
@@ -560,7 +713,7 @@ body {
 }
 
 .mobile-nav-link {
-    color: #ccc;
+    color: var(--text-secondary);
     text-decoration: none;
     padding: 10px 20px;
     border-radius: 8px;
@@ -571,6 +724,33 @@ body {
     background: rgba(255, 215, 0, 0.1);
     color: var(--primary-gold);
 }
+
+/* Classe utilitária para garantir que a transição afete a opacidade */
+        .slide-image {
+            opacity: 0;
+            transition-property: opacity;
+            /* A duração da transição é definida via JS, mas tem um padrão aqui */
+            transition-timing-function: ease-in-out;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Garante que a imagem cubra a área sem distorcer */
+            object-position: top center; /* Salva as cabeças */
+            z-index: 0;
+        }
+
+        /* Classe para o slide ativo (visível) */
+        .slide-image.active {
+            opacity: 1;
+            z-index: 10;
+        }
+        
+        /* Overlay sutil para garantir que texto (se houver) fique legível sobre as fotos */
+        .overlay-gradient {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.4));
+        }
 
 /* Hero Section */
 .hero-section {
@@ -835,19 +1015,18 @@ body {
 }
 
 .section-subtitle {
-    color: #ccc;
+    color: var(--text-secondary); /* Antes era #ccc */
     font-size: 18px;
     max-width: 600px;
     margin: 0 auto;
+    text-align: center;
 }
-
-.section-subtitle-campeonato{
-    color: #ccc;
+.section-subtitle-campeonato {
+    color: var(--text-secondary); /* Antes era #ccc */
     font-size: 18px;
 }
-
 .section-subtitle-politica {
-    color: #ccc;
+    color: var(--text-secondary); /* Antes era #ccc */
     font-size: 18px;
     max-width: 900px;
 }
@@ -855,6 +1034,7 @@ body {
 /* Team Section */
 .team-section {
     padding: 80px 0;
+    background: var(--section-background); /* Antes era var(--black) */
 }
 
 .players-grid {
@@ -938,7 +1118,7 @@ body {
 }
 
 .player-details {
-    color: #ccc;
+    color: var(--text-secondary);
     font-size: 14px;
     margin-bottom: 16px;
 }
@@ -966,7 +1146,7 @@ body {
 }
 
 .stat-label {
-    color: #ccc;
+    color: var(--text-secondary);
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -982,7 +1162,7 @@ body {
 }
 
 .kd-ratio span:first-child {
-    color: #ccc;
+    color: var(--text-secondary);
     font-size: 14px;
 }
 
@@ -1006,7 +1186,7 @@ body {
     align-items: center;
     margin-bottom: 8px;
     font-size: 14px;
-    color: #ccc;
+    color: var(--text-secondary);
 }
 
 .progress-bar {
@@ -1097,6 +1277,30 @@ body {
     letter-spacing: 0.1em;
 }
 /*Loja section */
+
+#Loja {
+    position: relative; /* Isso cria a "âncora". Tudo que for absolute dentro da Loja, fica na Loja. */
+    overflow: hidden;   /* Garante que nada vaze para os lados */
+}
+
+/* Correção para o menu fixo não tapar o título do Campeonato */
+#campeonato {
+    padding-top: 80px; /* Empurra o conteúdo para baixo (Altura do Menu + Respiro) */
+}
+
+/* Correção de espaçamento para a página de Política de Privacidade */
+#politica {
+    padding-top: 80px; /* Empurra o conteúdo para baixo. 120px é suficiente para limpar o header */
+    min-height: 100vh;  /* Garante que a página ocupe pelo menos a altura da tela inteira */
+}
+
+/* Ajuste opcional para Mobile, caso o header fique menor */
+@media (max-width: 768px) {
+    #politica {
+        padding-top: 100px;
+    }
+}
+
 .section-title-loja {
     font-size: clamp(2.5rem, 6vw, 5rem);
     font-weight: 900;
@@ -1121,16 +1325,1066 @@ body {
 
 }
 
+/* Container do Banner (Estica ponta a ponta) */
 .store-cta {
-    border-radius: 16px;
+    /* --- LÓGICA DE LARGURA TOTAL --- */
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    position: relative;
+    left: 0;
+    
+    /* Remove bordas laterais e arredondamento para encostar na tela */
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-top: 1px solid rgba(255, 215, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+    
     text-align: center;
-    border: 1px solid rgba(255, 215, 0, 0.2);
+    overflow: hidden; /* Garante que nada vaze */
+    
+    /* Altura fixa para o container (Ajuste aqui se quiser mais alto ou baixo) */
+    height: 400px; 
 }
 
+.player-profile-banner {
+            /* Altura um pouco reduzida */
+            width: 100%;
+            margin: 0;
+            /* MUDANÇA 1: Altura reduzida para ver os cards embaixo */
+    height: 65vh;        /* Ocupa 55% da altura da tela (era 85vh) */
+    min-height: 400px;   /* Garante que não fique pequeno demais */
+    max-height: 600px;   /* Trava num máximo para telas gigantes */
+            background-color: var(--card-bg-light); /* Fundo Amarelo Queimado/Dourado Escuro */
+            
+            overflow: hidden; 
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); 
+            position: relative;
+            cursor: pointer; 
+            color: var(--text-dark); 
+            
+            z-index: 0;
+
+            transition: background-color 0.5s ease-in-out,
+                        color 0.5s ease-in-out,
+                        box-shadow 0.5s ease-in-out;
+    
+}
+
+.loja-banner-title {
+    position: absolute;
+    top: 4%;           /* Centraliza verticalmente */
+    left: 50%;          /* Centraliza horizontalmente */
+    transform: translate(-50%, -50%); /* O pulo do gato para centralizar exato */
+    z-index: 10;
+    width: 100%;        /* Garante que o texto tenha espaço */
+    text-align: center; /* Centraliza o texto */
+    
+    /* Estilização da Fonte */
+    font-family: 'Strays', sans-serif; /* Sua fonte personalizada */
+    font-size: 5rem; /* Tamanho grande */
+    color: var(--primary-gold); /* Cor Dourada */
+    text-transform: uppercase; /* Força letra maiúscula */
+    margin: 0;
+    line-height: 1;
+    pointer-events: none; /* O clique passa através do texto (opcional) */
+    
+    /* Efeito de sombra para leitura (caso a imagem seja clara) */
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+.loja-banner-subtitle {
+    position: absolute;
+    top: 10%; 
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    text-align: center;
+
+    /* Estilização da Fonte */
+    font-family:  sans-serif; /* Sua fonte personalizada */
+    font-size: 1rem; /* Tamanho grande */
+    color: var(--primary-gold); /* Cor Dourada */
+    text-transform: uppercase; /* Força letra maiúscula */
+    margin: 0;
+    line-height: 1;
+    pointer-events: none; /* O clique passa através do texto (opcional) */
+    
+    /* Efeito de sombra para leitura (caso a imagem seja clara) */
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+.line-banner-title {
+    position: absolute;
+    /* MUDANÇA 2: Usamos BOTTOM em vez de TOP */
+    top: auto;          /* Anula o top antigo */
+    bottom: 60px;       /* Cola no fundo do banner */
+    left: 60px;
+    z-index: 10; /* Fica acima da imagem e das linhas de fundo */
+    
+    /* Estilização da Fonte */
+    font-family: 'Strays', sans-serif; /* Sua fonte personalizada */
+    font-size: 5rem; /* Tamanho grande */
+    color: var(--primary-gold); /* Cor Dourada */
+    text-transform: uppercase; /* Força letra maiúscula */
+    margin: 0;
+    line-height: 1;
+    pointer-events: none; /* O clique passa através do texto (opcional) */
+    
+    /* Efeito de sombra para leitura (caso a imagem seja clara) */
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+.line-banner-subtitle {
+    position: absolute;
+    /* MUDANÇA 3: Posiciona logo abaixo do título */
+    top: auto;
+    bottom: 30px; 
+    left: 60px;
+    z-index: 10; /* Fica acima da imagem e das linhas de fundo */
+    
+    /* Estilização da Fonte */
+    font-family:  sans-serif; /* Sua fonte personalizada */
+    font-size: 1rem; /* Tamanho grande */
+    color: var(--primary-gold); /* Cor Dourada */
+    text-transform: uppercase; /* Força letra maiúscula */
+    margin: 0;
+    line-height: 1;
+    pointer-events: none; /* O clique passa através do texto (opcional) */
+    
+    /* Efeito de sombra para leitura (caso a imagem seja clara) */
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+/* Ajuste para celular (Mobile) */
+@media (max-width: 768px) {
+    .line-banner-title {
+        font-size: 3rem;
+        top: 20px;
+        left: 30px;
+    }
+}
+
+/* Configuração da imagem para cortar sem esticar */
+.player-profile-banner img {
+    width: 100%;
+    height: 100%;        /* Força a imagem a ter a altura da caixa (350px) */
+    object-fit: cover;   /* CORTA o excesso da imagem para preencher tudo sem distorcer */
+    object-position: center center; /* Foca no terço superior da imagem (onde geralmente estão os rostos) */
+    display: block;
+}
+
+/* SIMULAÇÃO DAS LINHAS CRUZADAS FIXAS E GROSSAS (USANDO ::before) */
+        .player-profile-banner::before {
+            content: '';
+            position: absolute;
+            top: -200px; /* Mais para cima */
+            right: -300px; /* Mais para a direita */
+            width: 2500px; /* Aumentado para 1000px para garantir cobertura */
+            height: 900px; /* Aumentado para 1000px para garantir cobertura */
+            z-index: -1; 
+            pointer-events: none; /* Ignora eventos do mouse para não interferir no hover */
+
+            /* Cria as QUATRO linhas grossas cruzadas, não repetitivas */
+            background-image:
+                /* Linha 1: 45 graus */
+                linear-gradient(45deg,
+                    transparent 0%, transparent 48%,
+                    var(--hover-line-light) 48%, var(--hover-line-light) 52%, 
+                    transparent 52%, transparent 100%
+                ),
+                /* Linha 2: -45 graus */
+                linear-gradient(-45deg,
+                    transparent 0%, transparent 48%,
+                    var(--hover-line-light) 48%, var(--hover-line-light) 52%, 
+                    transparent 52%, transparent 100%
+                ),
+                /* Linha 3: 30 graus (Ponto de encontro movido) */
+                linear-gradient(30deg,
+                    transparent 0%, transparent 35%, 
+                    var(--hover-line-light) 35%, var(--hover-line-light) 39%, 
+                    transparent 39%, transparent 100%
+                ),
+                /* Linha 4: -30 graus (Ponto de encontro movido) */
+                linear-gradient(-30deg,
+                    transparent 0%, transparent 42%, 
+                    var(--hover-line-light) 42%, var(--hover-line-light) 46%, 
+                    transparent 46%, transparent 100%
+                );
+            background-size: 100% 100%; /* Ocupa todo o elemento, impedindo repetição */
+            background-repeat: no-repeat;
+            
+            /* Transição para o efeito de hover */
+            transition: transform 0.6s ease-out, background-image 0.5s ease-in-out; 
+            transform: scale(1);
+        }
+
+.player-profile {
+            width: 100%;          /* Ocupa o espaço que tiver disponível */
+            max-width: 650px;     /* Mas não passa de 650px em telas grandes */
+            height: auto;         /* Altura automática para o texto não vazar */
+            min-height: 400px;    /* Altura mínima se quiser manter o padrão */
+            margin: 0 auto 30px;  /* Centraliza e dá espaço embaixo */
+            background-color: var(--card-bg-light); 
+            border-radius: 20px; /* Bordas mais arredondadas */
+            overflow: hidden; 
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); 
+            position: relative;
+            cursor: pointer; 
+            color: var(--text-dark); 
+
+            transition: background-color 0.5s ease-in-out,
+                        color 0.5s ease-in-out,
+                        box-shadow 0.5s ease-in-out;
+        }
+
+/* SIMULAÇÃO DAS LINHAS CRUZADAS FIXAS E GROSSAS (USANDO ::before) */
+        .player-profile::before {
+            content: '';
+            position: absolute;
+            top: -200px; /* Mais para cima */
+            right: -300px; /* Mais para a direita */
+            width: 1000px; /* Aumentado para 1000px para garantir cobertura */
+            height: 1000px; /* Aumentado para 1000px para garantir cobertura */
+            z-index: 1; 
+            pointer-events: none; /* Ignora eventos do mouse para não interferir no hover */
+
+            /* Cria as QUATRO linhas grossas cruzadas, não repetitivas */
+            background-image:
+                /* Linha 1: 45 graus (Espessura de 4% - Posição central) */
+                linear-gradient(45deg,
+                    transparent 0%, transparent 48%,
+                    var(--static-gold) 48%, var(--static-gold) 52%, 
+                    transparent 52%, transparent 100%
+                ),
+                /* Linha 2: -45 graus (Espessura de 4% - Posição central) */
+                linear-gradient(-45deg,
+                    transparent 0%, transparent 48%,
+                    var(--static-gold) 48%, var(--static-gold) 52%, 
+                    transparent 52%, transparent 100%
+                ),
+                /* Linha 3: 30 graus (Espessura de 4% - Ponto de encontro movido) */
+                linear-gradient(30deg,
+                    transparent 0%, transparent 35%, 
+                    var(--static-gold) 35%, var(--static-gold) 39%, 
+                    transparent 39%, transparent 100%
+                ),
+                /* Linha 4: -30 graus (Espessura de 4% - Ponto de encontro movido) */
+                linear-gradient(-30deg,
+                    transparent 0%, transparent 42%, 
+                    var(--static-gold) 42%, var(--static-gold) 46%, 
+                    transparent 46%, transparent 100%
+                );
+            background-size: 100% 100%; /* Ocupa todo o elemento, impedindo repetição */
+            background-repeat: no-repeat;
+            
+            /* Transição para o efeito de hover */
+            transition: transform 0.6s ease-out, background-image 0.5s ease-in-out; 
+            transform: scale(1);
+        }
+
+        .player-info-profile {
+            position: absolute;
+            top: 25px;
+            left: 30px;
+            z-index: 3; 
+            width: 45%;
+        }
+
+        .player-name-full {
+            font-size: 0.8em;
+            margin-bottom: 3px;
+            opacity: 0.7; 
+            color: inherit; 
+        }
+
+        .player-nickname {
+            font-size: 4em;
+            font-weight: bold;
+            letter-spacing: -2px;
+            margin-bottom: 25px;
+            color: inherit; 
+        }
+
+        .details-section {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1); 
+            color: inherit; 
+            transition: border-top-color 0.5s ease-in-out;
+        }
+
+        .detail-item {
+            display: block;
+            margin-bottom: 8px;
+            align-items: center;
+            position: relative; 
+            padding-left: 15px;
+            text-transform: uppercase;
+        }
+
+        .detail-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0; /* Posiciona a linha no início do padding */
+            width: 1px; /* Espessura da linha */
+            height: 100%; /* Faz a linha se estender por toda a altura do item */
+            background: var(--primary-gold); /* Cor da linha (dourada) */
+            border-radius: 1px;
+    
+            /* Se quiser que a linha seja menor e apenas antes da primeira palavra: */
+            /* top: 5px; 
+            height: 1em; 
+            width: 3px;
+            background: linear-gradient(to bottom, var(--primary-gold), transparent);
+            */
+        }
+        .detail-label {
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 0.2px;
+            width: 100px; 
+            opacity: 0.6;
+            display: block;
+            margin-right: 35px;
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            font-size: 1em;
+            font-weight: 600;
+            display: block;
+            text-transform: uppercase;
+        }
+
+        .player-photo-container {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100%; /* Diminuído para 45% */
+            height: 100%; /* Diminuído para 85% */
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-end; 
+            z-index: 2; 
+        }
+
+        .player-photo {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; 
+            transform: scale(1); 
+            transition: transform 0.5s ease-in-out; 
+            filter: drop-shadow(5px 5px 15px rgba(0,0,0,0.3)); 
+        }
+
+        /* ESTADO HOVER */
+        .player-profile:hover {
+            background-color: var(--hover-bg-dark); /* Fundo Amarelo Queimado/Dourado Escuro */
+            color: var(--text-light); /* Texto branco */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6); 
+        }
+
+        .player-profile:hover::before {
+            /* Mapeia a imagem de fundo para a cor de linha mais clara */
+            background-image:
+                /* Linha 1: 45 graus */
+                linear-gradient(45deg,
+                    transparent 0%, transparent 48%,
+                    var(--hover-line-light) 48%, var(--hover-line-light) 52%, 
+                    transparent 52%, transparent 100%
+                ),
+                /* Linha 2: -45 graus */
+                linear-gradient(-45deg,
+                    transparent 0%, transparent 48%,
+                    var(--hover-line-light) 48%, var(--hover-line-light) 52%, 
+                    transparent 52%, transparent 100%
+                ),
+                /* Linha 3: 30 graus (Ponto de encontro movido) */
+                linear-gradient(30deg,
+                    transparent 0%, transparent 35%, 
+                    var(--hover-line-light) 35%, var(--hover-line-light) 39%, 
+                    transparent 39%, transparent 100%
+                ),
+                /* Linha 4: -30 graus (Ponto de encontro movido) */
+                linear-gradient(-30deg,
+                    transparent 0%, transparent 42%, 
+                    var(--hover-line-light) 42%, var(--hover-line-light) 46%, 
+                    transparent 46%, transparent 100%
+                );
+            transform: scale(1.1); /* Efeito de zoom out do fundo sutil (10%) */
+        }
+
+        .player-profile:hover .details-section {
+            border-top-color: rgba(255, 255, 255, 0.4); /* Linha divisória clara */
+        }
+
+        .player-profile:hover .detail-label {
+            opacity: 0.9;
+        }
+
+        .player-profile:hover .player-photo {
+            transform: scale(1.05); /* Pequeno zoom na foto da pessoa (5%) */
+        }
+
+        /* Para os ícones sociais - apenas um placeholder */
+        .social-icons {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 4;
+            color: var(--text-dark); /* Cor padrão para os ícones */
+            transition: color 0.5s ease-in-out;
+        }
+
+        .player-profile:hover .social-icons {
+            color: var(--text-light); /* Ícones brancos no hover */
+        }
+
+        .social-icons span {
+            margin-left: 10px;
+            font-size: 1.2em;
+        }
+
+.player-foto{
+    right: 50px;
+    
+}
+       
+/* style.css - Adicione esta nova regra para posicionar o bloco de ícones */
+.player-social {
+    position: absolute; /* Sai do fluxo normal */
+    bottom: 20px;          /* 20px de distância do topo do .store-cta */
+    right: 20px;        /* 20px de distância da direita do .store-cta */
+    z-index: 10;        /* Garante que fique acima da imagem */
+    /* Mantém os estilos de display existentes, se houver, ou: */
+    display: flex;
+    gap: 16px;
+}
+
+.player-banner-wrapper {
+    position: relative;
+    width: 100%;
+    height: 350px; /* ajuste se precisar */
+    overflow: hidden;
+}
+
+/* fundo separado */
+.player-banner-wrapper .x-pattern {
+    position: absolute;
+    inset: 0;
+    background-image: url('img/pattern.png'); /* mesmo pattern que você usa hoje */
+    background-repeat: repeat;
+    z-index: 1;
+}
+
+/* imagem do jogador */
+.player-banner {
+    position: absolute;
+    right: 0;     /* 👉 agora a imagem vai para a direita sem mexer o fundo */
+    bottom: 0;
+    height: 100%;
+    z-index: 2;
+    width: auto;       /* Manter proporção correta */
+    transition: transform 0.3s ease;
+}
+
+
+.player-banner {
+    /* ... (seus estilos existentes) ... */
+    
+    /* Adicione esta regra para o brilho na silhueta do jogador (funciona melhor em PNGs transparentes) */
+    transition: filter 0.3s ease; 
+}
+
+.player-cta:hover .player-banner {
+    filter: drop-shadow(0 0 8px var(--primary-gold)) drop-shadow(0 0 3px var(--secondary-gold));
+}
+
+/* --- WIDGET DE PARTIDA (Novo) --- */
+.match-widget {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    color: var(--card-bg-light)
+}
+
+.match-header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+    flex-wrap: wrap;
+}
+
+.match-tag {
+    background: var(--primary-gold);
+    color: #000;
+    font-weight: 800;
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pulse-dot {
+    width: 8px;
+    height: 8px;
+    background: #000;
+    border-radius: 50%;
+    animation: pulse-fast 1s infinite;
+}
+
+.match-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 8px 20px;
+    font-family: monospace; /* Fonte estilo código */
+    font-size: 0.9rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+}
+
+.text-gold { color: var(--primary-gold); }
+
+.match-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px;
+    gap: 20px;
+}
+
+.team-block {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex: 1;
+}
+
+.team-home { justify-content: flex-end; padding-right: 130px; }
+.team-away { justify-content: flex-start; padding-left: 130px; }
+
+.camp-logo-widget {
+    width: 20px;   /* Largura da logo */
+    height: 20px;  /* Altura da logo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* O filtro continua criando uma sombra bonita em volta da imagem transparente */
+    filter: drop-shadow(0 0 10px rgba(255,215,0,0.3));
+}
+
+.camp-logo-widget img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Garante que a logo não fique esticada/amassada */
+}
+
+
+.team-logo-widget {
+    width: 80px;   /* Largura da logo */
+    height: 80px;  /* Altura da logo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* O filtro continua criando uma sombra bonita em volta da imagem transparente */
+    filter: drop-shadow(0 0 10px rgba(255,215,0,0.3));
+}
+
+.team-logo-widget img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Garante que a logo não fique esticada/amassada */
+}
+
+.team-name {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #fff;
+    margin: 0;
+    font-style: italic;
+    line-height: 1;
+}
+
+.team-role {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    letter-spacing: 2px;
+    font-weight: bold;
+}
+
+.align-right { text-align: right; }
+
+.vs-block {
+    position: relative;
+    width: 80px;
+    text-align: center;
+}
+
+.vs-bg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4rem;
+    font-weight: 900;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.05);
+    pointer-events: none;
+}
+
+.vs-fg {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-gold);
+    font-style: italic;
+    position: relative;
+}
+
+.btn-icon-only {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--primary-gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-gold);
+    transition: all 0.3s ease;
+}
+
+.btn-icon-only-nohover {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--primary-gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-gold);
+    transition: all 0.3s ease;
+}
+
+
+.btn-icon-only:hover {
+    background: var(--primary-gold);
+    color: #000;
+    transform: scale(1.1);
+}
+
+/* Responsividade Mobile para o Widget */
+@media (max-width: 768px) {
+    .match-header { flex-direction: column; }
+    .match-tag { width: 100%; justify-content: center; }
+    .match-info { width: 100%; justify-content: center; padding: 10px; font-size: 0.75rem;}
+    .match-body { flex-direction: column; text-align: center; }
+    .team-block { flex-direction: column; justify-content: center; width: 100%; }
+    .team-away { flex-direction: column-reverse; } /* Inverte para logo ficar em cima no mobile */
+    .align-right { text-align: center; }
+    .ticket-action { display: none; } /* Esconde botão no mobile para economizar espaço */
+    .team-logo-widget {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+/* --- CALENDAR WIDGET STYLES --- */
+
+/* O container precisa ser relativo para posicionar o menu */
+.calendar-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* O Menu escondido */
+.calendar-menu {
+    position: absolute;
+    right: 100%; /* Fica à esquerda do botão */
+    top: 50%;
+    transform: translateY(-50%); /* Centraliza verticalmente */
+    
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    
+    background: #000; /* Fundo preto para leitura */
+    border: 1px solid var(--primary-gold);
+    border-radius: 50px; /* Borda redonda */
+    padding: 0; /* Começa sem padding */
+    margin-right: 12px; /* Espaço entre menu e botão */
+    
+    /* Animação de abrir */
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100; /* Garante que fique por cima */
+}
+
+/* Estado Aberto do Menu */
+.calendar-menu.open {
+    max-width: 250px; /* Largura suficiente para os ícones */
+    opacity: 1;
+    padding: 8px 20px; /* Adiciona padding quando abre */
+}
+
+/* Ícones dentro do menu */
+.calendar-menu a {
+    color: var(--white);
+    font-size: 1.2rem;
+    transition: transform 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.calendar-menu a:hover {
+    color: var(--primary-gold);
+    transform: scale(1.2);
+}
+
+/* Estilo especial para o texto ICS */
+.ics-icon {
+    font-size: 0.7rem !important;
+    font-weight: bold;
+    border: 1px solid var(--white);
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+.calendar-menu a:hover .ics-icon {
+    border-color: var(--primary-gold);
+}
+
+/* O Botão Redondo Principal */
+.calendar-btn {
+    
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 101; /* Botão fica acima do menu */
+}
+
+/* O Desenho SVG do Calendário */
+.calendar-svg {
+    stroke: var(--primary-gold);
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: all 0.3s ease;
+}
+
+.calendar-btn:hover .calendar-svg {
+    filter: drop-shadow(0 0 5px var(--primary-gold));
+    stroke: var(--secondary-gold);
+}
+
+/* --- ESTILO DO WIDGET DE PLACAR --- */
+
+/* Layout dos Times no Widget */
+.team-container-widget {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+    transition: transform 0.3s ease;
+}
+
+.team-container-widget.left {
+    justify-content: flex-start; /* Alinha LOUD à esquerda */
+}
+
+.team-container-widget.right {
+    justify-content: flex-end;   /* Alinha SEN à direita */
+}
+
+/* Efeito de hover nos times */
+.team-container-widget:hover {
+    transform: scale(1.02);
+}
+
+/* Logos Grandes */
+.team-logo-large {
+    width: 80px;
+    height: 80px;
+    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.2));
+}
+
+.team-logo-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Textos dos Times */
+.team-name-large {
+    font-family: var(--strays-font); /* Fonte do título do site */
+    font-size: 1.8rem;
+    margin: 0;
+    line-height: 1;
+    color: var(--text-dark);
+    font-style: italic;
+}
+
+.team-region {
+    font-size: 0.8rem;
+    letter-spacing: 3px;
+    color: var(--text-secondary);
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+/* Placar Central */
+.scoreboard-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 40px;
+}
+
+.score-display {
+    font-family: 'JetBrains Mono', monospace; /* Fonte de números */
+    font-size: 4rem;
+    font-weight: bold;
+    color: var(--white);
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+    line-height: 1;
+}
+
+.score-divider {
+    color: var(--primary-gold);
+    margin: 0 10px;
+    opacity: 0.6;
+}
+
+.text-gray {
+    color: #888; /* Cor para o perdedor, opcional */
+}
+
+.match-status {
+    margin-top: 10px;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    color: var(--primary-gold);
+    font-weight: bold;
+    padding: 6px 16px;
+    border-radius: 20px;
+    display: inline-flex;   /* Alinha bolinha e texto na mesma linha */
+    align-items: center;    /* Centraliza verticalmente */
+    gap: 8px;               /* Espaço entre a bolinha e o texto */
+    white-space: nowrap;    /* PROIBE o texto de quebrar linha */
+    transition: all 0.3s ease;
+}
+
+/* Estilo QUANDO ESTIVER AO VIVO (Adicionado via JS) */
+.match-status.live-active {
+    color: #ff4444 !important;       /* Texto Vermelho */
+}
+
+/* Cria a bolinha vermelha AUTOMATICAMENTE antes do texto */
+.match-status.live-active::before {
+    content: '';
+    display: block;
+    width: 8px;
+    height: 8px;
+    background-color: #ff4444;
+    border-radius: 50%;
+    box-shadow: 0 0 5px #ff4444;
+    animation: pulse-red 1.5s infinite; /* Usa a animação abaixo */
+}
+
+/* Animação da bolinha piscando */
+@keyframes pulse-red {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* Ajustes Mobile */
+@media (max-width: 768px) {
+    .match-body {
+        flex-direction: column;
+        gap: 30px;
+    }
+    .team-container-widget {
+        justify-content: center !important;
+        width: 100%;
+    }
+    .team-container-widget.right {
+        flex-direction: row-reverse; /* Inverte a ordem no mobile para o logo ficar fora */
+    }
+    .text-left, .text-right {
+        text-align: center;
+    }
+    .score-display {
+        font-size: 3rem;
+    }
+}
+
+/* --- HISTÓRICO DE PARTIDAS --- */
+.history-section {
+    padding: 30px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    margin-top: 30px;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
+}
+
+.history-header h3 {
+    color: var(--primary-gold);
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.history-year {
+    background: var(--card-bg-light);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    color: var(--text-secondary);
+}
+
+/* Container da lista com scroll se ficar muito grande */
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 400px; /* Altura máxima antes de começar a rolar */
+    overflow-y: auto;
+    padding-right: 10px; /* Espaço para a scrollbar */
+}
+
+/* Custom Scrollbar para a lista */
+.history-list::-webkit-scrollbar {
+    width: 6px;
+}
+.history-list::-webkit-scrollbar-thumb {
+    background: var(--medium-gray);
+    border-radius: 3px;
+}
+
+/* O Item Individual (Cada Jogo) */
+.history-item {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 1fr; /* Data | Jogo | Placar | Resultado */
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 15px 20px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.history-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(5px);
+}
+
+/* Cores da Borda Lateral baseadas no Resultado */
+.history-item.win { border-left-color: #10b981; } /* Verde */
+.history-item.loss { border-left-color: #ef4444; } /* Vermelho */
+.history-item.draw { border-left-color: var(--text-secondary); } /* Cinza */
+
+/* Colunas */
+.h-date {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-family: monospace;
+}
+
+.h-matchup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+    color: var(--white);
+}
+
+.h-matchup img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+
+.h-score {
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--white);
+    letter-spacing: 2px;
+}
+
+.h-result {
+    text-align: right;
+    font-weight: bold;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.h-result.win { color: #10b981; }
+.h-result.loss { color: #ef4444; }
+
+/* Mobile Responsivo */
+@media (max-width: 768px) {
+    .history-item {
+        grid-template-columns: 1fr auto; /* Vira 2 colunas */
+        gap: 10px;
+    }
+    .h-date { grid-column: 1 / -1; font-size: 0.8rem; opacity: 0.7; }
+    .h-matchup { grid-column: 1; }
+    .h-score { grid-column: 2; text-align: right; }
+    .h-result { display: none; } /* Esconde texto Win/Loss no mobile para economizar espaço (a cor da borda já indica) */
+}
+
+/* A Imagem dentro do Banner */
 .store-banner {
     width: 100%;
     height: 100%;
-    border-radius: 16px;
+    
+    /* O SEGREDO: 'cover' faz a imagem preencher tudo sem esticar/deformar o desenho */
+    object-fit: cover;
+    /* Ajuste a posição do foco da imagem (center, top, bottom) */
+    object-position: center; 
+    
+    border-radius: 0; /* Remove cantos arredondados da imagem */
+    display: block;
+}
+
+.loja-banner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Garante que a imagem cubra a área sem distorcer */
+            object-position: top center; /* Salva as cabeças */
+            z-index: 0;
 }
 
 .store-banner:hover {
@@ -1175,7 +2429,7 @@ body {
 /* News Section */
 .news-section {
     padding: 80px 0;
-    background: var(--black);
+    background: var(--section-background); /* Antes era var(--black) */
 }
 
 
@@ -1225,7 +2479,7 @@ body {
 .news-title {
     font-size: 20px;
     font-weight: bold;
-    color: var(--white);
+    color: var(--text-color);
     margin-bottom: 12px;
     transition: all 0.3s ease;
 }
@@ -1235,7 +2489,7 @@ body {
 }
 
 .news-excerpt {
-    color: #ccc;
+    color: var(--text-secondary);
     font-size: 14px;
     line-height: 1.6;
     margin-bottom: 16px;
@@ -1338,7 +2592,8 @@ body {
 
 /* Gallery Section */
 .gallery-section {
-    padding: 80px 0;
+    padding: 20px 0;
+    background: var(--section-background); /* Antes era var(--black) */
 }
 
 .gallery-carousel {
@@ -1432,11 +2687,19 @@ body {
 }
 
 .prev-btn-players {
-    right: 800px;
+    left: 10px;   /* Cola na esquerda */
+    right: auto;  /* Anula o right */
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
 }
 
 .next-btn-players {
-    left: 800px;
+    right: 10px;  /* Cola na direita */
+    left: auto;   /* Anula o left */
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
 }
 
 .image-counter {
@@ -1537,10 +2800,138 @@ body {
     flex-wrap: wrap;
 }
 
+/* --- ESTILOS DA PÁGINA DE GALERIA COMPLETA (ANTI-ZOOM) --- */
+
+/* 1. Container que permite largura total */
+#galeria-page .container {
+    width: 100vw;      /* Largura total da janela */
+    max-width: 100vw;  /* Garante que não tenha limite de pixels */
+    padding: 0;        /* Remove padding para controlar via grid */
+    margin: 0;
+    overflow-x: hidden; /* Evita scroll lateral indesejado */
+}
+
+/* O Grid Principal */
+.full-gallery-grid {
+    display: grid;
+    
+    /* MÁGICA DO ANTI-ZOOM: 
+       Usamos 'vw' (Viewport Width). 
+       46vw = 46% da largura da janela. 
+       Como são 2 colunas, soma 92%, sobrando espaço para o gap.
+       Isso faz a imagem SEMPRE ocupar a mesma proporção da tela, ignorando o zoom do texto. */
+    grid-template-columns: repeat(2, 46vw);
+    
+    justify-content: center;
+    gap: 3vw; /* Espaço também em porcentagem da tela */
+    width: 100%;
+    margin: 0 auto;
+    padding-bottom: 50px;
+}
+
+/* O Retângulo (Item da Galeria) */
+.gallery-item-rect {
+    position: relative;
+    
+    /* Largura preenche a coluna do grid (46vw) */
+    width: 100%; 
+    
+    /* ALTURA FIXA NA TELA:
+       50vh = 50% da altura da janela.
+       Independente do zoom, a imagem sempre terá metade da altura do seu monitor. */
+    height: 50vh; 
+    
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid rgba(255, 215, 0, 0.1);
+    background: var(--card-bg-light);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gallery-item-rect:hover {
+    /* No hover, um leve destaque, mas mantendo a proporção */
+    transform: scale(1.02); 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border-color: var(--primary-gold);
+    z-index: 10;
+}
+
+/* A Imagem ou Vídeo */
+.gallery-item-rect img, 
+.gallery-item-rect video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    object-position: center; 
+    transition: transform 0.5s ease;
+}
+
+.gallery-item-rect:hover img,
+.gallery-item-rect:hover video {
+    transform: scale(1.1); 
+}
+
+/* Overlay (Texto e Ícone) */
+.item-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 2vw; /* Padding também relativo ao tamanho da tela */
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.gallery-item-rect:hover .item-overlay {
+    opacity: 1;
+}
+
+.item-caption {
+    color: var(--white);
+    font-weight: bold;
+    /* Fonte usa 'vmin' para escalar suavemente com a tela, não com o zoom do navegador de forma agressiva */
+    font-size: 2.5vmin; 
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+
+.item-icon {
+    color: var(--primary-gold);
+    font-size: 3vmin; 
+}
+
+/* --- RESPONSIVIDADE --- */
+
+/* Para telas verticais (Celulares e Tablets em pé) */
+@media (orientation: portrait) {
+    .full-gallery-grid {
+        /* Muda para 1 coluna que ocupa quase toda a largura */
+        grid-template-columns: 92vw; 
+        gap: 3vh;
+    }
+    
+    .gallery-item-rect {
+        /* No celular, a altura ocupa 35% da tela para caber mais de uma */
+        height: 35vh; 
+    }
+    
+    .item-caption {
+        font-size: 1.2rem; /* No celular voltamos para rem para legibilidade */
+    }
+    
+    .item-icon {
+        font-size: 1.5rem;
+    }
+}
+
 /* Sponsors Section */
 .sponsors-section {
     padding: 80px 0;
-    background: var(--black);
+    background: var(--section-background); /* Antes era var(--black) */
 }
 
 .sponsors-grid-carousel {
@@ -1599,7 +2990,7 @@ body {
 }
 
 .sponsor-name {
-    color: var(--white);
+    color: var(--text-color);
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 16px;
@@ -1649,7 +3040,7 @@ body {
 }
 
 .cta-description {
-    color: #ccc;
+    color: var(--text-secondary);
     font-size: 18px;
     margin-bottom: 32px;
     max-width: 500px;
@@ -1660,6 +3051,7 @@ body {
 /* Footer */
 .footer {
     padding: 80px 0 32px;
+    background: var(--section-background); /* Antes era var(--black) */
 }
 
 .footer-main {
@@ -1736,7 +3128,7 @@ body {
 }
 
 .footer-description {
-    color: #ccc;
+    color: var(--text-secondary);
     line-height: 1.6;
     margin-bottom: 24px;
 }
@@ -1753,7 +3145,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #ccc;
+    color: var(--text-secondary);
     font-size: 20px;
     transition: all 0.3s ease;
     text-decoration: none
@@ -1802,15 +3194,15 @@ body {
 
 .contact-item {
     display: flex;
-    align-items: flex-start;
+    align-items: center; /* <--- MUDE DE flex-start PARA center */
     gap: 12px;
-    color: #ccc;
+    color: var(--text-secondary);
     text-decoration: none;
 }
 
 .contact-item i {
     color: var(--primary-gold);
-    margin-top: 2px;
+    margin-top: 0;
     transition: color 0.3s ease;
 }
 
@@ -1831,7 +3223,7 @@ body {
     margin: 0;
     transition: color 0.3s ease;
     text-decoration: none;
-    color: #ccc;
+    color: var(--text-secondary);
 }
 
 .contact-item:hover a {
@@ -1854,7 +3246,7 @@ body {
 }
 
 .newsletter-description {
-    color: #ccc;
+    color: var(--text-secondary);
     margin-bottom: 24px;
 }
 
@@ -1870,10 +3262,10 @@ body {
     flex: 1;
     min-width: 200px;
     padding: 12px 16px;
-    border: 1px solid #444;
+    border: 1px solid var(--medium-gray);
     border-radius: 8px;
-    background: rgba(0, 0, 0, 0.3);
-    color: var(--white);
+    background: var(--card-background);
+    color: var(--text-color);
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
 }
@@ -1904,7 +3296,7 @@ body {
 }
 
 .copyright {
-    color: #ccc;
+    color: var(--text-secondary);
     margin: 0;
 }
 
@@ -1933,7 +3325,7 @@ body {
 }
 
 .perf-label {
-    color: #ccc;
+    color: var(--text-secondary);
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -1998,7 +3390,7 @@ body {
             color: var(--light-gray);
             position: absolute;
             top: 15px;
-            left: 800px;
+            right: 20px;
             font-size: 40px;
             line-height: 1;
             transition: color var(--transition-speed-fast) ease, transform var(--transition-speed-fast) ease;
@@ -2110,16 +3502,6 @@ a:focus:not(:focus-visible) {
         scroll-snap-align: center; /* Centraliza o card ao rolar */
         height: auto;
         margin-right: 0;
-    }
-
-    .prev-btn-players {
-        right: 320px;
-        margin-top: 270px;
-    }
-
-    .next-btn-players {
-        left: 320px;
-        margin-top: 270px;
     }
 
     .close-button {
@@ -2326,6 +3708,43 @@ a:focus:not(:focus-visible) {
         min-width: 50vw; /* Ocupa 50% da tela em mobile */
     }
 
+    .hero-title, .section-title, .section-title-loja {
+        font-size: 2.5rem; /* Reduz a fonte no celular */
+        word-wrap: break-word; /* Quebra linha se a palavra for longa */
+    }
+
+    /* Ajuste do Card de Jogador no Mobile */
+    .player-profile {
+        width: 100%;
+        height: auto;
+        display: flex;
+        flex-direction: column; /* Empilha foto e texto */
+        margin: 0 0 20px 0;
+    }
+
+    .player-info-profile {
+        position: relative; /* Tira do absolute no mobile */
+        width: 100%;
+        padding: 20px;
+        top: 0; left: 0;
+    }
+
+    .player-photo-container {
+        position: relative; /* Tira do absolute */
+        width: 100%;
+        height: 300px; /* Altura fixa para a foto */
+    }
+    
+    .player-nickname {
+        font-size: 3em; /* Nome um pouco menor */
+    }
+
+    /* Conserta o Widget de Partida */
+    .team-home, .team-away {
+        padding: 0; /* Remove aquele padding de 130px */
+        justify-content: center;
+    }
+
 }
 
 @media (max-width: 700px) {
@@ -2355,4 +3774,125 @@ a:focus:not(:focus-visible) {
     .performance-stats {
         grid-template-columns: repeat(2, 1fr);
     }
+}
+
+/* --- CORREÇÃO DO BANNER NO MOBILE --- */
+@media (max-width: 768px) {
+    
+    /* 1. Diminui a altura da caixa para ficar no formato "faixa" */
+    .player-profile-banner {
+        height: 250px; /* Reduz de 700px para 250px para caber a foto inteira */
+    }
+
+    /* 2. Garante que a imagem se ajuste a essa nova altura */
+    .player-profile-banner img {
+        /* 'contain' garante que a imagem inteira apareça, sem cortes laterais */
+        /* Se ficar com bordas pretas, troque por 'cover' */
+        object-fit: cover; 
+        object-position: top center;
+    }
+
+    /* 3. Reposiciona o título (antes estava em 540px, agora iria sumir) */
+    .line-banner-title {
+        top: 70%;       /* Coloca no meio da imagem */
+        left: 50%;      /* Centraliza horizontalmente */
+        transform: translate(-50%, -50%); /* Ajuste fino do centro */
+        font-size: 3rem; /* Fonte um pouco menor para não estourar a tela */
+        width: 100%;
+        text-align: center;
+    }
+
+    /* 4. Reposiciona o subtítulo */
+    .line-banner-subtitle {
+        top: 85%;       /* Um pouco abaixo do título */
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* ========================================= */
+/* NOTIFICAÇÕES (DROPDOWN DO SINO)           */
+/* ========================================= */
+
+.notification-dropdown {
+    position: absolute;
+    top: 50px;
+    right: -10px;
+    width: 320px;
+    background: #1c1f26;
+    border: 1px solid #333;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    z-index: 1000;
+    display: none; /* Escondido por padrão */
+    flex-direction: column;
+    overflow: hidden;
+    animation: fadeInDropdown 0.2s ease-out;
+}
+
+.notification-dropdown.show { display: flex; }
+
+.notif-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #15171e;
+}
+.notif-header h3 { font-size: 13px; font-weight: 800; color: white; text-transform: uppercase; }
+.notif-clear { font-size: 10px; color: #888; cursor: pointer; }
+.notif-clear:hover { color: #ff4655; }
+
+.notif-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.notif-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    gap: 12px;
+    transition: background 0.2s;
+    position: relative;
+}
+.notif-item:hover { background: rgba(255,255,255,0.02); }
+.notif-item.unread { background: rgba(234, 179, 8, 0.05); border-left: 3px solid #eab308; }
+
+.notif-icon {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: #333;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: white;
+}
+.notif-icon.invite { background: #6d28d9; } /* Roxo */
+.notif-icon.match { background: #ef4444; }  /* Vermelho */
+.notif-icon.info { background: #3b82f6; }   /* Azul */
+
+.notif-content { flex: 1; }
+.notif-title { font-size: 13px; font-weight: 700; color: white; margin-bottom: 2px; }
+.notif-msg { font-size: 11px; color: #9ca3af; line-height: 1.4; margin-bottom: 6px; }
+.notif-time { font-size: 10px; color: #555; }
+
+/* Botões de Ação (Aceitar/Recusar) */
+.notif-actions { display: flex; gap: 8px; margin-top: 8px; }
+.btn-accept {
+    background: #10b981; color: white; border: none; padding: 4px 10px;
+    border-radius: 4px; font-size: 10px; font-weight: 800; cursor: pointer;
+}
+.btn-decline {
+    background: #333; color: #ccc; border: none; padding: 4px 10px;
+    border-radius: 4px; font-size: 10px; font-weight: 800; cursor: pointer;
+}
+.btn-accept:hover { background: #059669; }
+.btn-decline:hover { background: #444; color: white; }
+
+@keyframes fadeInDropdown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }

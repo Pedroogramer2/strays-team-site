@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil - U4nted Cup</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-[#0f1116] text-white">
+
+    <aside class="sidebar">
+        <div class="logo"><h1>U4<span class="logo-accent">NTED CUP</span></h1></div>
+        <nav class="menu">
+            <a href="index.html#home" class="menu-item"><i data-lucide="home"></i><span>Home</span></a>
+            <a href="index.html#players" class="menu-item"><i data-lucide="user"></i><span>Players</span></a>
+            <a href="index.html#times" class="menu-item"><i data-lucide="shield"></i><span>Times</span></a>
+            <a href="index.html#campeonatos" class="menu-item"><i data-lucide="trophy"></i><span>Campeonatos</span></a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="top-bar" id="top-bar-container"></div>
+
+        <div id="loading-screen" class="flex flex-col items-center justify-center h-[60vh] animate-fadeIn">
+            <div class="w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p class="text-gray-400 text-sm font-bold uppercase tracking-widest">Carregando Perfil...</p>
+        </div>
+
+        <div id="profile-content" class="max-w-7xl mx-auto px-8 py-12 animate-fadeIn hidden">
+            
+            <div class="flex items-center justify-between mb-12">
+                <div class="flex items-center gap-6">
+                    <div class="w-24 h-24 rounded-full bg-gray-800 border-2 border-gray-700 overflow-hidden shrink-0">
+                        <img id="profile-avatar" src="" class="w-full h-full object-cover">
+                    </div>
+                    
+                    <div class="flex flex-col gap-1">
+                        <h1 id="profile-nick" class="text-4xl font-black text-white leading-none">...</h1>
+                        
+                        <div class="flex items-center gap-4">
+                            <p id="profile-name" class="text-gray-400 text-sm font-medium">...</p>
+                            
+                            <div id="social-icons-container" class="flex items-center gap-3 border-l border-gray-700 pl-4"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <a href="editar-perfil.html" class="bg-[#1c1f26] border border-gray-700 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-colors text-sm">
+                    <i data-lucide="edit-2" class="w-4 h-4"></i> Editar
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                
+                <div class="space-y-8">
+                    <div class="bg-[#15171e] p-6 rounded-xl border border-gray-800">
+                        <h3 class="text-gray-500 text-[10px] font-bold uppercase mb-3">Assinatura do player</h3>
+                        <p id="profile-bio" class="text-gray-300 italic text-sm">"Sem assinatura definida."</p>
+                    </div>
+
+                    <div class="flex gap-6 text-sm">
+                        <div class="flex items-center gap-2 text-gray-400">
+                            <i data-lucide="map-pin" class="w-4 h-4 text-purple-500"></i> Brasil
+                        </div>
+                        <div class="flex items-center gap-2 text-gray-400">
+                            <i data-lucide="gamepad-2" class="w-4 h-4 text-purple-500"></i> Valorant
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-gray-500 text-[10px] font-bold uppercase mb-2">Time Atual</h3>
+                        <div id="my-team-display">
+                            <p class="text-gray-400 text-sm">Carregando...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2">
+                    
+                    <div class="flex gap-4 mb-8 border-b border-gray-800">
+                        <button onclick="switchProfileTab('overview')" id="prof-btn-overview" class="px-6 py-2 bg-[#5b4dff] text-white text-xs font-bold rounded-lg mb-4">Visão Geral</button>
+                        <button onclick="switchProfileTab('matches')" id="prof-btn-matches" class="px-6 py-2 text-gray-500 hover:text-white text-xs font-bold mb-4 transition-colors">Partidas</button>
+                    </div>
+
+                    <div id="prof-tab-overview">
+                        <div class="grid grid-cols-3 gap-4 mb-10">
+                            <div class="bg-[#15171e] border border-gray-800 p-5 rounded-xl">
+                                <i data-lucide="zap" class="w-5 h-5 text-gray-400 mb-2"></i>
+                                <div class="text-2xl font-bold text-white" id="stat-matches">0</div>
+                                <div class="text-[10px] text-gray-500 font-bold uppercase">Partidas Jogadas</div>
+                            </div>
+                            <div class="bg-[#15171e] border border-gray-800 p-5 rounded-xl">
+                                <i data-lucide="trophy" class="w-5 h-5 text-gray-400 mb-2"></i>
+                                <div class="text-2xl font-bold text-white" id="stat-tourneys">0</div>
+                                <div class="text-[10px] text-gray-500 font-bold uppercase">Campeonatos Jogados</div>
+                            </div>
+                            <div class="bg-[#15171e] border border-gray-800 p-5 rounded-xl">
+                                <i data-lucide="medal" class="w-5 h-5 text-gray-400 mb-2"></i>
+                                <div class="text-2xl font-bold text-white" id="stat-mvp">0</div>
+                                <div class="text-[10px] text-gray-500 font-bold uppercase">MVP Totais</div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-white font-bold text-sm uppercase mb-1">CONTA DE JOGOS</h3>
+                            <p class="text-gray-500 text-xs mb-4">Estatísticas do player nos jogos</p>
+
+                            <div id="riot-account-section" class="mb-4"></div>
+
+                            <div id="riot-connect-card" class="bg-[#2a1e22] border border-red-900/30 rounded-xl p-10 text-center hidden">
+                                <div class="flex justify-center mb-4">
+                                    <div class="w-10 h-10 rounded-full border-2 border-white flex items-center justify-center">
+                                        <span class="font-bold text-white">!</span>
+                                    </div>
+                                </div>
+                                <h3 class="text-white font-bold text-lg mb-2">Vinculação necessária</h3>
+                                <p class="text-gray-400 text-sm mb-6 max-w-md mx-auto">
+                                    Para você jogar os campeonatos é necessário vincular sua conta do Valorant em nossa plataforma
+                                </p>
+                                <button onclick="openLinkModal()" class="bg-[#1c1f26] hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg text-sm border border-gray-700 transition-colors inline-flex items-center gap-2">
+                                    <i data-lucide="plus" class="w-4 h-4"></i> Vincular Conta
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="prof-tab-matches" class="hidden space-y-3">
+                        <p class="text-center text-gray-500 py-8">Histórico de partidas indisponível no momento.</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="link-modal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-[#15171e] w-full max-w-md rounded-xl border border-gray-800 shadow-2xl p-6 animate-fadeIn">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h3 class="text-white font-bold text-lg">Adicionar Conta</h3>
+                    <p class="text-gray-500 text-xs">Informe o seu nick e tag da sua conta do Valorant</p>
+                </div>
+                <button onclick="closeLinkModal()" class="text-gray-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <div class="flex gap-4 mb-6">
+                <div class="flex-1">
+                    <label class="block text-white text-xs font-bold mb-2">Nick</label>
+                    <input type="text" id="riot-nick" placeholder="Seu Nick" class="w-full bg-[#1c1f26] border border-[#5b4dff] text-white px-4 py-3 rounded-lg text-sm outline-none">
+                </div>
+                <div class="w-1/3">
+                    <label class="block text-white text-xs font-bold mb-2">Tag</label>
+                    <input type="text" id="riot-tag" placeholder="#BR1" class="w-full bg-[#1c1f26] border border-gray-700 text-white px-4 py-3 rounded-lg text-sm outline-none focus:border-[#5b4dff]">
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center mt-8">
+                <button onclick="closeLinkModal()" class="text-white font-bold text-sm px-4 py-2 hover:bg-white/5 rounded-lg transition-colors">Cancelar</button>
+                <button onclick="connectRiotAccount()" id="btn-connect-riot" class="bg-[#5b4dff] hover:bg-[#4a3ecc] text-white font-bold py-2 px-6 rounded-lg text-sm transition-colors shadow-lg shadow-indigo-500/20">
+                    Adicionar Conta
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="manage-riot-modal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-[#15171e] w-full max-w-md rounded-xl border border-gray-800 shadow-2xl p-6 animate-fadeIn">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h3 class="text-white font-bold text-lg">Gerenciar Conta do Valorant</h3>
+                    <p class="text-gray-500 text-xs">Visualize informações ou desconecte sua conta.</p>
+                </div>
+                <button onclick="closeManageModal()" class="text-gray-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex gap-4">
+                    <div class="flex-1">
+                        <label class="block text-gray-500 text-xs font-bold mb-1 uppercase">Nick</label>
+                        <input type="text" id="mng-nick" readonly class="w-full bg-[#0f1116] border border-gray-800 text-gray-300 px-4 py-3 rounded-lg text-sm outline-none cursor-default">
+                    </div>
+                    <div class="w-1/3">
+                        <label class="block text-gray-500 text-xs font-bold mb-1 uppercase">Tag</label>
+                        <input type="text" id="mng-tag" readonly class="w-full bg-[#0f1116] border border-gray-800 text-gray-300 px-4 py-3 rounded-lg text-sm outline-none cursor-default">
+                    </div>
+                </div>
+
+                <div class="bg-[#0f1116] border border-gray-800 rounded-xl p-4 flex justify-between items-center">
+                    <div>
+                        <p class="text-gray-500 text-xs font-bold uppercase mb-1">Região</p>
+                        <p class="text-white font-bold uppercase" id="mng-region">BR</p>
+                        <p class="text-gray-600 text-[10px] mt-2" id="mng-update">Atualizado agora</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-gray-500 text-xs font-bold uppercase mb-1">Rank Atual</p>
+                        <p class="text-white font-bold" id="mng-rank">Unranked</p>
+                        
+                        <button onclick="openUnlinkModal()" class="mt-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ml-auto">
+                            <i data-lucide="trash-2" class="w-3 h-3"></i> Excluir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="unlink-confirmation-modal" class="fixed inset-0 bg-black/80 z-[60] hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-[#15171e] w-full max-w-md rounded-xl border border-gray-800 shadow-2xl p-6 animate-fadeIn">
+            <h3 class="text-white font-bold text-lg mb-2">Desvincular Conta</h3>
+            <p class="text-gray-400 text-sm mb-6 leading-relaxed">
+                Você tem certeza que deseja desvincular esta conta Riot? <br>
+                Você perderá o histórico e os dados associados a ela no site.
+            </p>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeUnlinkModal()" class="bg-[#1c1f26] hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg text-sm border border-gray-700 transition-colors">Cancelar</button>
+                <button onclick="confirmUnlinkRiot()" id="btn-confirm-unlink" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg shadow-red-900/20 transition-colors">Sim, desvincular</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="auth.js"></script>
+    <script src="global-topbar.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Aguarda um pouco para carregar o firebase e evitar erros
+            setTimeout(() => {
+                loadProfileData();
+            }, 600);
+            lucide.createIcons();
+        });
+
+        let currentProfileData = null;
+
+        // --- 1. CARREGAR DADOS ---
+        async function loadProfileData() {
+            document.getElementById('loading-screen').classList.remove('hidden');
+            document.getElementById('profile-content').classList.add('hidden');
+
+            const params = new URLSearchParams(window.location.search);
+            const targetUid = params.get('uid');
+            const loggedUserJson = localStorage.getItem('u4nted_user');
+            const loggedUser = loggedUserJson ? JSON.parse(loggedUserJson) : null;
+
+            let userData = null;
+            let isMe = false;
+
+            try {
+                if (targetUid) {
+                    if (loggedUser && String(loggedUser.uid) === String(targetUid)) {
+                        userData = loggedUser;
+                        isMe = true;
+                    } else {
+                        if(window.doc && window.db && window.getDoc) {
+                            const docRef = window.doc(window.db, "users", targetUid);
+                            const docSnap = await window.getDoc(docRef);
+                            if (docSnap.exists()) {
+                                userData = { uid: docSnap.id, ...docSnap.data() };
+                                isMe = false;
+                            }
+                        }
+                    }
+                } else {
+                    if (!loggedUser) { window.location.href = 'login.html'; return; }
+                    userData = loggedUser;
+                    isMe = true;
+                }
+
+                if (!userData) {
+                    document.querySelector('.main-content').innerHTML = "<div class='text-center p-20 text-white'>Usuário não encontrado.</div>";
+                    return;
+                }
+                
+                currentProfileData = userData;
+
+                // --- UI Update ---
+                const editBtn = document.querySelector('a[href="editar-perfil.html"]');
+                if(editBtn) editBtn.style.display = isMe ? 'flex' : 'none';
+
+                document.getElementById('profile-nick').innerText = userData.nick || userData.name;
+                document.getElementById('profile-name').innerText = userData.name;
+                document.getElementById('profile-avatar').src = userData.photo || `https://api.dicebear.com/7.x/initials/svg?seed=${userData.nick}`;
+                document.getElementById('profile-bio').innerText = userData.bio ? `"${userData.bio}"` : '"Sem assinatura definida."';
+
+                if(userData.stats) {
+                    document.getElementById('stat-matches').innerText = userData.stats.matches || 0;
+                    document.getElementById('stat-tourneys').innerText = userData.stats.tournaments || 0;
+                    document.getElementById('stat-mvp').innerText = userData.stats.mvp || 0;
+                }
+
+                const socialContainer = document.getElementById('social-icons-container');
+                if(socialContainer) {
+                    socialContainer.innerHTML = '';
+                    if(userData.socials) {
+                        const addIcon = (url, iconName, colorHover) => {
+                            if (!url || url.trim() === "") return;
+                            let finalLink = url.startsWith('http') ? url : '#'; 
+                            if (!url.startsWith('http')) {
+                                if(iconName === 'twitter') finalLink = `https://twitter.com/${url.replace('@','')}`;
+                                if(iconName === 'instagram') finalLink = `https://instagram.com/${url.replace('@','')}`;
+                                if(iconName === 'twitch') finalLink = `https://twitch.tv/${url}`;
+                                if(iconName === 'youtube') finalLink = `https://youtube.com/@${url}`;
+                            }
+                            socialContainer.innerHTML += `<a href="${finalLink}" target="_blank" class="text-gray-500 ${colorHover} transition-colors p-1 hover:bg-white/5 rounded-full"><i data-lucide="${iconName}" class="w-4 h-4"></i></a>`;
+                        };
+                        addIcon(userData.socials.twitter, 'twitter', 'hover:text-blue-400');
+                        addIcon(userData.socials.instagram, 'instagram', 'hover:text-pink-500');
+                        addIcon(userData.socials.twitch, 'twitch', 'hover:text-purple-500');
+                        addIcon(userData.socials.youtube, 'youtube', 'hover:text-red-500');
+                    }
+                }
+
+                loadTeamDisplay(userData);
+                renderRiotSection(userData, isMe);
+                lucide.createIcons();
+
+            } catch (err) {
+                console.error("Erro ao carregar perfil:", err);
+            } finally {
+                document.getElementById('loading-screen').classList.add('hidden');
+                document.getElementById('profile-content').classList.remove('hidden');
+            }
+        }
+
+        // --- 2. FUNÇÕES RIOT ---
+
+        window.connectRiotAccount = async function() {
+            const nick = document.getElementById('riot-nick').value;
+            const tag = document.getElementById('riot-tag').value.replace('#', '');
+            const btn = document.getElementById('btn-connect-riot');
+
+            if (!nick || !tag) { alert("Preencha nick e tag."); return; }
+
+            btn.innerText = "Vinculando..."; btn.disabled = true;
+
+            try {
+                const mockRiotData = {
+                    gameName: nick,
+                    tagLine: tag,
+                    region: 'br',
+                    rank: 'Diamond 2',
+                    rankImage: 'https://media.valorant-api.com/competitivetiers/564d8e2d-c226-317e-4628-eb5263512e37/17/largeicon.png',
+                    elo: 45,
+                    matches: 120,
+                    wins: 65,
+                    card: 'https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/wideart.png'
+                };
+
+                const user = JSON.parse(localStorage.getItem('u4nted_user'));
+                if (!user) return;
+
+                const userRef = window.doc(window.db, "users", user.uid);
+                await window.updateDoc(userRef, { riotAccount: mockRiotData });
+
+                user.riotAccount = mockRiotData;
+                localStorage.setItem('u4nted_user', JSON.stringify(user));
+
+                showToast("Conta vinculada com sucesso!");
+                closeLinkModal();
+                loadProfileData(); 
+
+            } catch (error) {
+                console.error(error);
+                alert("Erro ao vincular: " + error.message);
+            } finally {
+                btn.innerText = "Adicionar Conta"; btn.disabled = false;
+            }
+        }
+
+        // --- NOVO SISTEMA DE DESVINCULAR ---
+
+        // 1. Abrir Modal de Confirmação
+        window.openUnlinkModal = function() {
+            document.getElementById('unlink-confirmation-modal').classList.remove('hidden');
+            document.getElementById('unlink-confirmation-modal').classList.add('flex');
+        }
+
+        // 2. Fechar Modal de Confirmação
+        window.closeUnlinkModal = function() {
+            document.getElementById('unlink-confirmation-modal').classList.add('hidden');
+            document.getElementById('unlink-confirmation-modal').classList.remove('flex');
+        }
+
+        // 3. Executar Ação Real
+        window.confirmUnlinkRiot = async function() {
+            const btn = document.getElementById('btn-confirm-unlink');
+            btn.innerText = "Removendo..."; btn.disabled = true;
+
+            try {
+                const user = JSON.parse(localStorage.getItem('u4nted_user'));
+                if (!user) return;
+
+                const userRef = window.doc(window.db, "users", user.uid);
+                await window.updateDoc(userRef, { riotAccount: null });
+
+                user.riotAccount = null;
+                localStorage.setItem('u4nted_user', JSON.stringify(user));
+
+                showToast("Conta desvinculada.");
+                
+                // Fecha TUDO
+                closeUnlinkModal();
+                closeManageModal();
+                
+                loadProfileData();
+
+            } catch(e) {
+                console.error(e);
+                alert("Erro ao desvincular.");
+            } finally {
+                btn.innerText = "Sim, desvincular"; btn.disabled = false;
+            }
+        }
+
+        // --- FUNÇÕES DE UI ---
+
+        function loadTeamDisplay(userData) {
+            const localTeams = JSON.parse(localStorage.getItem('u4nted_teams_db') || '[]');
+            const myTeam = localTeams.find(t => 
+                (t.ownerId === userData.uid) || 
+                (t.roster && t.roster.some(m => m.uid === userData.uid))
+            );
+
+            const teamDisplay = document.getElementById('my-team-display');
+            if (teamDisplay) {
+                if (myTeam) {
+                    teamDisplay.innerHTML = `
+                        <div onclick="window.location.href='index.html#team-detail-${myTeam.id}'" class="bg-[#1c1f26]/80 border border-purple-500/30 hover:border-yellow-500 rounded-xl p-3 flex items-center gap-3 cursor-pointer group transition-all shadow-lg w-full">
+                            <div class="w-10 h-10 rounded-full bg-[#0f1116] border border-gray-700 overflow-hidden shrink-0 group-hover:scale-105 transition-transform">
+                                <img src="${myTeam.logo}" class="w-full h-full object-cover">
+                            </div>
+                            <div class="overflow-hidden min-w-0">
+                                <h4 class="text-white font-bold text-sm truncate group-hover:text-yellow-500 transition-colors">${myTeam.name}</h4>
+                                <p class="text-gray-500 text-[10px] uppercase font-bold truncate">${myTeam.tag || 'TIME'}</p>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-600 ml-auto group-hover:text-yellow-500"></i>
+                        </div>
+                    `;
+                } else {
+                    teamDisplay.innerHTML = `<p class="text-gray-400 text-sm">Não participando de um time no momento</p>`;
+                }
+            }
+        }
+
+        function renderRiotSection(userData, isMe) {
+            const riotSection = document.getElementById('riot-account-section');
+            const riotConnectCard = document.getElementById('riot-connect-card');
+            
+            riotSection.innerHTML = '';
+
+            if (userData.riotAccount) {
+                if(riotConnectCard) riotConnectCard.style.display = 'none'; 
+                
+                let rankTextColor = 'text-white';
+                const rankName = userData.riotAccount.rank || "";
+                if (rankName.includes('Gold')) rankTextColor = 'text-[#FFD700]';
+                if (rankName.includes('Platinum')) rankTextColor = 'text-[#00CED1]';
+                if (rankName.includes('Diamond')) rankTextColor = 'text-[#b469ff]';
+                if (rankName.includes('Ascendant')) rankTextColor = 'text-[#4ade80]';
+                if (rankName.includes('Immortal')) rankTextColor = 'text-[#ff4655]';
+                if (rankName.includes('Radiant')) rankTextColor = 'text-[#ffffaa]';
+
+                const settingsBtnHtml = isMe 
+                    ? `<button onclick="openManageModal()" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/20 transition-all backdrop-blur-md"><i data-lucide="settings-2" class="w-4 h-4"></i></button>`
+                    : ``;
+
+                riotSection.innerHTML = `
+                    <div class="relative w-full max-w-lg mx-auto md:mx-0 rounded-xl overflow-hidden shadow-2xl group animate-fadeIn border border-white/10">
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style="background-image: url('${userData.riotAccount.card}');"></div>
+                        <div class="absolute inset-0 bg-black/70 backdrop-blur-[2px]"></div>
+
+                        <div class="relative z-10">
+                            <div class="px-6 pt-5 pb-2 flex justify-between items-start">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Valorant_logo.svg/1200px-Valorant_logo.svg.png" class="w-6 h-6 opacity-70 invert">
+                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest border border-white/10 px-2 py-0.5 rounded bg-black/20">Season Atual</span>
+                            </div>
+                            
+                            <div class="px-6 py-4 grid grid-cols-3 gap-4 items-center border-b border-white/10 pb-6">
+                                <div class="flex flex-col">
+                                    <div class="flex items-center gap-3 mb-1">
+                                        <div class="w-10 h-10 drop-shadow-md"><img src="${userData.riotAccount.rankImage}" class="w-full h-full object-contain"></div>
+                                        <span class="text-sm font-black uppercase ${rankTextColor} leading-tight text-shadow-sm">
+                                            ${userData.riotAccount.rank.split(' ')[0]} <br>
+                                            <span class="text-xs font-medium text-gray-300">${userData.riotAccount.rank.split(' ')[1] || ''}</span>
+                                        </span>
+                                    </div>
+                                    <span class="text-[10px] text-gray-400 font-bold uppercase mt-1 pl-1">Elo ${userData.riotAccount.elo} RR</span>
+                                </div>
+
+                                <div class="text-center border-l border-white/10 pl-2">
+                                    <div class="flex items-center justify-center gap-1 text-white font-black text-2xl drop-shadow-md">${userData.riotAccount.matches || 0}</div>
+                                    <span class="text-[9px] text-gray-400 font-bold uppercase tracking-wide">Partidas</span>
+                                </div>
+
+                                <div class="text-center border-l border-white/10 pl-2">
+                                    <div class="flex items-center justify-center gap-1 text-white font-black text-2xl drop-shadow-md">${userData.riotAccount.wins || 0}</div>
+                                    <span class="text-[9px] text-gray-400 font-bold uppercase tracking-wide">Vitórias</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-black/40 px-6 py-3 flex justify-between items-center border-t border-white/5">
+                                <div>
+                                    <h3 class="text-white font-bold text-base leading-none mb-1 drop-shadow-md">
+                                        ${userData.riotAccount.gameName} <span class="text-gray-400 font-normal">#${userData.riotAccount.tagLine}</span>
+                                    </h3>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_5px_#22c55e]"></div>
+                                        <span class="text-[10px] text-gray-400 font-medium">Conta Conectada</span>
+                                    </div>
+                                </div>
+                                ${settingsBtnHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                if(isMe) {
+                    if(riotConnectCard) riotConnectCard.style.display = 'block'; 
+                } else {
+                    if(riotConnectCard) riotConnectCard.style.display = 'none'; 
+                    riotSection.innerHTML = `<div class="p-4 border border-gray-800 rounded-lg text-gray-500 text-sm">Este jogador ainda não vinculou o Valorant.</div>`;
+                }
+            }
+        }
+
+        window.openLinkModal = function() {
+            document.getElementById('link-modal').classList.remove('hidden');
+            document.getElementById('link-modal').classList.add('flex');
+        }
+        window.closeLinkModal = function() {
+            document.getElementById('link-modal').classList.add('hidden');
+            document.getElementById('link-modal').classList.remove('flex');
+        }
+        window.openManageModal = function() {
+            const user = currentProfileData;
+            if(user && user.riotAccount) {
+                document.getElementById('mng-nick').value = user.riotAccount.gameName;
+                document.getElementById('mng-tag').value = user.riotAccount.tagLine;
+                document.getElementById('mng-rank').innerText = user.riotAccount.rank;
+            }
+            document.getElementById('manage-riot-modal').classList.remove('hidden');
+            document.getElementById('manage-riot-modal').classList.add('flex');
+        }
+        window.closeManageModal = function() {
+            document.getElementById('manage-riot-modal').classList.add('hidden');
+            document.getElementById('manage-riot-modal').classList.remove('flex');
+        }
+
+        window.switchProfileTab = function(tab) {
+            const overview = document.getElementById('prof-tab-overview');
+            const matches = document.getElementById('prof-tab-matches');
+            const btnOver = document.getElementById('prof-btn-overview');
+            const btnMatch = document.getElementById('prof-btn-matches');
+
+            if(tab === 'overview') {
+                overview.classList.remove('hidden'); matches.classList.add('hidden');
+                btnOver.className = "px-6 py-2 bg-[#5b4dff] text-white text-xs font-bold rounded-lg mb-4 transition-colors";
+                btnMatch.className = "px-6 py-2 text-gray-500 hover:text-white text-xs font-bold mb-4 transition-colors";
+            } else {
+                overview.classList.add('hidden'); matches.classList.remove('hidden');
+                btnMatch.className = "px-6 py-2 bg-[#5b4dff] text-white text-xs font-bold rounded-lg mb-4 transition-colors";
+                btnOver.className = "px-6 py-2 text-gray-500 hover:text-white text-xs font-bold mb-4 transition-colors";
+            }
+        };
+
+        window.showToast = function(message) {
+            let container = document.querySelector('.toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.className = 'toast-container';
+                document.body.appendChild(container);
+            }
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<div class="toast-icon"><i data-lucide="check" style="width:14px; height:14px;"></i></div><span>${message}</span>`;
+            container.appendChild(toast);
+            lucide.createIcons();
+            setTimeout(() => { toast.style.animation = 'fadeOutToast 0.4s forwards'; setTimeout(() => toast.remove(), 400); }, 4000);
+        }
+    </script>
+</body>
+</html>

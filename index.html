@@ -9,9 +9,17 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
+
+   <div id="preloader">
+    <video autoplay muted loop class="preloader-gif">
+        <source src="media/Strayspreloaders.webm" type="video/webm">
+        Your browser does not support the video tag.
+    </video>
+</div>
+
     <!-- Enhanced Header -->
     <header id="header" class="header">
-        <div class="container">
+        
             <div class="nav-wrapper">
                 <!-- Logo -->
                 <div class="logo-section">
@@ -33,6 +41,44 @@
                     <a href="#gallery" class="nav-link">Galeria</a>
                     <a href="#sponsors" class="nav-link">Patrocinadores</a>
                     <a href="#contact" class="nav-link">Contato</a>
+                    
+                    <button id="theme-toggle" class="theme-icon-button">
+                    <svg id="moon-icon" class="theme-icon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                    </svg>
+        
+                    <svg id="sun-icon" class="theme-icon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                     viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true">
+                    <circle cx="12" cy="12" r="5" />
+                    <path d="M12 1v2" />
+                    <path d="M12 21v2" />
+                    <path d="M4.22 4.22l1.42 1.42" />
+                    <path d="M18.36 18.36l1.42 1.42" />
+                    <path d="M1 12h2" />
+                    <path d="M21 12h2" />
+                    <path d="M4.22 19.78l1.42-1.42" />
+                    <path d="M18.36 5.64l1.42-1.42" />
+                    </svg>
+                    </button>
                 </nav>
 
                 <!-- Mobile Menu Button -->
@@ -51,16 +97,30 @@
                 <a href="#gallery" class="mobile-nav-link">Galeria</a>
                 <a href="#sponsors" class="mobile-nav-link">Patrocinadores</a>
                 <a href="#contact" class="mobile-nav-link">Contato</a>
-            </div>
         </div>
     </header>
 
+    
     <!-- Enhanced Hero Section -->
     <section id="home" class="hero-section">
-        <video autoplay muted class="hero-video-bg">
-        <source src="media/Strays bg.mp4" type="video/mp4">
-        Seu navegador não suporta a tag de vídeo.
-    </video>
+    
+    <div id="hero-slider" class="relative w-full h-[500px] md:h-[600px] lg:h-[700px] xl:h-[90vh] overflow-hidden bg-gray-900 shadow-xl">
+        
+        <!-- Container das Imagens -->
+        <div id="slides-container" class="w-full h-full relative">
+            <!-- As imagens serão injetadas aqui via JavaScript, 
+                 mas você pode colocá-las manualmente se preferir -->
+        </div>
+
+        <!-- Overlay (Opcional: Deixa a imagem mais escura para destacar menus/logos) -->
+        <div class="absolute inset-0 overlay-gradient z-20 pointer-events-none"></div>
+
+        <!-- Indicadores (Bolinhas) -->
+        <div class="absolute bottom-6 left-0 right-0 z-30 flex justify-center gap-3" id="indicators-container">
+            <!-- Bolinhas geradas via JS -->
+        </div>
+
+
     <div class="hero-bg-overlay"></div>
         <div class="hero-bg"></div>
         <div class="tech-pattern"></div>
@@ -73,7 +133,7 @@
         <div class="container hero-content">
             <div class="hero-logo fade-in">
               <br><br><br><br>
-              <img src="img/icone.png" alt="Logo Strays" class="footer-brand-logo-title">
+              
                 <h1 class="hero-title">STRAYS</h1>
                 <p class="hero-slogan text-glow">O Esforço vence o Talento</p>
             </div>
@@ -91,63 +151,14 @@
 
     </section>
 
+    
+
     <!-- Enhanced Team Roster -->
-    <section id="team" class="team-section gradient-premium tech-pattern">
+     
+    <section id="team" class="team-section">
         <div class="container">
-            <div class="section-header fade-in">
-                <h2 class="section-title">Conheça nossas lines</h2>
-                <p class="section-subtitle">Lines dedicadas e excepcionais unidas pela habilidade, estratégia e uma sede insaciável de vitória.</p>
-            </div>
-
-           <div class="players-grid">
-    <div class="player-card card-premium fade-in stagger-1" data-team="principal">
-                    <div class="player-image image-container">
-                        <img src="img/Strays line main.png" alt="Logo Strays principal">
-                        <div class="role-icon role-duelist glass-effect">
-                            <i class="fas fa-sword"></i>
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Strays</h3>
-                        <p class="player-role">Profissional players</p>
-                        <p class="player-details">Indefined • Coach</p>
-                        
-                        <div class="player-stats">
-                            <div class="stat tooltip">
-                                <div class="stat-value">826</div>
-                                <div class="stat-label">Kills</div>
-                                <span class="tooltiptext">Total Kills</span>
-                            </div>
-                            <div class="stat tooltip">
-                                <div class="stat-value">800</div>
-                                <div class="stat-label">Deaths</div>
-                                <span class="tooltiptext">Total deaths</span>
-                            </div>
-                            <div class="stat tooltip">
-                                <div class="stat-value">432</div>
-                                <div class="stat-label">Assists</div>
-                                <span class="tooltiptext">Team assistance count</span>
-                            </div>
-                        </div>
-
-                        <div class="kd-ratio">
-                            <span>K/D Ratio</span>
-                            <span class="kd-value">1.10</span>
-                        </div>
-
-                        <div class="performance-bar">
-                            <div class="performance-label">
-                                <span>Performance</span>
-                                <span>61%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 61%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="teamModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-team-name">
+            
+            <div id="teamModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-team-name">
     <div class="modal-content">
         <button class="close-button" aria-label="Fechar modal">&times;</button>
         <div class="modal-header">
@@ -162,42 +173,44 @@
     </div>
 </div>
 
+            <div class="section-header fade-in">
+                <h2 class="section-title">Conheça nossas lines</h2>
+                <p class="section-subtitle">Lines dedicadas e excepcionais unidas pela habilidade, estratégia e uma sede insaciável de vitória.</p>
+            </div>
 
-                <div class="player-card card-premium fade-in stagger-2" data-team="core">
+           <div class="players-grid">
+    <div class="player-card card-premium fade-in stagger-1" data-team="principal">
                     <div class="player-image image-container">
-                        <img src="img/Strays line core.png" alt="VIPER">
-                        <div class="role-icon role-controller glass-effect">
-                            <i class="fas fa-bolt"></i>
-                        </div>
+                        <img src="img/Strays line main.png" alt="Logo Strays principal">
+                        
                     </div>
                     <div class="player-info">
-                        <h3 class="player-name">Strays Core</h3>
+                        <h3 class="player-name">Strays Principal</h3>
                         <p class="player-role">Profissional players</p>
-                        <p class="player-details">Nogth • Coach</p>
+                        <p class="player-details">B1w • Coach</p>
+                
+                        <div class="performance-bar">
+                            <div class="performance-label">
+                                <span>Performance</span>
+                                <span>61%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 61%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="player-card card-premium fade-in stagger-2" data-team="mobile">
+                    <div class="player-image image-container">
+                        <img src="img/Strays moba.png" alt="VIPER">
+                    
+                    </div>
+                    <div class="player-info">
+                        <h3 class="player-name">Strays Mobile</h3>
+                        <p class="player-role">Profissional players</p>
+                        <p class="player-details">Zenith • Coach</p>
                         
-                        <div class="player-stats">
-                            <div class="stat tooltip">
-                                <div class="stat-value">595</div>
-                                <div class="stat-label">Kills</div>
-                                <span class="tooltiptext">Total eliminations</span>
-                            </div>
-                            <div class="stat tooltip">
-                                <div class="stat-value">778</div>
-                                <div class="stat-label">Deaths</div>
-                                <span class="tooltiptext">Total deaths</span>
-                            </div>
-                            <div class="stat tooltip">
-                                <div class="stat-value">284</div>
-                                <div class="stat-label">Assists</div>
-                                <span class="tooltiptext">Team assistance count</span>
-                            </div>
-                        </div>
-
-                        <div class="kd-ratio">
-                            <span>K/D Ratio</span>
-                            <span class="kd-value">1.09</span>
-                        </div>
-
                         <div class="performance-bar">
                             <div class="performance-label">
                                 <span>Performance</span>
@@ -210,40 +223,16 @@
                     </div>
                 </div>
 
-                <div class="player-card card-premium fade-in stagger-3" data-team="feminina">
+                <div class="player-card card-premium fade-in stagger-3" data-team="Strays GC">
                     <div class="player-image image-container">
                         <img src="img/Strays line fem.png" alt="SAGE">
-                        <div class="role-icon role-sentinel glass-effect">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
+                        
                     </div>
                     <div class="player-info">
-                        <h3 class="player-name">Strays Feminina</h3>
+                        <h3 class="player-name">Strays GC</h3>
                         <p class="player-role">Profissional players</p>
                         <p class="player-details">Mattsz • Coach</p>
                         
-                        <div class="player-stats">
-                            <div class="stat tooltip">
-                                <div class="stat-value">315</div>
-                                <div class="stat-label">Kills</div>
-                                <span class="tooltiptext">Total eliminations</span>
-                            </div>
-                            <div class="stat tooltip">
-                                <div class="stat-value">316</div>
-                                <div class="stat-label">Deaths</div>
-                                <span class="tooltiptext">Total deaths</span>
-                            </div>
-                            <div class="stat tooltip">
-                                <div class="stat-value">121</div>
-                                <div class="stat-label">Assists</div>
-                                <span class="tooltiptext">Team assistance count</span>
-                            </div>
-                        </div>
-
-                        <div class="kd-ratio">
-                            <span>K/D Ratio</span>
-                            <span class="kd-value">0.81</span>
-                        </div>
 
                         <div class="performance-bar">
                             <div class="performance-label">
@@ -260,84 +249,12 @@
                 <div class="player-card card-premium fade-in stagger-4" data-team="academy">
                     <div class="player-image image-container">
                         <img src="img/Strays line academy.png" alt="SAGE">
-                        <div class="role-icon role-sentinel glass-effect">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
+                    
                     </div>
                     <div class="player-info">
                         <h3 class="player-name">Strays Academy</h3>
                         <p class="player-role">Novos talentos</p>
-                        <p class="player-details">Undefined • Coach</p>
-                        
-                        <div class="player-stats">
-                            <div class="stat tooltip">
-                                <div class="stat-value">689</div>
-                                <div class="stat-label">Kills</div>
-                                <span class="tooltiptext">Total eliminations</span>
-                            </div>
-                            <div class="stat tooltip">
-                                <div class="stat-value">914</div>
-                                <div class="stat-label">Deaths</div>
-                                <span class="tooltiptext">Total deaths</span>
-                            </div>
-                            <div class="stat tooltip">
-                                <div class="stat-value">382</div>
-                                <div class="stat-label">Assists</div>
-                                <span class="tooltiptext">Team assistance count</span>
-                            </div>
-                        </div>
-
-                        <div class="kd-ratio">
-                            <span>K/D Ratio</span>
-                            <span class="kd-value">0.81</span>
-                        </div>
-
-                        <div class="performance-bar">
-                            <div class="performance-label">
-                                <span>Performance</span>
-                                <span>40%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 40%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="player-card card-premium fade-in stagger-5" data-team="mobile">
-                    <div class="player-image image-container">
-                        <img src="img/Strays moba.png" alt="SOVA">
-                        <div class="role-icon role-initiator glass-effect">
-                            <i class="fas fa-eye"></i>
-                        </div>
-                    </div>
-                    <div class="player-info">
-                        <h3 class="player-name">Strays Mobile</h3>
-                        <p class="player-role">Novos talentos</p>
-                        <p class="player-details">Undefined • Coach</p>
-                        
-                        <div class="player-stats">
-                            <div class="stat tooltip">
-                                <div class="stat-value">68</div>
-                                <div class="stat-label">Kills</div>
-                                <span class="tooltiptext">Total eliminations</span>
-                            </div>
-                            <div class="stat tooltip">
-                                <div class="stat-value">91</div>
-                                <div class="stat-label">Deaths</div>
-                                <span class="tooltiptext">Total deaths</span>
-                            </div>
-                            <div class="stat tooltip">
-                                <div class="stat-value">38</div>
-                                <div class="stat-label">Assists</div>
-                                <span class="tooltiptext">Team assistance count</span>
-                            </div>
-                        </div>
-
-                        <div class="kd-ratio">
-                            <span>K/D Ratio</span>
-                            <span class="kd-value">0.81</span>
-                        </div>
+                        <p class="player-details">Abandonado • Coach</p>
 
                         <div class="performance-bar">
                             <div class="performance-label">
@@ -351,44 +268,106 @@
                     </div>
                 </div>
             </div>
-            
-            
 
-            <!-- Team Stats Summary -->
-            <div class="team-summary glass-effect fade-in">
-    <h3 class="summary-title text-glow">Estatísticas das Lines</h3>
-    <div class="summary-stats">
-        <div class="summary-stat">
-            <div class="summary-value" data-target="2425">0</div>
-            <div class="summary-label">Total de Kills</div>
+            <br><br><br>
+            
+            <div class="container fade-in stagger-1" style="margin-top: -50px; position: relative; z-index: 20; margin-bottom: 50px;">
+    <div class="match-widget glass-effect">
+        
+        <div class="match-header">
+    <div class="match-tag">
+        <span class="pulse-dot"></span>
+        PRÓXIMA PARTIDA
+    </div>
+    
+    <div class="match-info">
+        <div class="info-item">
+            <div class="camp-logo-widget">
+                <img src="img/temp/Vexacup.png" alt="Logo Campeonato">
+            </div>
+            <span class="scramble-text" data-text="VEXACUP: FINAL">CARREGANDO...</span>
         </div>
-        <div class="summary-stat">
-            <div class="summary-value" data-target="0.86">0</div>
-            <div class="summary-label">K/D Médio</div>
-        </div>
-        <div class="summary-stat">
-            <div class="summary-value" data-target="1219">0</div>
-            <div class="summary-label">Total de Assistências</div>
+
+        <div class="info-item">
+            <i class="fas fa-calendar-alt text-gold"></i>
+            <span class="scramble-text" data-text="16/11 21:00 BRT">CARREGANDO...</span>
         </div>
     </div>
 </div>
+
+        <div class="match-body">
+    <div class="team-block team-home">
+        <div class="team-logo-widget">
+            <img src="img/icone.png" alt="Logo Time Casa">
+        </div> 
+        
+        <div class="team-text">
+            <h3 class="team-name text-glow">Strays Principal</h3>
+            <span class="team-role">CASA</span>
+        </div>
+    </div>
+
+    <div class="vs-block">
+        <span class="vs-bg">VS</span>
+        <span class="vs-fg text-glow">VS</span>
+    </div>
+
+    <div class="team-block team-away">
+        <div class="team-text align-right">
+            <h3 class="team-name text-glow">Valoriza</h3>
+            <span class="team-role">VISITANTE</span>
+        </div>
+        
+        <div class="team-logo-widget">
+            <img src="img/temp/Valoriza.png" alt="Logo Time Visitante">
+        </div> 
+    </div>
+     
+     <div class="ticket-action calendar-wrapper">
+    
+    <div id="calendarMenu" class="calendar-menu glass-effect">
+        <a href="https://calendar.google.com/calendar/" target="_blank" title="Google Calendar">
+            <i class="fab fa-google"></i>
+        </a>
+        <a href="#" title="Apple Calendar">
+            <i class="fab fa-apple"></i>
+        </a>
+        <a href="#" title="Outlook">
+            <i class="fas fa-envelope-open-text"></i>
+        </a>
+    </div>
+
+    <button id="calendarTrigger" class="btn-icon-only-nohover calendar-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" class="calendar-svg">
+            <path d="M19 4 H5 C 3.89543 4 3 4.89543 3 6 V 20 C 3 21.1046 3.89543 22 5 22 H 13" />
+            <path d="M16 2 V 6" />
+            <path d="M8 2 V 6" />
+            <path d="M3 10 H 21" />
+            <path d="M21 10 V 14" />
+            <line x1="19" y1="16" x2="19" y2="22" />
+            <line x1="16" y1="19" x2="22" y2="19" />
+        </svg>
+    </button>
+</div>
+</div>
+    </div>
+</div>
+
+            
     </section>
     
     <!-- Store Section -->
-    <section id="Loja" class="gallery-section gradient-premium-store">
-    <div class="container">
-        <div class="section-header fade-in">
-            <h2 class="section-title-loja">LOJA STRAYS</h2>
-            <p class="section-subtitle">Conheça nosso merchandise</p>
-            <br><br>
-            <div class="store-cta glass-effect fade-in store-image-container">
+    <section id="Loja" class="gallery-section">
+        <img src="img/img_loja_final.jpg" alt="Jersey da strays" class="loja-banner">
+    <h2 class="loja-banner-title">LOJA STRAYS</h2>
+            <p class="loja-banner-subtitle">Qualidade Premium & Design Exclusivo</p>
+            
                 <a href="https://minidrop.com.br/loja/times/" target="_blank">
-                <img src="img/Jersey loja.png" alt="Jersey da strays" class="store-banner">
                 </a>
 
             </div>
         </div>
-    </div>
+    
     <div class="hero-cta fade-in stagger-5">
                 <button id="LojaBtn" class="btn-premium">
                     <i class="fas fa-forward"></i>
@@ -412,7 +391,7 @@
 </section>
 
     <!-- Enhanced Media Gallery -->
-    <section id="gallery" class="gallery-section gradient-premium">
+    <section id="gallery" class="gallery-section">
         <div class="container">
             <div class="section-header fade-in">
                 <h2 class="section-title">Galeria da Strays</h2>
@@ -479,8 +458,10 @@
 
             <!-- Gallery Actions -->
             <div class="gallery-actions fade-in">
-                <button class="btn-premium">Veja nossa galeria</button>
-            </div>
+    <a href="galeria.html" class="btn-premium" style="text-decoration: none;">
+        Veja nossa galeria completa
+    </a>
+</div>
         </div>
     </section>
 
@@ -589,7 +570,7 @@
 </section>
 
     <!-- Enhanced Footer -->
-    <footer id="contact" class="footer gradient-premium tech-pattern">
+    <footer id="contact" class="footer">
         <div class="container">
             <!-- Main Footer Content -->
             <div class="footer-main">
@@ -719,6 +700,11 @@ o cenário de eSports e inspirar a próxima geração de jogadores.
     <div id="gallery-grid-body" style="display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; align-items: flex-start; padding: 24px 0;"></div>
   </div>
 </div>
+
+
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 
     <script src="script.js"></script>

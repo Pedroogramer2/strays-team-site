@@ -7,164 +7,70 @@
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/png" href="img/icone.png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* RESET GLOBAL PARA ESSA PÁGINA */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden; /* Trava a rolagem da página principal (quem rola é o iframe) */
+            background-color: transparent;
+        }
+
+        /* CONFIGURAÇÃO DO IFRAME (JANELA MÁGICA) */
+        #campeonato-portal {
+            position: fixed; /* Fixa na tela, ignorando margens ou containers */
+            top: 0;       /* Empurra para baixo para não ficar atrás do Header */
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;    /* 100% da largura da janela */
+            height: 100vh; /* 100% da altura menos o header */
+            
+            border: none;
+            z-index: 1;      /* Fica abaixo do Header (que costuma ser z-index 100 ou 1000) */
+            display: block;
+        }
+
+        /* Ajuste para celular (caso o header seja menor) */
+        @media (max-width: 768px) {
+            #campeonato-portal {
+                top: 70px;
+                height: calc(100vh - 70px);
+            }
+        }
+    </style>
+
 </head>
 <body>
-    <!-- Enhanced Header -->
-    <header id="header" class="header">
-        <div class="container">
-            <div class="nav-wrapper">
-                <!-- Logo -->
-                <div class="logo-section">
-                    <img id="headerLogo" src="img/icone.png" alt="Logo Strays" class="footer-brand-logo">
-                    <div class="brand-info fade-in">
-                        <h1 class="brand-name text-glow">STRAYS</h1>
-                        <p class="brand-slogan">O Esforço vence o Talento</p>
-                    </div>
-                </div>
-                   
 
-                <!-- Desktop Navigation -->
-                <nav class="desktop-nav">
-                    <a href="index.html#home" class="nav-link">Início</a>
-                    <a href="index.html#team" class="nav-link">Time</a>
-                    <a href="index.html#Loja" class="nav-link">Loja</a>
-                    <a href="#campeonato" class="nav-link">Torneio</a>
-                    <a href="index.html#news" class="nav-link">Notícias</a>
-                    <a href="index.html#gallery" class="nav-link">Galeria</a>
-                    <a href="index.html#sponsors" class="nav-link">Patrocinadores</a>
-                    <a href="#contact" class="nav-link">Contato</a>
-                </nav>
-
-                <!-- Mobile Menu Button -->
-                <button class="mobile-menu-btn" id="mobileMenuBtn">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-
-            <!-- Mobile Navigation -->
-            <div class="mobile-nav" id="mobileNav">
-                <a href="index.html#home" class="mobile-nav-link">Início</a>
-                <a href="index.htmlteam" class="mobile-nav-link">Time</a>
-                <a href="index.html#news" class="mobile-nav-link">Notícias</a>
-                <a href="index.html#Loja" class="mobile-nav-link">Loja</a>
-                <a href="#campeonato" class="nav-link">Torneio</a>
-                <a href="index.html#gallery" class="mobile-nav-link">Galeria</a>
-                <a href="index.html#sponsors" class="mobile-nav-link">Patrocinadores</a>
-                <a href="#contact" class="mobile-nav-link">Contato</a>
-            </div>
-        </div>
-    </header>
+    <div id="preloader">
+    <video autoplay muted loop class="preloader-gif">
+        <source src="media/Strayspreloaders.webm" type="video/webm">
+        Your browser does not support the video tag.
+    </video>
+</div>
 
     
-    <section id="campeonato" class="gallery-section">
-    <div class="container">
-        <div class="section-header fade-in">
-            <h2 class="section-title-loja">TORNEIO STRAYS</h2>
-            <h3 class="section-title-campeonato">Onde as Lendas Nascem.</h3>
-            <p class="section-subtitle-campeonato">Entre no torneio e prove seu valor. O STRAYS LEGENDS é o campeonato oficial do time STRAYS, feito para os verdadeiros competidores. Não importa se você é um player experiente ou uma nova promessa, esta é a sua chance de brilhar. Junte suas equipes, prepare suas estratégias e lute pelo título de lenda. Apenas os melhores chegarão ao topo, a glória espera por você.
-</p>
-            <br><br>
-            <div class="store-cta glass-effect fade-in store-image-container">
-                <img src="img/Torneio banner.png" alt="Jersey da strays" class="store-banner">
-
-            </div>
-            <br><br>
-            <div class="hero-cta fade-in stagger-5">
-                <a href="https://docs.google.com/forms/d/e/1FAIpQLSf4dRoEBtEtCPSIxpKkT07heNclQxm89ukJe3NnUMkGC_rnug/viewform?usp=dialog" class="btn-secondary" target="_blank">Inscrições</a>
-                 <a href="https://docs.google.com/forms/d/e/1FAIpQLScqY5TAzoxfac__45xatvo0ijcwYuecNmYQNxKMe8Xarp-LLA/viewform?usp=dialog" class="btn-secondary" target="_blank">Contato à equipe</a>
-                  <a href="https://docs.google.com/document/d/1VK4ZcCe7oOKqtOublpvSUmyfXdiKIqoaVNuAS9_UdU0/edit?usp=sharing" class="btn-secondary" target="_blank">Regras</a>
-                  <a href="https://docs.google.com/forms/d/e/1FAIpQLSfP0F2nMFY85oYtL3jcg-Mm_AVMeGkCGSifRkXBz0TmIsPruw/viewform?usp=dialog" class="btn-secondary" target="_blank">Nickname Change</a>
-            </div>
-        </div>
-        </div>
-    </div>
-    </section>
-
-    <!-- Enhanced Footer -->
-    <footer id="contact" class="footer gradient-premium tech-pattern">
-        <div class="container">
-            <!-- Main Footer Content -->
-            <div class="footer-main">
-                <!-- Brand Section -->
-                <div class="footer-brand fade-in">
-                    <div class="footer-logo-section">
-    <img id="headerLogo2" src="img/icone.png" alt="Logo Strays" class="footer-brand-logo-normal">
-    <div class="footer-brand-info">
-        <h3 class="footer-brand-name text-glow">STRAYS</h3>
-        <p class="footer-brand-slogan">O Esforço vence o Talento</p>
-    </div>
-</div>
-                    <p class="footer-description">
-                        Somos uma equipe semi-profissional de e-Sports de Valorant dedicada a desafiar os limites dos jogos competitivos.
-Por meio de prática incansável, inovação estratégica e trabalho em equipe inabalável, buscamos dominar
-o cenário de eSports e inspirar a próxima geração de jogadores.
-                    </p>
-                    
-                    <!-- Social Media -->
-                    <div class="footer-social">
-                        <a href="https://www.instagram.com/straysteam" target="_blank" class="social-link , social-link-instagram glass-effect fade-in stagger-1">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="https://x.com/straysvlr" target="_blank" class="social-link , social-link-twitter glass-effect fade-in stagger-2">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="https://www.youtube.com/@STRAYSTEAM" target="_blank" class="social-link , social-link-youtube glass-effect fade-in stagger-3">
-                            <i class="fab fa-youtube"></i>
-                        </a>
-                        <a href="https://www.twitch.tv/rissa_str" target="_blank" class="social-link , social-link-twitch glass-effect fade-in stagger-4">
-                            <i class="fab fa-twitch"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Quick Links -->
-                <div class="footer-links fade-in stagger-2">
-                    <h4 class="footer-section-title text-glow">Acesso rápido</h4>
-                    <ul class="footer-nav">
-                        <li><a href="index.html#team" class="nav-link">Nossas Lines</a></li>
-                        <li><a href="https://docs.google.com/forms/d/e/1FAIpQLScS7fpzMkoQus_a0IDSmitw9RRpvD5PbCNDDm21hhm5MRnjrg/viewform?usp=dialog" target="_blank" class="nav-link">Marcar Scrim</a></li>
-                        <li><a href="index.html#Loja" class="nav-link">Loja</a></li>
-                    </ul>
-                </div>
-
-                <!-- Contact Info -->
-                <div class="footer-contact fade-in stagger-3">
-                    <h4 class="footer-section-title text-glow">Nossos contatos</h4>
-                    <div class="contact-info">
-                        <div class="contact-item">
-                            <i class="fas fa-envelope"></i>
-                            <div>
-                                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=straysteambr@gmail.com" target="_blank">straysteambr@gmail.com</a>
-                            </div>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-phone"></i>
-                            <p>+55 (11) 95073-1615</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <iframe id="campeonato-portal" src="arena/index.html" title="U4nted Cup"></iframe>
 
 
-            <!-- Bottom Bar -->
-            <div class="footer-bottom fade-in">
-                <p class="copyright">© 2025 STRAYS TEAM. All rights reserved.</p>
-                <div class="footer-legal">
-                    <a href="politica-privacidade-STRAYS-team.html" class="nav-link">Politica de privacidade</a>
-                    <a href="#" class="nav-link">Termos de serviço</a>
-                    <a href="#" class="nav-link">Cookie Policy</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-
-
-
-
-
-
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
     <script src="script.js"></script>
+
+    <script>
+       document.addEventListener('DOMContentLoaded', () => {
+            // Garante que o menu mobile funcione mesmo nessa página especial
+            if(window.StraysTeamWebsite && window.StraysTeamWebsite.initMobileMenu) {
+                window.StraysTeamWebsite.initMobileMenu();
+            } else if (typeof initMobileMenu === 'function') {
+                initMobileMenu();
+            }
+        });
+    </script>
+    
 </body>
 </html>
