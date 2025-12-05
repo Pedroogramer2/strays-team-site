@@ -10,7 +10,6 @@ let selectedBannerFile = null;
 async function uploadImageToFirebase(file, path) {
     if (!file) return null;
     
-    // Verifica se as ferramentas globais existem (carregadas pelo auth.js)
     if (!window.storage || !window.storageRef || !window.uploadBytes) {
         throw new Error("Sistema de Upload não inicializado. Verifique o auth.js.");
     }
@@ -208,7 +207,6 @@ export function renderTeamSettings(teamId) {
 
     const content = document.getElementById('page-content');
     
-    // Adicionei cores de fundo (bg-[#0a0a0a]) nos inputs para garantir que não fiquem invisíveis
     content.innerHTML = `
         <div class="max-w-7xl mx-auto px-6 py-10 animate-fadeIn">
             <button onclick="navigateToPage('team-detail-${t.id}')" class="flex items-center gap-2 text-gray-500 hover:text-white text-sm font-bold mb-6 transition-colors">
@@ -292,14 +290,13 @@ export function renderTeamSettings(teamId) {
     if(window.lucide) lucide.createIcons();
 }
 
-// --- 4. FUNÇÕES DE INJEÇÃO DE MODAIS (CORREÇÃO CRÍTICA DO ERRO DE SCROLL) ---
+// --- 4. FUNÇÕES DE INJEÇÃO DE MODAIS (CORRIGIDAS) ---
 function injectSettingsModals() {
     const oldEdit = document.getElementById('edit-player-modal');
     if(oldEdit) oldEdit.remove();
     const oldDel = document.getElementById('delete-team-modal');
     if(oldDel) oldDel.remove();
 
-    // ADICIONEI style="display: none !important;" PARA EVITAR QUE APAREÇAM NO FINAL DA PAGINA
     const modalsHtml = `
         <div id="edit-player-modal" style="display: none !important;" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm hidden">
             <div class="bg-[#15171e] w-full max-w-md rounded-xl border border-gray-800 shadow-2xl p-6">
@@ -531,19 +528,12 @@ export async function saveTeamSettings() {
 }
 
 export function openDeleteTeamModal() {
-    // Agora removemos o display: none para mostrar
     const m = document.getElementById('delete-team-modal');
-    if(m) { 
-        m.style.display = 'flex'; // Torna visível
-        m.classList.remove('hidden'); 
-    }
+    if(m) { m.style.display = 'flex'; m.classList.remove('hidden'); }
 }
 export function closeDeleteTeamModal() {
     const m = document.getElementById('delete-team-modal');
-    if(m) { 
-        m.style.display = 'none'; // Esconde novamente
-        m.classList.add('hidden'); 
-    }
+    if(m) { m.style.display = 'none'; m.classList.add('hidden'); }
 }
 export function confirmDeleteTeam() {
     let teams = JSON.parse(localStorage.getItem('u4nted_teams_db') || '[]');
@@ -560,12 +550,12 @@ export function openEditPlayerModal(uid, nick, role, gameRole) {
     document.getElementById('modal-p-role').value = role || 'Membro';
     document.getElementById('modal-p-gameRole').value = gameRole || 'Flex';
     const m = document.getElementById('edit-player-modal');
-    m.style.display = 'flex'; // Torna visível
+    m.style.display = 'flex';
     m.classList.remove('hidden');
 }
 export function closeEditPlayerModal() {
     const m = document.getElementById('edit-player-modal');
-    m.style.display = 'none'; // Esconde
+    m.style.display = 'none';
     m.classList.add('hidden');
 }
 export function savePlayerEdit() {
@@ -598,7 +588,66 @@ export function removePlayer(uid) {
     }
 }
 
+// --- FUNÇÕES DE RECRUTAMENTO (CONVITE - NOVO) ---
+export function openAddPlayerModal() {
+    const modal = document.getElementById('add-player-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex'; 
+    }
+}
+
+export async function confirmAddPlayer() {
+    const nickInput = document.getElementById('recruit-nick');
+    const nick = nickInput.value;
+    const modal = document.getElementById('add-player-modal');
+    
+    if(!nick) return window.showToast("Digite o nick do jogador.", "error");
+
+    const btn = modal.querySelector('button[onclick="confirmAddPlayer()"]');
+    const originalText = btn.innerText;
+    btn.innerText = "Buscando...";
+
+    try {
+        if (!window.searchUserByNick) {
+            throw new Error("Função de busca não encontrada no auth.js");
+        }
+
+        const targetUser = await window.searchUserByNick(nick);
+        
+        if (!targetUser) {
+            window.showToast("Jogador não encontrado.", "error");
+            btn.innerText = originalText;
+            return;
+        }
+
+        if (window.NotificationSystem) {
+            await window.NotificationSystem.send(
+                targetUser.uid,
+                'invite',
+                'Convite de Time', 
+                `Você foi convidado para entrar no time.`,
+                { teamId: state.currentTeamId }
+            );
+            window.showToast(`Convite enviado para ${nick}!`, "success");
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+            nickInput.value = '';
+        } else {
+            console.error("Sistema de notificação não carregado.");
+            window.showToast("Erro no sistema de notificação.", "error");
+        }
+
+    } catch (e) {
+        console.error(e);
+        window.showToast("Erro ao enviar convite.", "error");
+    } finally {
+        btn.innerText = originalText;
+    }
+}
+
 // EXPORTS
 window.handleCreateTeamForm = handleCreateTeamForm;
 window.closeCreateTeamModal = closeCreateTeamModal;
 window.previewCreateLogo = window.previewCreateLogo;
+window.confirmAddPlayer = confirmAddPlayer; // Exportando para o HTML

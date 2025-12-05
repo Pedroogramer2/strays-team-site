@@ -3,214 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configurações - U4nted Cup</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Configurações da Conta</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f1116; color: white; }
+        
+        /* Input Customizado para ficar igual à imagem */
+        .input-dark {
+            width: 100%;
+            background-color: #0f1116; /* Fundo bem escuro */
+            border: 1px solid #2a2e35;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .input-dark:focus { border-color: #4a4d55; }
+        .input-dark:disabled { color: #555; cursor: not-allowed; }
+
+        .label-dark {
+            display: block;
+            color: #6b7280; /* Cinza claro */
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .animate-fadeIn { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
-<body class="bg-[#0f1116] text-white">
+<body class="bg-[#0f1116] min-h-screen">
 
-    <aside class="sidebar">
-        <div class="logo"><h1>U4<span class="logo-accent">NTED CUP</span></h1></div>
-        <nav class="menu">
-    <a href="index.html#home" class="menu-item"><i data-lucide="home"></i><span>Home</span></a>
-    <a href="index.html#players" class="menu-item"><i data-lucide="user"></i><span>Players</span></a>
-    <a href="index.html#times" class="menu-item"><i data-lucide="shield"></i><span>Times</span></a>
-    <a href="index.html#campeonatos" class="menu-item"><i data-lucide="trophy"></i><span>Campeonatos</span></a>
-</nav>
-    </aside>
+    <div class="max-w-5xl mx-auto px-8 pt-8">
+        <a href="perfil.html" class="inline-flex items-center gap-2 text-gray-500 hover:text-white transition-colors font-bold text-sm">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar para o perfil
+        </a>
+    </div>
 
-    <main class="main-content">
-        <div class="top-bar" id="top-bar-container"></div>
+    <div class="max-w-5xl mx-auto px-8 py-8 animate-fadeIn">
+        
+        <div class="mb-10">
+            <h1 class="text-3xl font-black text-white uppercase mb-2">CONFIGURAÇÕES DA SUA CONTA</h1>
+            <p class="text-gray-500 text-sm">Gerencie todas as informações da sua conta</p>
+        </div>
 
-        <div class="max-w-5xl mx-auto px-8 py-12 animate-fadeIn">
+        <div class="bg-[#15171e] border border-gray-800 rounded-xl p-10 shadow-xl">
             
-            <h1 class="text-3xl font-black mb-2 uppercase">Configurações da sua conta</h1>
-            <p class="text-gray-500 mb-10">Gerencie todas as informações da sua conta</p>
-
-            <div class="bg-[#15171e] border border-gray-800 rounded-2xl p-8 shadow-xl">
+            <form id="edit-form" onsubmit="event.preventDefault(); saveProfile();">
                 
-                <div class="flex items-center gap-6 mb-10 pb-10 border-b border-gray-800">
-                    <div class="w-24 h-24 rounded-full bg-gray-800 border-2 border-gray-700 overflow-hidden relative group">
+                <div class="flex items-center gap-8 mb-10 pb-10 border-b border-gray-800">
+                    <div class="w-24 h-24 rounded-full bg-[#0f1116] border-2 border-gray-700 overflow-hidden relative shrink-0">
                         <img id="edit-avatar-img" src="" class="w-full h-full object-cover">
                     </div>
                     <div>
-                        <label for="file-upload-profile" class="bg-[#1c1f26] hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-bold border border-gray-700 transition-colors cursor-pointer inline-block">
+                        <label for="file-upload-profile" class="bg-[#1c1f26] border border-gray-700 hover:bg-gray-700 text-white px-5 py-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer inline-block tracking-wide uppercase">
                             Enviar nova foto
                         </label>
                         <input type="file" id="file-upload-profile" class="hidden" accept="image/*" onchange="previewProfileImage(event)">
-                        <p class="text-gray-600 text-xs mt-2">Recomendamos uma imagem 500x500.<br>Apenas PNG, JPEG, JPG e WEBP.</p>
+                        <p class="text-gray-600 text-[11px] mt-3 leading-relaxed">
+                            Recomendamos uma imagem 500x500.<br>Apenas PNG, JPEG, JPG e WEBP.
+                        </p>
                     </div>
                 </div>
 
-                <form id="edit-form" class="space-y-8" onsubmit="event.preventDefault(); saveProfile();">
-                    
+                <div class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="flex flex-col gap-2">
-                            <label class="text-xs font-bold text-gray-400 uppercase">Primeiro Nome</label>
-                            <input type="text" id="edit-name" disabled class="w-full bg-[#0f1116] border border-gray-800 text-gray-500 px-4 py-3 rounded-lg focus:outline-none cursor-not-allowed font-medium">
+                        <div>
+                            <label class="label-dark">PRIMEIRO NOME</label>
+                            <input type="text" id="edit-name" class="input-dark" placeholder="Seu nome">
                         </div>
-                        <div class="flex flex-col gap-2">
-                            <label class="text-xs font-bold text-gray-400 uppercase">Seu E-mail</label>
-                            <input type="text" id="edit-email" disabled class="w-full bg-[#0f1116] border border-gray-800 text-gray-500 px-4 py-3 rounded-lg focus:outline-none cursor-not-allowed font-medium">
+                        <div>
+                            <label class="label-dark">SEU E-MAIL</label>
+                            <input type="text" id="edit-email" disabled class="input-dark">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="flex flex-col gap-2">
-                            <label class="text-xs font-bold text-gray-400 uppercase">Assinatura</label>
-                            <input type="text" id="edit-bio" class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg focus:border-yellow-500 focus:outline-none transition-colors">
+                        <div>
+                            <label class="label-dark">BIO</label>
+                            <input type="text" id="edit-bio" class="input-dark" placeholder="Escreva algo...">
                         </div>
-                        <div class="flex flex-col gap-2">
-                            <label class="text-xs font-bold text-gray-400 uppercase">Nick</label>
-                            <input type="text" id="edit-nick" class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg focus:border-yellow-500 focus:outline-none transition-colors">
+                        <div>
+                            <label class="label-dark">NICK</label>
+                            <input type="text" id="edit-nick" class="input-dark font-bold text-white" placeholder="Seu Nick">
                         </div>
                     </div>
 
-                    <div class="pt-8 border-t border-gray-800">
-                        <h3 class="text-gray-300 font-bold mb-6">Redes Sociais</h3>
+                    <div class="pt-4">
+                        <h3 class="text-white font-bold text-sm mb-6">Redes Sociais</h3>
+                        
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="flex flex-col gap-2">
-                                <label class="text-xs font-bold text-gray-400 uppercase">Twitter (X)</label>
+                            <div>
+                                <label class="label-dark">TWITTER (X)</label>
                                 <div class="relative">
-                                    <i data-lucide="twitter" class="absolute left-4 top-3.5 text-gray-600 w-4 h-4"></i>
-                                    <input type="text" id="edit-twitter" placeholder="@exemplo" class="w-full bg-[#0f1116] border border-gray-800 text-white pl-10 pr-4 py-3 rounded-lg focus:border-blue-500 focus:outline-none transition-colors">
+                                    <div class="absolute left-4 top-3.5 text-gray-500"><i data-lucide="twitter" class="w-4 h-4"></i></div>
+                                    <input type="text" id="edit-twitter" placeholder="@exemplo" class="input-dark pl-10">
                                 </div>
                             </div>
-                            <div class="flex flex-col gap-2">
-                                <label class="text-xs font-bold text-gray-400 uppercase">Instagram</label>
+                            
+                            <div>
+                                <label class="label-dark">INSTAGRAM</label>
                                 <div class="relative">
-                                    <i data-lucide="instagram" class="absolute left-4 top-3.5 text-gray-600 w-4 h-4"></i>
-                                    <input type="text" id="edit-instagram" placeholder="@exemplo" class="w-full bg-[#0f1116] border border-gray-800 text-white pl-10 pr-4 py-3 rounded-lg focus:border-pink-500 focus:outline-none transition-colors">
+                                    <div class="absolute left-4 top-3.5 text-gray-500"><i data-lucide="instagram" class="w-4 h-4"></i></div>
+                                    <input type="text" id="edit-instagram" placeholder="@exemplo" class="input-dark pl-10">
                                 </div>
                             </div>
-                            <div class="flex flex-col gap-2">
-                                <label class="text-xs font-bold text-gray-400 uppercase">Twitch</label>
+
+                            <div>
+                                <label class="label-dark">TWITCH</label>
                                 <div class="relative">
-                                    <i data-lucide="twitch" class="absolute left-4 top-3.5 text-gray-600 w-4 h-4"></i>
-                                    <input type="text" id="edit-twitch" placeholder="exemplo123" class="w-full bg-[#0f1116] border border-gray-800 text-white pl-10 pr-4 py-3 rounded-lg focus:border-purple-500 focus:outline-none transition-colors">
+                                    <div class="absolute left-4 top-3.5 text-gray-500"><i data-lucide="twitch" class="w-4 h-4"></i></div>
+                                    <input type="text" id="edit-twitch" placeholder="canal" class="input-dark pl-10">
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div>
-                        <button type="submit" id="save-btn" class="bg-[#5b4dff] hover:bg-[#4a3ecc] text-white font-bold px-6 py-3 rounded-lg shadow-lg shadow-indigo-900/20 transition-all">
-                            Salvar Alterações
-                        </button>
-                    </div>
+                <div class="pt-10 mt-10 border-t border-gray-800 flex justify-end">
+                    <button type="submit" id="save-btn" class="bg-[#FFD700] hover:bg-[#e6c200] text-black font-bold py-3 px-10 rounded-lg shadow-lg shadow-yellow-500/10 transition-all text-xs uppercase tracking-wider transform hover:scale-105">
+                        Salvar Alterações
+                    </button>
+                </div>
 
-                </form>
-            </div>
+            </form>
         </div>
-    </main>
+    </div>
 
-    <script type="module" src="auth.js"></script>
-    <script src="global-topbar.js"></script>
-    
-    <script>
-    // --- LÓGICA DE UPLOAD E SALVAMENTO ---
-    let selectedProfileFile = null;
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    document.addEventListener('DOMContentLoaded', () => {
-        lucide.createIcons();
-        
-        // Carregar dados
-        const userJson = localStorage.getItem('u4nted_user');
-        if(userJson) {
-            const user = JSON.parse(userJson);
+        // Configuração
+        const firebaseConfig = {
+            apiKey: "AIzaSyDaaBVNHZ6UOgHzb-pzT1RJxAT5yiQZLw0",
+            authDomain: "site-strays.firebaseapp.com",
+            projectId: "site-strays",
+            storageBucket: "site-strays.firebasestorage.app", 
+            messagingSenderId: "1005872178248",
+            appId: "1:1005872178248:web:36dfa929ab008a4415e47d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        const auth = getAuth(app);
+
+        let currentUserUid = null;
+        let selectedProfileFile = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
             
-            // Preenche Campos
-            setVal('edit-name', user.name);
-            setVal('edit-email', user.email);
-            setVal('edit-nick', user.nick || user.name.split(' ')[0]);
-            setVal('edit-bio', user.bio);
+            // Check Auth
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    currentUserUid = user.uid;
+                    loadUserProfile(user.uid);
+                } else {
+                    window.location.href = 'login.html';
+                }
+            });
+        });
+
+        async function loadUserProfile(uid) {
+            const local = localStorage.getItem('u4nted_user');
+            if(local) fillForm(JSON.parse(local));
+
+            try {
+                const docSnap = await getDoc(doc(db, "users", uid));
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    fillForm(data);
+                    if(local) {
+                        const merged = { ...JSON.parse(local), ...data };
+                        localStorage.setItem('u4nted_user', JSON.stringify(merged));
+                    }
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function fillForm(data) {
+            document.getElementById('edit-name').value = data.name || "";
+            document.getElementById('edit-email').value = data.email || "";
+            document.getElementById('edit-nick').value = data.nick || data.name || "";
+            document.getElementById('edit-bio').value = data.bio || "";
             
             const avatar = document.getElementById('edit-avatar-img');
-            if(avatar) avatar.src = user.photo || `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`;
+            avatar.src = data.photo || `https://api.dicebear.com/7.x/initials/svg?seed=${data.name}`;
 
-            if (user.socials) {
-                setVal('edit-twitter', user.socials.twitter);
-                setVal('edit-instagram', user.socials.instagram);
-                setVal('edit-twitch', user.socials.twitch);
+            if(data.socials) {
+                document.getElementById('edit-twitter').value = data.socials.twitter || "";
+                document.getElementById('edit-instagram').value = data.socials.instagram || "";
+                document.getElementById('edit-twitch').value = data.socials.twitch || "";
             }
-        } else {
-            window.location.href = 'login.html';
         }
-    });
 
-    function setVal(id, val) {
-        const el = document.getElementById(id);
-        if(el) el.value = val || '';
-    }
-
-    // Função de Preview (Agora guarda o arquivo real)
-    window.previewProfileImage = function(event) {
-        const file = event.target.files[0];
-        if (file) {
-            selectedProfileFile = file; // Guarda para o upload
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('edit-avatar-img').src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-    }
-
-    // Função de Salvar (Com Upload)
-    window.saveProfile = async function() {
-        const userJson = localStorage.getItem('u4nted_user');
-        if(!userJson) return;
-
-        let user = JSON.parse(userJson);
-        const btn = document.getElementById('save-btn');
-        const oldText = btn.innerText;
-        btn.innerText = "Salvando..."; btn.disabled = true;
-
-        try {
-            // 1. Upload Foto (Se tiver nova)
-            if (selectedProfileFile && window.storage) {
-                const ref = window.storageRef(window.storage, `users/${user.uid}/profile.jpg`);
-                const snap = await window.uploadBytes(ref, selectedProfileFile);
-                const url = await window.getDownloadURL(snap.ref);
-                user.photo = url; // Atualiza com o link do Firebase
+        window.previewProfileImage = function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                selectedProfileFile = file;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('edit-avatar-img').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
             }
-
-            // 2. Coleta Dados
-            user.nick = document.getElementById('edit-nick').value;
-            user.bio = document.getElementById('edit-bio').value;
-            user.socials = {
-                twitter: document.getElementById('edit-twitter').value,
-                instagram: document.getElementById('edit-instagram').value,
-                twitch: document.getElementById('edit-twitch').value
-            };
-
-            // 3. Salva no Banco (Firestore)
-            if(window.updateDoc && window.doc && window.db) {
-                 await window.updateDoc(window.doc(window.db, "users", user.uid), { 
-                     nick: user.nick,
-                     bio: user.bio,
-                     photo: user.photo,
-                     socials: user.socials
-                 });
-            }
-
-            // 4. Salva no LocalStorage
-            localStorage.setItem('u4nted_user', JSON.stringify(user));
-            
-            // Avisa o resto do site
-            window.dispatchEvent(new Event('auth-change'));
-
-            alert("Perfil atualizado com sucesso!");
-            window.location.href = 'perfil.html';
-
-        } catch (e) {
-            console.error(e);
-            alert("Erro ao salvar: " + e.message);
-        } finally {
-            btn.innerText = oldText; btn.disabled = false;
         }
-    }
+
+        window.saveProfile = async function() {
+            const btn = document.getElementById('save-btn');
+            const originalText = btn.innerText;
+            btn.innerText = "SALVANDO..."; btn.disabled = true;
+
+            try {
+                let photoUrl = document.getElementById('edit-avatar-img').src;
+
+                if (selectedProfileFile) {
+                    const storageRef = ref(storage, `users/${currentUserUid}/profile_${Date.now()}.jpg`);
+                    const snapshot = await uploadBytes(storageRef, selectedProfileFile);
+                    photoUrl = await getDownloadURL(snapshot.ref);
+                }
+
+                const newData = {
+                    nick: document.getElementById('edit-nick').value,
+                    name: document.getElementById('edit-name').value,
+                    bio: document.getElementById('edit-bio').value,
+                    photo: photoUrl,
+                    socials: {
+                        twitter: document.getElementById('edit-twitter').value,
+                        instagram: document.getElementById('edit-instagram').value,
+                        twitch: document.getElementById('edit-twitch').value
+                    }
+                };
+
+                await updateDoc(doc(db, "users", currentUserUid), newData);
+
+                const localUser = JSON.parse(localStorage.getItem('u4nted_user') || '{}');
+                const updatedUser = { ...localUser, ...newData };
+                localStorage.setItem('u4nted_user', JSON.stringify(updatedUser));
+
+                alert("Perfil salvo com sucesso!");
+                window.location.href = 'perfil.html';
+
+            } catch (error) {
+                console.error(error);
+                alert("Erro ao salvar: " + error.message);
+            } finally {
+                btn.innerText = originalText; btn.disabled = false;
+            }
+        }
     </script>
 </body>
 </html>
