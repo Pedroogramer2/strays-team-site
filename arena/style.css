@@ -336,28 +336,44 @@ a { text-decoration: none; color: inherit; transition: 0.2s; }
 .mb-row.winner .mb-score { color: var(--accent-green); }
 .mb-score { color: #555; font-weight: 700; }
 
-/* Conectores */
-.connector-right { position: absolute; right: -30px; width: 30px; border-right: 1px solid #444; }
-.connector-right.top { top: 50%; height: 50%; border-top: 1px solid #444; }
-.connector-right.bottom { bottom: 50%; height: 50%; border-bottom: 1px solid #444; }
-.connector-left { position: absolute; left: -30px; top: 50%; width: 30px; height: 1px; background: #444; }
-
-/* Search e Filtros */
-.filter-bar { display: flex; gap: 16px; margin-bottom: 24px; }
-.search-input-modern {
-    background: var(--bg-card); border: 1px solid var(--border-subtle); color: white;
-    padding: 12px 16px; border-radius: 8px; width: 100%; outline: none;
+.connector-right { 
+    position: absolute; 
+    right: -30px; /* Avança 30px para a direita */
+    width: 30px;  /* Largura 30px */
+    border-right: 2px solid #333; 
+    z-index: 0;
+    pointer-events: none;
 }
-.search-input-modern:focus { border-color: var(--primary-gold); }
 
-/* Responsivo */
-@media (max-width: 768px) {
-    .sidebar { transform: translateX(-220px); }
-    .main-content { margin-left: 0; }
-    .header-content { flex-direction: column; align-items: flex-start; gap: 24px; }
-    .header-stats { align-items: flex-start; min-width: 100%; }
-    .nav-tabs { gap: 16px; }
-    .filter-bar { flex-direction: column; }
+.connector-right.top { 
+    top: 50%; 
+    border-top: 2px solid #333; 
+}
+
+.connector-right.bottom { 
+    bottom: 50%; 
+    border-bottom: 2px solid #333; 
+}
+
+.connector-left { 
+    position: absolute; 
+    left: -30px; /* Recua 30px para a esquerda */
+    top: 50%; 
+    width: 30px; /* Largura 30px */
+    height: 2px; 
+    background: #333; 
+    z-index: 0;
+}
+
+/* Ajuste no Match Box para garantir que a linha não fique por cima do texto */
+.match-box {
+    background: #15171e; 
+    border: 1px solid var(--border-subtle); 
+    border-radius: 8px;
+    overflow: visible; /* IMPORTANTE: Permite que a linha saia da caixa */
+    position: relative; 
+    margin: 16px 0; /* Aumentei um pouco a margem para dar espaço às linhas */
+    z-index: 1;
 }
 
 /* ========================================= */

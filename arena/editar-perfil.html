@@ -35,15 +35,15 @@
                         <img id="edit-avatar-img" src="" class="w-full h-full object-cover">
                     </div>
                     <div>
-                        <button onclick="document.getElementById('file-upload-profile').click()" class="bg-[#1c1f26] hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-bold border border-gray-700 transition-colors">
+                        <label for="file-upload-profile" class="bg-[#1c1f26] hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-bold border border-gray-700 transition-colors cursor-pointer inline-block">
                             Enviar nova foto
-                        </button>
+                        </label>
                         <input type="file" id="file-upload-profile" class="hidden" accept="image/*" onchange="previewProfileImage(event)">
                         <p class="text-gray-600 text-xs mt-2">Recomendamos uma imagem 500x500.<br>Apenas PNG, JPEG, JPG e WEBP.</p>
                     </div>
                 </div>
 
-                <form id="edit-form" class="space-y-8">
+                <form id="edit-form" class="space-y-8" onsubmit="event.preventDefault(); saveProfile();">
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="flex flex-col gap-2">
@@ -65,12 +65,6 @@
                             <label class="text-xs font-bold text-gray-400 uppercase">Nick</label>
                             <input type="text" id="edit-nick" class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg focus:border-yellow-500 focus:outline-none transition-colors">
                         </div>
-                    </div>
-
-                    <div>
-                        <button type="button" onclick="saveProfile()" class="bg-[#5b4dff] hover:bg-[#4a3ecc] text-white font-bold px-6 py-3 rounded-lg shadow-lg shadow-indigo-900/20 transition-all">
-                            Salvar Alterações
-                        </button>
                     </div>
 
                     <div class="pt-8 border-t border-gray-800">
@@ -101,7 +95,7 @@
                     </div>
 
                     <div>
-                        <button type="button" onclick="saveProfile()" class="bg-[#5b4dff] hover:bg-[#4a3ecc] text-white font-bold px-6 py-3 rounded-lg shadow-lg shadow-indigo-900/20 transition-all">
+                        <button type="submit" id="save-btn" class="bg-[#5b4dff] hover:bg-[#4a3ecc] text-white font-bold px-6 py-3 rounded-lg shadow-lg shadow-indigo-900/20 transition-all">
                             Salvar Alterações
                         </button>
                     </div>
@@ -115,6 +109,9 @@
     <script src="global-topbar.js"></script>
     
     <script>
+    // --- LÓGICA DE UPLOAD E SALVAMENTO ---
+    let selectedProfileFile = null;
+
     document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
         
@@ -142,89 +139,77 @@
         }
     });
 
-    let tempNewProfileImage = ""; // Variável para a foto nova
-
     function setVal(id, val) {
         const el = document.getElementById(id);
         if(el) el.value = val || '';
     }
 
-    // Função NOVA para ver a foto antes de salvar
+    // Função de Preview (Agora guarda o arquivo real)
     window.previewProfileImage = function(event) {
         const file = event.target.files[0];
         if (file) {
+            selectedProfileFile = file; // Guarda para o upload
             const reader = new FileReader();
             reader.onload = function(e) {
                 document.getElementById('edit-avatar-img').src = e.target.result;
-                tempNewProfileImage = e.target.result;
             };
             reader.readAsDataURL(file);
         }
     }
 
-    function saveProfile() {
+    // Função de Salvar (Com Upload)
+    window.saveProfile = async function() {
         const userJson = localStorage.getItem('u4nted_user');
         if(!userJson) return;
 
         let user = JSON.parse(userJson);
-        let changes = [];
+        const btn = document.getElementById('save-btn');
+        const oldText = btn.innerText;
+        btn.innerText = "Salvando..."; btn.disabled = true;
 
-        // Verifica Nick
-        const newNick = document.getElementById('edit-nick').value;
-        if (newNick !== user.nick) { user.nick = newNick; changes.push("Nick"); }
-
-        // Verifica Assinatura
-        const newBio = document.getElementById('edit-bio').value;
-        if (newBio !== (user.bio || '')) { user.bio = newBio; changes.push("Assinatura"); }
-
-        // Verifica Foto (Lógica Nova)
-        if (tempNewProfileImage !== "") {
-            user.photo = tempNewProfileImage;
-            changes.push("Foto de Perfil");
-            // Se tiver conexão com banco, atualiza lá também
-            if(window.db && window.doc && window.updateDoc) {
-                 window.updateDoc(window.doc(window.db, "users", user.uid), { photo: tempNewProfileImage });
+        try {
+            // 1. Upload Foto (Se tiver nova)
+            if (selectedProfileFile && window.storage) {
+                const ref = window.storageRef(window.storage, `users/${user.uid}/profile.jpg`);
+                const snap = await window.uploadBytes(ref, selectedProfileFile);
+                const url = await window.getDownloadURL(snap.ref);
+                user.photo = url; // Atualiza com o link do Firebase
             }
-        }
 
-        // Verifica Redes Sociais
-        const newSocials = {
-            twitter: document.getElementById('edit-twitter').value,
-            instagram: document.getElementById('edit-instagram').value,
-            twitch: document.getElementById('edit-twitch').value
-        };
-        if (JSON.stringify(user.socials) !== JSON.stringify(newSocials)) {
-            user.socials = newSocials;
-            changes.push("Redes Sociais");
-        }
+            // 2. Coleta Dados
+            user.nick = document.getElementById('edit-nick').value;
+            user.bio = document.getElementById('edit-bio').value;
+            user.socials = {
+                twitter: document.getElementById('edit-twitter').value,
+                instagram: document.getElementById('edit-instagram').value,
+                twitch: document.getElementById('edit-twitch').value
+            };
 
-        // Salva tudo
-        localStorage.setItem('u4nted_user', JSON.stringify(user));
-        
-        // Avisa o resto do site
-        window.dispatchEvent(new Event('auth-change'));
+            // 3. Salva no Banco (Firestore)
+            if(window.updateDoc && window.doc && window.db) {
+                 await window.updateDoc(window.doc(window.db, "users", user.uid), { 
+                     nick: user.nick,
+                     bio: user.bio,
+                     photo: user.photo,
+                     socials: user.socials
+                 });
+            }
 
-        if (changes.length > 0) {
-            if (changes.length > 2) showToast("Perfil atualizado com sucesso!");
-            else changes.forEach(change => showToast(`${change} atualizado com sucesso!`));
-        } else {
-            showToast("Nenhuma alteração detectada.");
-        }
-    }
+            // 4. Salva no LocalStorage
+            localStorage.setItem('u4nted_user', JSON.stringify(user));
+            
+            // Avisa o resto do site
+            window.dispatchEvent(new Event('auth-change'));
 
-    function showToast(message) {
-        let container = document.querySelector('.toast-container');
-        if (!container) {
-            container = document.createElement('div');
-            container.className = 'toast-container';
-            document.body.appendChild(container);
+            alert("Perfil atualizado com sucesso!");
+            window.location.href = 'perfil.html';
+
+        } catch (e) {
+            console.error(e);
+            alert("Erro ao salvar: " + e.message);
+        } finally {
+            btn.innerText = oldText; btn.disabled = false;
         }
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.innerHTML = `<div class="toast-icon"><i data-lucide="check" style="width:14px; height:14px;"></i></div><span>${message}</span>`;
-        container.appendChild(toast);
-        lucide.createIcons();
-        setTimeout(() => { toast.style.animation = 'fadeOutToast 0.4s forwards'; setTimeout(() => toast.remove(), 400); }, 4000);
     }
     </script>
 </body>

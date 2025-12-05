@@ -94,43 +94,7 @@
     <script src="sidebar-toggle.js"></script>
     <script type="module" src="js/main.js"></script>
 
-                <h3 class="text-white font-bold text-xl flex items-center gap-2">
-                    <span class="text-yellow-500">🏆</span> Criar Time
-                </h3>
-                <p class="text-gray-500 text-xs">Preencha as informações do seu time.</p>
-            </div>
-            <button onclick="closeCreateTeamModal()" class="text-gray-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-        </div>
 
-        <form onsubmit="handleCreateTeamForm(event)" class="space-y-4">
-            <div class="flex justify-center mb-4">
-                <div class="w-24 h-24 rounded-full bg-[#0f1116] border-2 border-dashed border-gray-700 flex flex-col items-center justify-center cursor-pointer hover:border-purple-500 hover:text-purple-500 text-gray-500 transition-all group">
-                    <i data-lucide="camera" class="w-6 h-6 mb-1"></i>
-                    <span class="text-[10px] font-bold uppercase">Logo</span>
-                </div>
-            </div>
-
-            <div>
-                <label class="block text-gray-400 text-xs font-bold mb-1 uppercase">Nome do Time</label>
-                <input type="text" id="new-team-name" required placeholder="Digite o nome do time" class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:border-purple-500 outline-none transition-colors">
-            </div>
-
-            <div>
-                <label class="block text-gray-400 text-xs font-bold mb-1 uppercase">Tag (Sigla)</label>
-                <input type="text" id="new-team-tag" required maxlength="4" placeholder="Ex: LOUD" class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:border-purple-500 outline-none transition-colors">
-            </div>
-
-            <div>
-                <label class="block text-gray-400 text-xs font-bold mb-1 uppercase">Descrição</label>
-                <textarea id="new-team-desc" rows="2" placeholder="Fale um pouco sobre o time..." class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:border-purple-500 outline-none transition-colors"></textarea>
-            </div>
-
-            <button type="submit" class="w-full bg-[#6d28d9] hover:bg-[#5b21b6] text-white font-bold py-3 rounded-lg transition-all shadow-lg shadow-purple-900/20 mt-4">
-                Criar Time
-            </button>
-        </form>
-    </div>
-</div>
 
 <div id="add-player-modal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
     <div class="bg-[#15171e] w-full max-w-sm rounded-xl border border-gray-800 shadow-2xl p-6">
@@ -153,56 +117,7 @@
                 <h3 class="text-white font-bold text-xl flex items-center gap-2">
                     <span class="text-yellow-500">🏆</span> Novo Campeonato
                 </h3>
-                <p class="text-gray-500 text-xs">Crie um novo torneio na plataforma.</p>
-            </div>
-            <button onclick="closeCreateTournamentModal()" class="text-gray-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-        </div>
 
-        <form onsubmit="handleCreateTournamentForm(event)" class="space-y-4">
-            
-            <div>
-                <label class="block text-gray-400 text-xs font-bold mb-1 uppercase">Nome do Evento</label>
-                <input type="text" id="tour-name" required class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:border-yellow-500 outline-none transition-colors">
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-gray-400 text-xs font-bold mb-1 uppercase">Premiação (R$)</label>
-                    <input type="number" id="tour-prize" required class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:border-yellow-500 outline-none transition-colors">
-                </div>
-                <div>
-                    <label class="block text-gray-400 text-xs font-bold mb-1 uppercase">Vagas (Times)</label>
-                    <select id="tour-teams" class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:border-yellow-500 outline-none">
-                        <option value="8">8 Times</option>
-                        <option value="16">16 Times</option>
-                        <option value="32">32 Times</option>
-                    </select>
-                </div>
-            </div>
-
-            <div>
-                <label class="block text-gray-400 text-xs font-bold mb-1 uppercase">Formato</label>
-                <select id="tour-format" class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:border-yellow-500 outline-none">
-                    <option value="Eliminação Simples (Mata-mata)">Eliminação Simples (Mata-mata)</option>
-                    <option value="Fase de Grupos + Playoffs">Fase de Grupos + Playoffs</option>
-                    <option value="Dupla Eliminação (Upper/Lower)">Dupla Eliminação</option>
-                </select>
-            </div>
-
-            <div class="mb-4">
-    <label class="block text-gray-400 text-xs font-bold mb-1 uppercase">Banner do Evento</label>
-    <div class="flex gap-4 items-center bg-[#0f1116] p-3 rounded-xl border border-gray-800">
-        <div onclick="document.getElementById('tour-banner-input').click()" class="w-24 h-14 rounded bg-[#1c1f26] border-2 border-dashed border-gray-600 flex items-center justify-center cursor-pointer hover:border-white transition-all overflow-hidden shrink-0">
-            <img id="tour-banner-preview" class="hidden w-full h-full object-cover">
-            <i id="tour-banner-icon" data-lucide="image" class="w-6 h-6 text-gray-500"></i>
-        </div>
-        <div>
-            <button type="button" onclick="document.getElementById('tour-banner-input').click()" class="bg-[#1c1f26] text-white text-xs font-bold px-3 py-1.5 rounded border border-gray-700 hover:bg-gray-700 transition-colors">Escolher Imagem</button>
-            <p class="text-[10px] text-gray-500 mt-1">Recomendado 1920x1080.</p>
-        </div>
-        <input type="file" id="tour-banner-input" hidden accept="image/*" onchange="previewTourBanner(event)">
-    </div>
-</div>
 
             <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 rounded-lg transition-all shadow-lg shadow-yellow-900/20 mt-4 uppercase text-sm">
                 Publicar Campeonato

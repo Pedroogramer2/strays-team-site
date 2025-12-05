@@ -20,11 +20,11 @@ import {
     getDocs,
     addDoc,
     updateDoc,
+    deleteDoc, // <--- 1. ADICIONEI O IMPORT AQUI
     orderBy,
     arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// --- IMPORTANTE: ISTO ESTAVA FALTANDO ---
 import { 
     getStorage, 
     ref, 
@@ -46,21 +46,23 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app); // INICIALIZA O STORAGE
+const storage = getStorage(app); 
 const googleProvider = new GoogleAuthProvider();
 
-// --- EXPORTAR FERRAMENTAS PARA O WINDOW (Isto faz o teams.js funcionar) ---
+// --- EXPORTAR FERRAMENTAS PARA O WINDOW ---
 window.db = db;
 window.auth = auth; 
-window.storage = storage;       // ESSENCIAL
-window.storageRef = ref;        // ESSENCIAL
-window.uploadBytes = uploadBytes; // ESSENCIAL
-window.getDownloadURL = getDownloadURL; // ESSENCIAL
+window.storage = storage;       
+window.storageRef = ref;        
+window.uploadBytes = uploadBytes; 
+window.getDownloadURL = getDownloadURL; 
 
 // Ferramentas do Firestore
 window.collection = collection;
 window.addDoc = addDoc;
 window.doc = doc;
+window.setDoc = setDoc;
+window.deleteDoc = deleteDoc; // <--- 2. ADICIONEI O EXPORT AQUI
 window.getDoc = getDoc;
 window.getDocs = getDocs;
 window.updateDoc = updateDoc;
