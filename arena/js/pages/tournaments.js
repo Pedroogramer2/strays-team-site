@@ -1,6 +1,42 @@
 // js/pages/tournaments.js
 import { TOURNAMENTS, TEAMS_LIST_DB, OVERVIEW_DATA } from '../database.js';
 import { state } from '../state.js';
+// Cole isso logo abaixo dos imports no topo do tournaments.js
+
+function cleanTextFromHTML(htmlString) {
+    if (!htmlString) return "";
+    
+    // 1. Converte <br> e </div> em quebra de linha (Enter)
+    let text = htmlString.replace(/<br\s*\/?>/gi, "\n")
+                         .replace(/<\/div>/gi, "\n")
+                         .replace(/<\/li>/gi, "\n");
+
+    // 2. Remove as tags HTML restantes
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = text;
+    text = tempDiv.textContent || tempDiv.innerText || "";
+
+    // 3. REMOVE AS FRASES QUE ESTAVAM DUPLICANDO (A Mágica acontece aqui)
+    const frasesParaRemover = [
+        "Os jogadores devem se registrar em nosso site e formar uma equipe para participar.",
+        "O pagamento da inscrição será realizado via PIX.",
+        "VALOR DA INSCRIÇÃO",
+        "Valor:",
+        "Regulamento Simplificado",
+        "Agendamento dos Playoffs",
+        "Cronograma",
+        "Onde Assistir",
+        "Todas as partidas principais serão transmitidas AO VIVO em nossos canais oficiais."
+    ];
+
+    frasesParaRemover.forEach(frase => {
+        // Remove a frase onde quer que ela esteja
+        text = text.split(frase).join("");
+    });
+
+    // 4. Limpa espaços extras no começo e fim
+    return text.trim();
+}
 
 // --- VARIÁVEL GLOBAL PARA O ARQUIVO ---
 let selectedTourBannerFile = null;
@@ -262,6 +298,8 @@ export function switchOverviewInfo(key) {
 }
 
 // --- 4. ADMINISTRAÇÃO (EDITOR COM EXCLUSÃO E VISUAL BONITO) ---
+// Substitua a função openEditTournamentModal inteira por esta:
+
 export function openEditTournamentModal(tourId) {
     const t = state.currentTournament;
     if(!t) return;
@@ -269,52 +307,29 @@ export function openEditTournamentModal(tourId) {
     const old = document.getElementById('edit-tour-modal');
     if(old) old.remove();
 
-    // Helper: Limpa HTML e retorna apenas o texto visível
-    const cleanText = (html) => {
-        if(!html) return "";
-        const tmp = document.createElement("DIV");
-        tmp.innerHTML = html;
-        return tmp.textContent || tmp.innerText || "";
-    };
-
-    // Helper: Limpa HTML mas preserva quebras de linha
-    const cleanTextMultiline = (html) => {
-        if(!html) return "";
-        let text = html.replace(/<br\s*\/?>/gi, "\n").replace(/<\/li>/gi, "\n").replace(/<li>/gi, "• ");
-        const tmp = document.createElement("DIV");
-        tmp.innerHTML = text;
-        return (tmp.textContent || tmp.innerText || "").trim();
-    };
-
-    // Helper: Extrai links
-    const extractLink = (html, domain) => {
-        if(!html) return "";
-        const match = html.match(new RegExp(`href="([^"]*${domain}[^"]*)"`));
-        return match ? match[1] : "";
-    };
-
-    const currentHtmlInscricao = t.customOverview?.inscricao || "";
-    const currentHtmlTransmissao = t.customOverview?.transmissoes || "";
-    const currentHtmlAgenda = t.customOverview?.playoffs || "";
-    const currentHtmlRegras = t.customOverview?.regras || "";
-
-    const valInscricao = cleanText(currentHtmlInscricao).replace("Valor da Inscrição", "").replace("Valor:", "").replace("Para participar, siga os passos abaixo:", "").trim() || "R$ 10,00 por player";
-    const valRegras = cleanTextMultiline(currentHtmlRegras) || "Regras padrão do Valorant.";
-    const valAgenda = cleanTextMultiline(currentHtmlAgenda).replace("Cronograma", "").trim() || "Oitavas: 22/09\nFinal: 05/10";
+    // --- AQUI A CORREÇÃO: Limpa o lixo antes de mostrar no input ---
+    const valInscricao = cleanTextFromHTML(t.customOverview?.inscricao) || "R$ 10,00 por player";
+    const valRegras = cleanTextFromHTML(t.customOverview?.regras) || "Regras padrão.";
+    const valAgenda = cleanTextFromHTML(t.customOverview?.playoffs) || "Oitavas: 22/09\nFinal: 05/10";
     
-    const valTwitch = extractLink(currentHtmlTransmissao, "twitch") || "";
-    const valYoutube = extractLink(currentHtmlTransmissao, "youtube") || "";
+    // Tenta manter os links se existirem
+    let valTwitch = "";
+    let valYoutube = "";
+    if(t.customOverview?.transmissoes) {
+        if(t.customOverview.transmissoes.includes("twitch.tv")) valTwitch = "https://twitch.tv/"; 
+        if(t.customOverview.transmissoes.includes("youtube.com")) valYoutube = "https://youtube.com/";
+    }
 
     const modalHtml = `
     <div id="edit-tour-modal" class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-md animate-fadeIn">
         <div class="bg-[#15171e] w-full max-w-2xl rounded-2xl border border-gray-800 shadow-2xl flex flex-col max-h-[90vh]">
             
             <div class="flex justify-between items-center p-6 border-b border-gray-800 bg-[#1c1f26] rounded-t-2xl">
-                <h3 class="text-white font-bold text-xl flex items-center gap-2"><span class="text-yellow-500">⚡</span> Editor de Torneio</h3>
+                <h3 class="text-white font-bold text-xl">⚡ Editor de Torneio</h3>
                 <button onclick="closeEditTournamentModal()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+            <div class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
                 
                 <div class="grid grid-cols-2 gap-6">
                     <div>
@@ -323,59 +338,46 @@ export function openEditTournamentModal(tourId) {
                             <option value="Aberto" ${t.status === 'Aberto' ? 'selected' : ''}>🟢 Aberto</option>
                             <option value="Ao Vivo" ${t.status === 'Ao Vivo' ? 'selected' : ''}>🔴 Ao Vivo</option>
                             <option value="Concluído" ${t.status === 'Concluído' ? 'selected' : ''}>🏁 Concluído</option>
-                            <option value="Anulado" ${t.status === 'Anulado' ? 'selected' : ''}>🚫 Anulado</option>
                         </select>
                     </div>
                     <div>
-                        <label class="text-xs font-bold text-gray-400 uppercase">Prêmio (Texto)</label>
+                        <label class="text-xs font-bold text-gray-400 uppercase">Prêmio Total</label>
                         <input type="text" id="edit-tour-prize" value="${t.prize}" class="w-full bg-[#0a0a0a] border border-gray-700 text-white px-4 py-3 rounded-xl mt-1 outline-none focus:border-green-500 font-bold">
                     </div>
                 </div>
 
-                <div class="bg-[#1c1f26] p-4 rounded-xl border border-gray-800 space-y-4">
-                    <h4 class="text-white font-bold text-sm border-b border-gray-700 pb-2">📺 Onde Assistir (Links)</h4>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-[#a970ff] text-xs font-bold mb-1">Link da Twitch</label>
-                            <input type="text" id="edit-tour-twitch" value="${valTwitch}" placeholder="https://twitch.tv/..." class="w-full bg-[#0f1116] border border-gray-700 text-white px-3 py-2 rounded-lg text-sm focus:border-[#a970ff] outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[#ff0000] text-xs font-bold mb-1">Link do YouTube</label>
-                            <input type="text" id="edit-tour-youtube" value="${valYoutube}" placeholder="https://youtube.com/..." class="w-full bg-[#0f1116] border border-gray-700 text-white px-3 py-2 rounded-lg text-sm focus:border-[#ff0000] outline-none">
-                        </div>
-                    </div>
-                    <p class="text-[10px] text-gray-500">Deixe em branco se não houver transmissão na plataforma.</p>
+                <div>
+                    <label class="block text-gray-400 text-xs font-bold mb-1">Valor da Inscrição (Só o valor)</label>
+                    <input type="text" id="txt-inscricao" value="${valInscricao}" class="w-full bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-lg text-sm outline-none focus:border-yellow-500">
+                    <p class="text-[10px] text-gray-500 mt-1">O texto "Os jogadores devem se registrar..." será adicionado automaticamente.</p>
+                </div>
+                
+                <div>
+                    <label class="block text-gray-400 text-xs font-bold mb-1">Agendamento (Use Enter para pular linha)</label>
+                    <textarea id="txt-playoffs" rows="5" class="w-full bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-lg text-sm outline-none resize-none font-mono">${valAgenda}</textarea>
                 </div>
 
-                <div class="space-y-4">
+                <div>
+                    <label class="block text-gray-400 text-xs font-bold mb-1">Regulamento (Use Enter para criar itens)</label>
+                    <textarea id="txt-regras" rows="5" class="w-full bg-[#0f1116] border border-gray-700 text-gray-300 text-sm rounded-lg p-3 outline-none resize-none">${valRegras}</textarea>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-gray-400 text-xs font-bold mb-1">Valor da Inscrição (Texto)</label>
-                        <input type="text" id="txt-inscricao" value="${valInscricao}" class="w-full bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-lg text-sm outline-none focus:border-yellow-500">
+                        <label class="block text-[#a970ff] text-xs font-bold mb-1">Link Twitch</label>
+                        <input type="text" id="edit-tour-twitch" value="${valTwitch}" placeholder="https://twitch.tv/..." class="w-full bg-[#0f1116] border border-gray-700 text-white px-3 py-2 rounded-lg text-sm">
                     </div>
-                    
                     <div>
-                        <label class="block text-gray-400 text-xs font-bold mb-1">Agendamento (Lista de Datas)</label>
-                        <textarea id="txt-playoffs" rows="5" class="w-full bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-lg text-sm outline-none focus:border-blue-500 resize-none font-mono" placeholder="Ex:&#10;Oitavas: 22/09&#10;Final: 05/10">${valAgenda}</textarea>
-                        <p class="text-[10px] text-gray-500 mt-1">Pule linhas para criar a lista vertical bonita.</p>
-                    </div>
-
-                    <div>
-                        <label class="block text-gray-400 text-xs font-bold mb-1">Regulamento (Lista)</label>
-                        <textarea id="txt-regras" rows="5" class="w-full bg-[#0f1116] border border-gray-700 text-gray-300 text-sm rounded-lg p-3 outline-none resize-none">${valRegras}</textarea>
-                        <p class="text-[10px] text-gray-500 mt-1">Cada linha vira um item com bolinha (•) automaticamente.</p>
+                        <label class="block text-[#ff0000] text-xs font-bold mb-1">Link YouTube</label>
+                        <input type="text" id="edit-tour-youtube" value="${valYoutube}" placeholder="https://youtube.com/..." class="w-full bg-[#0f1116] border border-gray-700 text-white px-3 py-2 rounded-lg text-sm">
                     </div>
                 </div>
+
             </div>
 
-            <div class="p-6 border-t border-gray-800 bg-[#1c1f26] rounded-b-2xl flex justify-between gap-3">
-                 <button onclick="openDeleteConfirmation('${t.id}')" class="text-red-500 hover:text-red-400 font-bold text-sm px-4 py-3 flex items-center gap-2 border border-red-900/30 rounded-lg hover:bg-red-900/20 transition-all">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i> Excluir Campeonato
-                </button>
-
-                <div class="flex gap-3">
-                    <button onclick="closeEditTournamentModal()" class="text-gray-400 hover:text-white font-bold text-sm px-6 py-3">Cancelar</button>
-                    <button onclick="saveTournamentChanges('${t.id}')" class="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 px-8 rounded-xl shadow-lg">Salvar Tudo</button>
-                </div>
+            <div class="p-6 border-t border-gray-800 bg-[#1c1f26] rounded-b-2xl flex justify-end gap-3">
+                <button onclick="closeEditTournamentModal()" class="text-gray-400 hover:text-white font-bold text-sm px-6 py-3">Cancelar</button>
+                <button onclick="saveTournamentChanges('${t.id}')" class="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 px-8 rounded-xl shadow-lg">Salvar Tudo</button>
             </div>
         </div>
     </div>`;
@@ -433,6 +435,8 @@ export async function executeDelete(tourId) {
 }
 
 // --- SALVAR (VISUAL RECONSTRUÍDO CORRETAMENTE) ---
+// Substitua a função saveTournamentChanges inteira por esta:
+
 export async function saveTournamentChanges(tourId) {
     try {
         const btn = document.querySelector('button[onclick^="saveTournamentChanges"]');
@@ -441,60 +445,92 @@ export async function saveTournamentChanges(tourId) {
         const newStatus = document.getElementById('edit-tour-status').value;
         const newPrize = document.getElementById('edit-tour-prize').value;
         
+        // Pega o texto puro que você digitou no modal
         const txtInscricao = document.getElementById('txt-inscricao').value;
         const txtAgenda = document.getElementById('txt-playoffs').value;
         const txtRegras = document.getElementById('txt-regras').value;
-        
         const linkTwitch = document.getElementById('edit-tour-twitch').value;
         const linkYoutube = document.getElementById('edit-tour-youtube').value;
 
-        // 1. LINKS
-        let botoesHtml = '';
-        if(linkTwitch) botoesHtml += `<a href="${linkTwitch}" target="_blank" class="flex items-center gap-2 bg-[#9146FF] hover:bg-[#7c2cf5] text-white px-6 py-3 rounded-lg font-bold transition-all shadow-lg shadow-purple-900/20"><i data-lucide="twitch" class="w-5 h-5"></i> Twitch TV</a>`;
-        if(linkYoutube) botoesHtml += `<a href="${linkYoutube}" target="_blank" class="flex items-center gap-2 bg-[#FF0000] hover:bg-[#cc0000] text-white px-6 py-3 rounded-lg font-bold transition-all shadow-lg shadow-red-900/20"><i data-lucide="youtube" class="w-5 h-5"></i> Youtube</a>`;
-        if(!botoesHtml) botoesHtml = '<p class="text-gray-500 text-sm">Nenhuma transmissão agendada no momento.</p>';
+        // --- RECONSTRÓI O HTML BONITO (TEMPLATES) ---
+        
+        // 1. Inscrição: Adiciona a frase padrão + seu valor
+        const htmlInscricao = `
+            <p class="text-gray-300 mb-4">Os jogadores devem se registrar em nosso site e formar uma equipe para participar.</p>
+            <div class="mt-4 bg-yellow-500/10 border-l-4 border-yellow-500 p-4 rounded-r-lg">
+                <p class="text-yellow-500 text-sm font-bold uppercase mb-1">VALOR DA INSCRIÇÃO</p>
+                <p class="text-white font-bold text-lg">Valor: <span class="text-white">${txtInscricao}</span></p>
+            </div>`;
 
-        // 2. CRONOGRAMA FORMATADO (Visual Limpo sem caixa, Final Dourada)
-        const agendaHtml = `<div class="space-y-4">
-            <h4 class="text-white font-bold flex items-center gap-2 text-lg">
-                <i data-lucide="calendar" class="text-white w-5 h-5"></i> Cronograma
-            </h4>
-            <div class="space-y-1 text-gray-300 font-bold text-sm">
-                ${txtAgenda.split('\n').map(line => {
-                    if (line.trim() === "") return "";
-                    // Se a linha tem "Final", aplica dourado
-                    if (line.toLowerCase().includes("final")) return `<div class="text-yellow-500 font-black text-base mt-2 uppercase tracking-wide">${line}</div>`;
-                    return `<div>${line}</div>`;
-                }).join('')}
-            </div>
+        // 2. Agenda: Transforma cada linha do enter em uma DIV bonita
+        const agendaLines = txtAgenda.split('\n').map(line => {
+            if(!line.trim()) return "";
+            // Se a linha tiver "Final", pinta de dourado
+            const styleClass = line.toLowerCase().includes("final") ? "text-yellow-500 font-black text-base mt-2 uppercase tracking-wide" : "";
+            return `<div class="${styleClass}">${line}</div>`;
+        }).join('');
+        
+        const htmlAgenda = `<div class="space-y-4">
+            <h4 class="text-white font-bold flex items-center gap-2 text-lg"><i data-lucide="calendar" class="text-white w-5 h-5"></i> Cronograma</h4>
+            <div class="space-y-1 text-gray-300 font-bold text-sm">${agendaLines}</div>
         </div>`;
 
-        // 3. REGRAS FORMATADAS (Lista limpa com bullets brancos)
-        const regrasHtml = `<ul class="space-y-2 text-gray-300 list-disc pl-5 marker:text-white text-sm">
-            ${txtRegras.split('\n').filter(l=>l.trim()).map(l => `<li>${l.replace(/•/g, '').trim()}</li>`).join('')}
+        // 3. Regras: Transforma cada linha em um item de lista (bullet point)
+        const htmlRegras = `<ul class="space-y-2 text-gray-300 list-disc pl-5 marker:text-white text-sm">
+            ${txtRegras.split('\n').filter(l=>l.trim()).map(l => `<li>${l}</li>`).join('')}
         </ul>`;
 
+        // 4. Transmissão (Versão Compacta e Elegante)
+        let botoesHtml = "";
+        
+        // Banner Twitch (Compacto)
+        if(linkTwitch) {
+            botoesHtml += `
+            <a href="${linkTwitch}" target="_blank" class="group w-full bg-[#9146FF] hover:bg-[#7c2cf5] rounded-xl p-4 flex items-center gap-4 transition-all duration-300 shadow-lg hover:shadow-[#9146FF]/40 hover:-translate-y-1 relative overflow-hidden border border-white/10">
+                <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                <svg class="w-8 h-8 md:w-10 md:h-10 text-white shrink-0 drop-shadow-md transform group-hover:scale-110 transition-transform duration-300" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
+                </svg>
+                <div>
+                    <div class="text-[10px] md:text-xs text-white/90 font-bold uppercase tracking-wider mb-0.5 leading-none">Assista agora na</div>
+                    <div class="text-white font-black text-xl md:text-2xl uppercase tracking-tight leading-none drop-shadow-md">Twitch TV</div>
+                </div>
+            </a>`;
+        }
+
+        // Banner YouTube (Compacto)
+        if(linkYoutube) {
+            botoesHtml += `
+            <a href="${linkYoutube}" target="_blank" class="group w-full bg-[#FF0000] hover:bg-[#cc0000] rounded-xl p-4 flex items-center gap-4 transition-all duration-300 shadow-lg hover:shadow-[#FF0000]/40 hover:-translate-y-1 relative overflow-hidden border border-white/10">
+                <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                 <svg class="w-8 h-8 md:w-10 md:h-10 text-white shrink-0 drop-shadow-md transform group-hover:scale-110 transition-transform duration-300" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                </svg>
+                <div>
+                    <div class="text-[10px] md:text-xs text-white/90 font-bold uppercase tracking-wider mb-0.5 leading-none">Assista agora no</div>
+                    <div class="text-white font-black text-xl md:text-2xl uppercase tracking-tight leading-none drop-shadow-md">YouTube</div>
+                </div>
+            </a>`;
+        }
+
+        if(!botoesHtml) botoesHtml = '<div class="bg-[#1c1f26] p-4 rounded-xl border border-gray-800 text-center text-gray-400 text-sm font-bold flex items-center justify-center gap-2"><i data-lucide="tv" class="w-4 h-4"></i> Nenhuma transmissão agendada.</div>';
+
+        // Container (mantive flex-col para empilhar se tiver os dois)
+        const htmlTransmissao = `
+            <div class="space-y-4">
+                <p class="leading-relaxed text-gray-300 text-sm">Todas as partidas principais serão transmitidas <strong class="text-white">AO VIVO</strong> em nossos canais oficiais.</p>
+                <div class="flex flex-col gap-3 w-full">${botoesHtml}</div>
+            </div>`;
+
+        // Monta o objeto final para o banco
         const customOverview = {
-            inscricao: `
-                <p class="text-gray-300 mb-4">Os jogadores devem se registrar em nosso site e formar uma equipe para participar.</p>
-                <div class="mt-4 bg-yellow-500/10 border-l-4 border-yellow-500 p-4 rounded-r-lg">
-                    <p class="text-yellow-500 text-sm font-bold uppercase mb-1">VALOR DA INSCRIÇÃO</p>
-                    <p class="text-white font-bold text-lg">Valor: <span class="text-white">${txtInscricao}</span></p>
-                </div>`,
-            
-            transmissoes: `
-                <div class="space-y-6">
-                    <p class="leading-relaxed text-gray-300">Todas as partidas principais serão transmitidas <strong class="text-white">AO VIVO</strong> em nossos canais oficiais.</p>
-                    <div class="flex flex-wrap gap-4">
-                        ${botoesHtml}
-                    </div>
-                </div>`,
-
-            playoffs: agendaHtml, // Usa o HTML limpo que criamos
-
-            regras: `<div class="leading-relaxed text-sm">${regrasHtml}</div>`
+            inscricao: htmlInscricao,
+            transmissoes: htmlTransmissao,
+            playoffs: htmlAgenda,
+            regras: htmlRegras
         };
 
+        // Salva no Firebase
         const tourRef = window.doc(window.db, "tournaments", tourId);
         await window.updateDoc(tourRef, {
             status: newStatus,
@@ -502,13 +538,30 @@ export async function saveTournamentChanges(tourId) {
             customOverview: customOverview
         });
 
+        // --- CORREÇÃO DO REFRESH ---
+        // Atualiza a memória local para não precisar recarregar a página
+        if(state.currentTournament && state.currentTournament.id === tourId) {
+            state.currentTournament.status = newStatus;
+            state.currentTournament.prize = newPrize;
+            state.currentTournament.customOverview = customOverview;
+        }
+
         window.showToast("Torneio atualizado com sucesso!", "success");
         closeEditTournamentModal();
-        renderTournamentPro(tourId); 
+        
+        // Atualiza a tela imediatamente
+        if(window.renderTournamentPro) window.renderTournamentPro(tourId); 
+        
+        // Força a atualização da aba "Visão Geral" se estiver aberta
+        const activeTab = document.querySelector('.nav-btn[data-tab="Visão Geral"]');
+        if(activeTab && activeTab.classList.contains('border-yellow-500')) {
+            // Recarrega o texto da seção de inscrição
+            if(window.switchOverviewInfo) window.switchOverviewInfo('inscricao');
+        }
 
     } catch (e) {
         console.error(e);
-        window.showToast("Erro ao salvar: " + e.message, "error");
+        alert("Erro ao salvar: " + e.message);
         if(btn) btn.innerText = "Salvar Tudo";
     }
 }
