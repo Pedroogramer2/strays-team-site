@@ -9,23 +9,27 @@ let selectedBannerFile = null;
 // --- FUNÇÃO AUXILIAR: UPLOAD BLINDADO ---
 async function uploadImageToFirebase(file, path) {
     if (!file) return null;
-    if (!window.storage) throw new Error("Firebase Storage não carregado.");
+    
+    // Verifica se as ferramentas globais existem (carregadas pelo auth.js)
+    if (!window.storage || !window.storageRef || !window.uploadBytes) {
+        throw new Error("Sistema de Upload não inicializado. Verifique o auth.js.");
+    }
 
     try {
-        const storageReference = window.storageRef(window.storage, path);
-        const snapshot = await window.uploadBytes(storageReference, file);
-        const downloadURL = await window.getDownloadURL(snapshot.ref);
-        return downloadURL;
+        const ref = window.storageRef(window.storage, path);
+        const metadata = { contentType: file.type };
+        const snapshot = await window.uploadBytes(ref, file, metadata);
+        const url = await window.getDownloadURL(snapshot.ref);
+        return url;
     } catch (error) {
-        console.error("Erro Firebase:", error);
-        throw new Error("Falha no upload: " + error.message);
+        console.error("Erro detalhado do Firebase:", error);
+        throw new Error(error.message || "Falha na conexão com a nuvem.");
     }
 }
 
 // --- 1. RENDERIZAÇÃO DOS CARDS ---
 export function generateTeamCard(t) {
     const logoSrc = t.logo || `https://api.dicebear.com/7.x/identicon/svg?seed=${t.name}`;
-    
     return `
         <div onclick="navigateToPage('team-detail-${t.id}')" class="bg-[#15171e] p-4 rounded-xl border border-transparent hover:border-gray-600 transition-all group cursor-pointer flex items-center gap-5 shadow-lg relative overflow-hidden">
              <div class="absolute inset-0 bg-gradient-to-r from-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -194,7 +198,7 @@ export function switchTeamTab(tabName, teamId) {
     if(window.lucide) lucide.createIcons();
 }
 
-// --- 3. CONFIGURAÇÕES E EDIÇÃO ---
+// --- 3. CONFIGURAÇÕES E EDIÇÃO (GERENCIAMENTO) ---
 export function renderTeamSettings(teamId) {
     const allTeams = JSON.parse(localStorage.getItem('u4nted_teams_db') || '[]');
     const t = allTeams.find(team => String(team.id) === String(teamId));
@@ -204,6 +208,7 @@ export function renderTeamSettings(teamId) {
 
     const content = document.getElementById('page-content');
     
+    // Adicionei cores de fundo (bg-[#0a0a0a]) nos inputs para garantir que não fiquem invisíveis
     content.innerHTML = `
         <div class="max-w-7xl mx-auto px-6 py-10 animate-fadeIn">
             <button onclick="navigateToPage('team-detail-${t.id}')" class="flex items-center gap-2 text-gray-500 hover:text-white text-sm font-bold mb-6 transition-colors">
@@ -237,15 +242,15 @@ export function renderTeamSettings(teamId) {
                                 </div>
                             </div>
                             <div class="space-y-6">
-                                <div><label class="block text-white text-xs font-bold mb-2">Nome</label><input id="edit-team-name" type="text" value="${t.name}" class="w-full bg-[#0f1116] border border-gray-800 text-gray-300 text-sm rounded-lg px-4 py-3 outline-none focus:border-yellow-500 transition-colors"></div>
-                                <div><label class="block text-white text-xs font-bold mb-2">Tag</label><input id="edit-team-tag" type="text" value="${t.tag || ''}" class="w-full bg-[#0f1116] border border-gray-800 text-gray-300 text-sm rounded-lg px-4 py-3 outline-none focus:border-yellow-500 transition-colors"></div>
-                                <div><label class="block text-white text-xs font-bold mb-2">Descrição</label><textarea id="edit-team-desc" rows="3" class="w-full bg-[#0f1116] border border-gray-800 text-gray-300 text-sm rounded-lg px-4 py-3 outline-none focus:border-yellow-500 transition-colors">${t.desc || ''}</textarea></div>
+                                <div><label class="block text-white text-xs font-bold mb-2">Nome</label><input id="edit-team-name" type="text" value="${t.name}" class="w-full bg-[#0a0a0a] border border-gray-800 text-white text-sm rounded-lg px-4 py-3 outline-none focus:border-yellow-500 transition-colors"></div>
+                                <div><label class="block text-white text-xs font-bold mb-2">Tag</label><input id="edit-team-tag" type="text" value="${t.tag || ''}" class="w-full bg-[#0a0a0a] border border-gray-800 text-white text-sm rounded-lg px-4 py-3 outline-none focus:border-yellow-500 transition-colors"></div>
+                                <div><label class="block text-white text-xs font-bold mb-2">Descrição</label><textarea id="edit-team-desc" rows="3" class="w-full bg-[#0a0a0a] border border-gray-800 text-white text-sm rounded-lg px-4 py-3 outline-none focus:border-yellow-500 transition-colors">${t.desc || ''}</textarea></div>
                             </div>
                             <div class="mt-8 pt-8 border-t border-gray-800">
                                 <h3 class="text-white font-bold text-sm mb-4">Redes Sociais</h3>
                                 <div class="grid grid-cols-2 gap-4">
-                                    <div><label class="block text-gray-500 text-xs mb-1">Twitter</label><div class="flex items-center bg-[#0f1116] border border-gray-800 rounded-lg px-3"><span class="text-gray-500 text-xs">@</span><input id="edit-team-twitter" type="text" value="${t.socials.twitter || ''}" class="bg-transparent border-none text-white text-sm w-full py-3 outline-none ml-1"></div></div>
-                                    <div><label class="block text-gray-500 text-xs mb-1">Instagram</label><div class="flex items-center bg-[#0f1116] border border-gray-800 rounded-lg px-3"><span class="text-gray-500 text-xs">@</span><input id="edit-team-insta" type="text" value="${t.socials.instagram || ''}" class="bg-transparent border-none text-white text-sm w-full py-3 outline-none ml-1"></div></div>
+                                    <div><label class="block text-gray-500 text-xs mb-1">Twitter</label><div class="flex items-center bg-[#0a0a0a] border border-gray-800 rounded-lg px-3"><span class="text-gray-500 text-xs">@</span><input id="edit-team-twitter" type="text" value="${t.socials.twitter || ''}" class="bg-transparent border-none text-white text-sm w-full py-3 outline-none ml-1"></div></div>
+                                    <div><label class="block text-gray-500 text-xs mb-1">Instagram</label><div class="flex items-center bg-[#0a0a0a] border border-gray-800 rounded-lg px-3"><span class="text-gray-500 text-xs">@</span><input id="edit-team-insta" type="text" value="${t.socials.instagram || ''}" class="bg-transparent border-none text-white text-sm w-full py-3 outline-none ml-1"></div></div>
                                 </div>
                             </div>
                             <div class="flex justify-between items-center mt-8 pt-8 border-t border-gray-800">
@@ -287,15 +292,16 @@ export function renderTeamSettings(teamId) {
     if(window.lucide) lucide.createIcons();
 }
 
-// --- 4. MODAIS AUXILIARES ---
+// --- 4. FUNÇÕES DE INJEÇÃO DE MODAIS (CORREÇÃO CRÍTICA DO ERRO DE SCROLL) ---
 function injectSettingsModals() {
     const oldEdit = document.getElementById('edit-player-modal');
     if(oldEdit) oldEdit.remove();
     const oldDel = document.getElementById('delete-team-modal');
     if(oldDel) oldDel.remove();
 
+    // ADICIONEI style="display: none !important;" PARA EVITAR QUE APAREÇAM NO FINAL DA PAGINA
     const modalsHtml = `
-        <div id="edit-player-modal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div id="edit-player-modal" style="display: none !important;" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm hidden">
             <div class="bg-[#15171e] w-full max-w-md rounded-xl border border-gray-800 shadow-2xl p-6">
                 <h3 class="text-white font-bold text-lg mb-6">Editar Função</h3>
                 <div class="bg-[#1c1f26] border border-gray-800 rounded-lg p-3 flex items-center gap-3 mb-6"><div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-white font-bold text-sm" id="modal-p-avatar"></div><h4 class="text-white font-bold text-sm" id="modal-p-nick"></h4></div>
@@ -307,7 +313,7 @@ function injectSettingsModals() {
                 <div class="flex justify-end gap-3"><button onclick="closeEditPlayerModal()" class="text-white font-bold text-sm px-4 py-2 hover:bg-white/5 rounded-lg">Cancelar</button><button onclick="savePlayerEdit()" class="bg-[#5b4dff] text-white font-bold py-2 px-6 rounded-lg text-sm shadow-lg">Salvar</button></div>
             </div>
         </div>
-        <div id="delete-team-modal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div id="delete-team-modal" style="display: none !important;" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm hidden">
             <div class="bg-[#15171e] w-full max-w-md rounded-xl border border-gray-800 shadow-2xl p-6">
                 <h3 class="text-white font-bold text-lg mb-2">Confirmar Saída do Time</h3>
                 <p class="text-gray-400 text-sm mb-6 leading-relaxed">Você tem certeza que deseja deletar o time? Esta ação não poderá ser desfeita.</p>
@@ -318,7 +324,7 @@ function injectSettingsModals() {
     document.body.insertAdjacentHTML('beforeend', modalsHtml);
 }
 
-// --- 5. CRIAÇÃO DE TIME (MODAL COM ID ÚNICO) ---
+// --- 5. CRIAÇÃO DE TIME (MODAL COM INPUTS CORRIGIDOS) ---
 export function openCreateTeamModal() {
     const oldModal = document.getElementById('create-team-modal');
     if (oldModal) oldModal.remove();
@@ -351,15 +357,15 @@ export function openCreateTeamModal() {
                 <div class="space-y-4">
                     <div>
                         <label class="block text-gray-400 text-xs font-bold mb-1 uppercase">Nome do Time</label>
-                        <input type="text" id="new-team-name" required placeholder="Digite o nome do time" class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:border-purple-500 outline-none transition-colors">
+                        <input type="text" id="new-team-name" required placeholder="Digite o nome do time" class="w-full bg-[#0a0a0a] border border-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:border-purple-500 outline-none transition-colors">
                     </div>
                     <div>
                         <label class="block text-gray-400 text-xs font-bold mb-1 uppercase">Tag (Sigla)</label>
-                        <input type="text" id="new-team-tag" required maxlength="5" placeholder="Ex: LOUD" class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:border-purple-500 outline-none transition-colors uppercase">
+                        <input type="text" id="new-team-tag" required maxlength="5" placeholder="Ex: LOUD" class="w-full bg-[#0a0a0a] border border-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:border-purple-500 outline-none transition-colors uppercase">
                     </div>
                     <div>
                         <label class="block text-gray-400 text-xs font-bold mb-1 uppercase">Descrição</label>
-                        <textarea id="new-team-desc" rows="2" placeholder="Fale um pouco sobre o time..." class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:border-purple-500 outline-none transition-colors"></textarea>
+                        <textarea id="new-team-desc" rows="2" placeholder="Fale um pouco sobre o time..." class="w-full bg-[#0a0a0a] border border-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:border-purple-500 outline-none transition-colors"></textarea>
                     </div>
                 </div>
 
@@ -429,7 +435,6 @@ export async function handleCreateTeamForm(e) {
             roster: [{ uid: user.uid, nick: user.nick || user.name, name: user.name, photo: user.photo, role: 'Capitão', gameRole: 'Flex' }] 
         };
         
-        // Salva Local
         localTeams.push(newTeam);
         localStorage.setItem('u4nted_teams_db', JSON.stringify(localTeams));
 
@@ -442,13 +447,10 @@ export async function handleCreateTeamForm(e) {
         selectedLogoFile = null; 
         window.showToast("Time criado com sucesso!", "success");
         
-        // --- AQUI ESTÁ A CORREÇÃO: Redireciona para o detalhe SEM recarregar ---
+        // REDIRECIONA SEM RECARREGAR (SPA)
         setTimeout(() => {
-            if (window.navigateToPage) {
-                window.navigateToPage(`team-detail-${newId}`);
-            } else {
-                window.location.reload(); // Fallback se o router falhar
-            }
+            if (window.navigateToPage) window.navigateToPage(`team-detail-${newId}`);
+            else window.location.reload();
         }, 1000);
 
     } catch (e) { 
@@ -529,12 +531,19 @@ export async function saveTeamSettings() {
 }
 
 export function openDeleteTeamModal() {
+    // Agora removemos o display: none para mostrar
     const m = document.getElementById('delete-team-modal');
-    if(m) { m.classList.remove('hidden'); m.classList.add('flex'); }
+    if(m) { 
+        m.style.display = 'flex'; // Torna visível
+        m.classList.remove('hidden'); 
+    }
 }
 export function closeDeleteTeamModal() {
     const m = document.getElementById('delete-team-modal');
-    if(m) { m.classList.add('hidden'); m.classList.remove('flex'); }
+    if(m) { 
+        m.style.display = 'none'; // Esconde novamente
+        m.classList.add('hidden'); 
+    }
 }
 export function confirmDeleteTeam() {
     let teams = JSON.parse(localStorage.getItem('u4nted_teams_db') || '[]');
@@ -551,11 +560,13 @@ export function openEditPlayerModal(uid, nick, role, gameRole) {
     document.getElementById('modal-p-role').value = role || 'Membro';
     document.getElementById('modal-p-gameRole').value = gameRole || 'Flex';
     const m = document.getElementById('edit-player-modal');
-    m.classList.remove('hidden'); m.classList.add('flex');
+    m.style.display = 'flex'; // Torna visível
+    m.classList.remove('hidden');
 }
 export function closeEditPlayerModal() {
     const m = document.getElementById('edit-player-modal');
-    m.classList.add('hidden'); m.classList.remove('flex');
+    m.style.display = 'none'; // Esconde
+    m.classList.add('hidden');
 }
 export function savePlayerEdit() {
     const uid = document.getElementById('modal-p-uid').value;

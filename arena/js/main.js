@@ -23,7 +23,6 @@ window.showToast = function(message, type = 'success') {
     }
 
     const toast = document.createElement('div');
-    // Adiciona a classe base 'toast' E a classe do tipo ('error' ou 'success')
     toast.className = `toast ${type}`;
     
     const icon = type === 'error' ? 'alert-circle' : 'check-circle';
@@ -42,7 +41,7 @@ window.showToast = function(message, type = 'success') {
     }, 4000);
 }
 
-// --- EXPOR FUNÇÕES PARA O HTML ---
+// --- EXPOR FUNÇÕES PARA O HTML (WINDOW) ---
 window.navigateToPage = navigateToPage;
 
 // Funções de Times
@@ -63,12 +62,9 @@ window.previewEditLogo = TeamsModule.previewEditLogo;
 window.previewEditBanner = TeamsModule.previewEditBanner;
 window.saveTeamSettings = TeamsModule.saveTeamSettings;
 window.removePlayer = TeamsModule.removePlayer;
-
-// --- AS LINHAS QUE FALTAVAM PARA O DELETE FUNCIONAR: ---
 window.openDeleteTeamModal = TeamsModule.openDeleteTeamModal;
 window.closeDeleteTeamModal = TeamsModule.closeDeleteTeamModal;
 window.confirmDeleteTeam = TeamsModule.confirmDeleteTeam; 
-// ------------------------------------------------------
 
 // Funções de Campeonato e Admin
 window.switchTab = TourneyModule.switchTab;
@@ -80,5 +76,18 @@ window.setMatchWinner = TourneyModule.setMatchWinner;
 window.switchOverviewInfo = TourneyModule.switchOverviewInfo;
 window.changeUserRole = TourneyModule.changeUserRole;
 window.openAdminPanel = TourneyModule.openAdminPanel;
+
+// --- FUNÇÕES DE EDIÇÃO DE TORNEIO (ATUALIZADAS) ---
+window.openEditTournamentModal = TourneyModule.openEditTournamentModal;
+window.closeEditTournamentModal = TourneyModule.closeEditTournamentModal;
+window.saveTournamentChanges = TourneyModule.saveTournamentChanges;
+
+// *** AQUI ESTAVA FALTANDO AS FUNÇÕES NOVAS DE DELETAR ***
+window.openDeleteConfirmation = TourneyModule.openDeleteConfirmation; 
+window.executeDelete = TourneyModule.executeDelete;
+
+window.subscribeTeam = TourneyModule.subscribeTeam;
+window.approveTeam = TourneyModule.approveTeam;
+window.rejectTeam = TourneyModule.rejectTeam;
 
 window.appState = state;
