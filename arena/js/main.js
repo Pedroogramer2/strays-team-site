@@ -23,8 +23,10 @@ window.showToast = function(message, type = 'success') {
     }
 
     const toast = document.createElement('div');
-    toast.className = 'toast';
-    const icon = type === 'error' ? 'alert-circle' : 'check';
+    // Adiciona a classe base 'toast' E a classe do tipo ('error' ou 'success')
+    toast.className = `toast ${type}`;
+    
+    const icon = type === 'error' ? 'alert-circle' : 'check-circle';
     
     toast.innerHTML = `
         <div class="toast-icon"><i data-lucide="${icon}" style="width:14px; height:14px;"></i></div>

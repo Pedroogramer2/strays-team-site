@@ -35,9 +35,10 @@
                         <img id="edit-avatar-img" src="" class="w-full h-full object-cover">
                     </div>
                     <div>
-                        <button class="bg-[#1c1f26] hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-bold border border-gray-700 transition-colors">
+                        <button onclick="document.getElementById('file-upload-profile').click()" class="bg-[#1c1f26] hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-bold border border-gray-700 transition-colors">
                             Enviar nova foto
                         </button>
+                        <input type="file" id="file-upload-profile" class="hidden" accept="image/*" onchange="previewProfileImage(event)">
                         <p class="text-gray-600 text-xs mt-2">Recomendamos uma imagem 500x500.<br>Apenas PNG, JPEG, JPG e WEBP.</p>
                     </div>
                 </div>
@@ -141,10 +142,24 @@
         }
     });
 
-    // Função auxiliar curta
+    let tempNewProfileImage = ""; // Variável para a foto nova
+
     function setVal(id, val) {
         const el = document.getElementById(id);
         if(el) el.value = val || '';
+    }
+
+    // Função NOVA para ver a foto antes de salvar
+    window.previewProfileImage = function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('edit-avatar-img').src = e.target.result;
+                tempNewProfileImage = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
     }
 
     function saveProfile() {
@@ -152,80 +167,65 @@
         if(!userJson) return;
 
         let user = JSON.parse(userJson);
-        let changes = []; // Lista de mudanças
+        let changes = [];
 
-        // 1. Verificar Nick
+        // Verifica Nick
         const newNick = document.getElementById('edit-nick').value;
-        if (newNick !== user.nick) {
-            user.nick = newNick;
-            changes.push("Nick");
-        }
+        if (newNick !== user.nick) { user.nick = newNick; changes.push("Nick"); }
 
-        // 2. Verificar Assinatura
+        // Verifica Assinatura
         const newBio = document.getElementById('edit-bio').value;
-        if (newBio !== (user.bio || '')) {
-            user.bio = newBio;
-            changes.push("Assinatura");
+        if (newBio !== (user.bio || '')) { user.bio = newBio; changes.push("Assinatura"); }
+
+        // Verifica Foto (Lógica Nova)
+        if (tempNewProfileImage !== "") {
+            user.photo = tempNewProfileImage;
+            changes.push("Foto de Perfil");
+            // Se tiver conexão com banco, atualiza lá também
+            if(window.db && window.doc && window.updateDoc) {
+                 window.updateDoc(window.doc(window.db, "users", user.uid), { photo: tempNewProfileImage });
+            }
         }
 
-        // 3. Verificar Redes Sociais
+        // Verifica Redes Sociais
         const newSocials = {
             twitter: document.getElementById('edit-twitter').value,
             instagram: document.getElementById('edit-instagram').value,
             twitch: document.getElementById('edit-twitch').value
         };
-        
-        // Compara objeto antigo com novo
         if (JSON.stringify(user.socials) !== JSON.stringify(newSocials)) {
             user.socials = newSocials;
             changes.push("Redes Sociais");
         }
 
-        // Salva
+        // Salva tudo
         localStorage.setItem('u4nted_user', JSON.stringify(user));
+        
+        // Avisa o resto do site
+        window.dispatchEvent(new Event('auth-change'));
 
-        // Mostra notificação baseada no que mudou
         if (changes.length > 0) {
-            // Se mudou muita coisa, mostra genérico, senão especifica
-            if (changes.length > 2) {
-                showToast("Perfil atualizado com sucesso!");
-            } else {
-                changes.forEach(change => {
-                    showToast(`${change} atualizado com sucesso!`);
-                });
-            }
+            if (changes.length > 2) showToast("Perfil atualizado com sucesso!");
+            else changes.forEach(change => showToast(`${change} atualizado com sucesso!`));
         } else {
             showToast("Nenhuma alteração detectada.");
         }
     }
 
-    // --- FUNÇÃO DE TOAST (NOTIFICAÇÃO VERDE) ---
     function showToast(message) {
-        // Cria container se não existir
         let container = document.querySelector('.toast-container');
         if (!container) {
             container = document.createElement('div');
             container.className = 'toast-container';
             document.body.appendChild(container);
         }
-
-        // Cria o Toast
         const toast = document.createElement('div');
         toast.className = 'toast';
-        toast.innerHTML = `
-            <div class="toast-icon"><i data-lucide="check" style="width:14px; height:14px;"></i></div>
-            <span>${message}</span>
-        `;
-
+        toast.innerHTML = `<div class="toast-icon"><i data-lucide="check" style="width:14px; height:14px;"></i></div><span>${message}</span>`;
         container.appendChild(toast);
-        lucide.createIcons(); // Atualiza ícone do check
-
-        // Remove após 4 segundos
-        setTimeout(() => {
-            toast.style.animation = 'fadeOutToast 0.4s forwards';
-            setTimeout(() => toast.remove(), 400);
-        }, 4000);
+        lucide.createIcons();
+        setTimeout(() => { toast.style.animation = 'fadeOutToast 0.4s forwards'; setTimeout(() => toast.remove(), 400); }, 4000);
     }
-</script>
+    </script>
 </body>
 </html>
