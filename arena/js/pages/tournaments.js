@@ -994,6 +994,56 @@ export function navigateToPage(slug) {
         }
     } catch(e) { console.error(e); }
 }
+export function openAdminPanel() {
+    const old = document.getElementById('admin-panel-modal'); 
+    if(old) old.remove();
+
+    const html = `
+    <div id="admin-panel-modal" class="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-fadeIn">
+        <div class="bg-[#15171e] w-full max-w-md rounded-xl border border-red-900/50 shadow-[0_0_50px_rgba(220,38,38,0.1)] overflow-hidden">
+            
+            <div class="bg-gradient-to-r from-red-900/20 to-transparent p-6 border-b border-red-900/20 flex justify-between items-center">
+                <h3 class="text-white font-bold text-xl flex items-center gap-2">
+                    <i data-lucide="shield-alert" class="text-red-500"></i> Painel Admin
+                </h3>
+                <button onclick="document.getElementById('admin-panel-modal').remove()" class="text-gray-400 hover:text-white transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <p class="text-gray-400 text-sm mb-4">Bem-vindo à central de controle da Strays Legends.</p>
+
+                <button onclick="document.getElementById('admin-panel-modal').remove(); openCreateTournamentModal();" class="w-full bg-[#1c1f26] hover:bg-[#252830] border border-gray-700 hover:border-yellow-500 p-4 rounded-xl flex items-center gap-4 group transition-all text-left">
+                    <div class="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center text-yellow-500 group-hover:scale-110 transition-transform">
+                        <i data-lucide="plus" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-bold text-sm">Criar Campeonato</h4>
+                        <p class="text-gray-500 text-xs">Adicionar novo torneio à lista.</p>
+                    </div>
+                </button>
+
+                <button onclick="document.getElementById('admin-panel-modal').remove(); navigateToPage('campeonatos');" class="w-full bg-[#1c1f26] hover:bg-[#252830] border border-gray-700 hover:border-blue-500 p-4 rounded-xl flex items-center gap-4 group transition-all text-left">
+                    <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform">
+                        <i data-lucide="list" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-bold text-sm">Gerenciar Torneios</h4>
+                        <p class="text-gray-500 text-xs">Ver lista e editar existentes.</p>
+                    </div>
+                </button>
+            </div>
+            
+            <div class="p-4 bg-black/20 text-center border-t border-white/5">
+                <p class="text-[10px] text-gray-600 uppercase font-bold">Strays Legends System v1.0</p>
+            </div>
+        </div>
+    </div>`;
+
+    document.body.insertAdjacentHTML('beforeend', html);
+    if(window.lucide) lucide.createIcons();
+}
 
 // ---------------------------
 // EXPORTS FINAIS E ATTACH AO WINDOW
