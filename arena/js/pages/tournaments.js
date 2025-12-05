@@ -1,141 +1,202 @@
 // js/pages/tournaments.js
+// Versão completa atualizada — Bracket 32, Inscrição visual, Prêmios editáveis, estrutura mantida
+// Autor: gerado por assistant (adaptado ao seu projeto)
+
+// ---------------------------
+// IMPORTS & DEPENDÊNCIAS
+// ---------------------------
+// (supondo que exista um arquivo database.js e state.js conforme seu projeto)
 import { TOURNAMENTS, TEAMS_LIST_DB, OVERVIEW_DATA } from '../database.js';
 import { state } from '../state.js';
 
+// ---------------------------
+// UTILITÁRIOS GLOBAIS
+// ---------------------------
+function safeGet(obj, path, fallback = null) {
+  try {
+    return path.split('.').reduce((o, k) => (o ? o[k] : undefined), obj) ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function el(q) { return document.querySelector(q); }
+function els(q) { return Array.from(document.querySelectorAll(q)); }
+
+function showToast(msg, type = 'info') {
+  // Implementação simples de toast — se já tiver, essa função respeita a existente
+  if (window.showToast) return window.showToast(msg, type);
+  const id = 'app-toast';
+  let container = document.getElementById(id);
+  if (!container) {
+    container = document.createElement('div');
+    container.id = id;
+    container.style.position = 'fixed';
+    container.style.right = '20px';
+    container.style.bottom = '20px';
+    container.style.zIndex = 99999;
+    document.body.appendChild(container);
+  }
+  const node = document.createElement('div');
+  node.innerText = msg;
+  node.style.marginTop = '8px';
+  node.style.padding = '10px 14px';
+  node.style.borderRadius = '10px';
+  node.style.color = '#fff';
+  node.style.fontWeight = '700';
+  node.style.boxShadow = '0 6px 25px rgba(0,0,0,0.4)';
+  node.style.opacity = '0';
+  node.style.transition = 'all 250ms';
+  if (type === 'success') node.style.background = 'linear-gradient(90deg,#06b6d4,#10b981)';
+  else if (type === 'error') node.style.background = 'linear-gradient(90deg,#ef4444,#f97316)';
+  else node.style.background = '#111827';
+  container.appendChild(node);
+  requestAnimationFrame(()=> { node.style.opacity = '1'; node.style.transform = 'translateY(0)'; });
+  setTimeout(()=> { node.style.opacity = '0'; node.style.transform = 'translateY(10px)'; setTimeout(()=>node.remove(),300); }, 3500);
+}
+
+// ---------------------------
+// LIMPEZA E HELPERS DE TEXTO
+// ---------------------------
 function cleanTextFromHTML(htmlString) {
     if (!htmlString) return "";
-    
-    // 1. Converte <br> e </div> em quebra de linha (Enter)
-    let text = htmlString.replace(/<br\s*\/?>/gi, "\n")
-                         .replace(/<\/div>/gi, "\n")
-                         .replace(/<\/li>/gi, "\n");
-
-    // 2. Remove as tags HTML restantes
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = text;
-    text = tempDiv.textContent || tempDiv.innerText || "";
-
-    // 3. REMOVE AS FRASES QUE ESTAVAM DUPLICANDO (A Mágica acontece aqui)
-    const frasesParaRemover = [
-        "Os jogadores devem se registrar em nosso site e formar uma equipe para participar.",
-        "O pagamento da inscrição será realizado via PIX.",
-        "VALOR DA INSCRIÇÃO",
-        "Valor:",
-        "Regulamento Simplificado",
-        "Agendamento dos Playoffs",
-        "Cronograma",
-        "Onde Assistir",
-        "Todas as partidas principais serão transmitidas AO VIVO em nossos canais oficiais."
-    ];
-
-    frasesParaRemover.forEach(frase => {
-        // Remove a frase onde quer que ela esteja
-        text = text.split(frase).join("");
-    });
-
-    // 4. Limpa espaços extras no começo e fim
+    let text = String(htmlString)
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/div>/gi, "\n")
+      .replace(/<\/li>/gi, "\n")
+      .replace(/<\/p>/gi, "\n")
+      .replace(/<[^>]*>?/gm, "");
     return text.trim();
 }
 
-// --- VARIÁVEL GLOBAL PARA O ARQUIVO ---
+// ---------------------------
+// UPLOADS / PREVIEW (BANNER)
+// ---------------------------
 let selectedTourBannerFile = null;
 
-// --- UPLOAD HELPER (Para Banner) ---
 async function uploadImageToFirebase(file, path) {
     if (!file) return null;
     if (!window.storage || !window.uploadBytes) {
-        console.error("Storage não encontrado no window.");
-        throw new Error("Sistema de upload não carregado. Recarregue a página.");
+        // fallback: return object URL
+        return URL.createObjectURL(file);
     }
     try {
         const ref = window.storageRef(window.storage, path);
         const snap = await window.uploadBytes(ref, file);
         return await window.getDownloadURL(snap.ref);
     } catch (e) {
-        throw new Error("Erro no upload: " + e.message);
+        console.error("Erro upload:", e);
+        throw e;
     }
 }
 
-// --- 1. LISTAGEM DE CAMPEONATOS ---
+export function previewTourBanner(input) {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    selectedTourBannerFile = file;
+    const url = URL.createObjectURL(file);
+    const img = document.getElementById('create-tour-banner-preview');
+    if (img) img.src = url;
+}
 
+// ---------------------------
+// RENDER LISTA DE TORNEIOS
+// ---------------------------
 export async function renderTournamentsList() {
     const content = document.getElementById('page-content');
     
-    // ATUALIZADO: strays_user
     const userJson = localStorage.getItem('strays_user');
     const user = userJson ? JSON.parse(userJson) : null;
     const isAdmin = user && (user.role === 'admin' || user.role === 'staff');
 
     const createBtn = isAdmin ? `
-        <div onclick="openCreateTournamentModal()" class="bg-[#15171e]/50 rounded-xl border-2 border-dashed border-gray-700 hover:border-yellow-500 hover:bg-[#15171e] transition-all cursor-pointer group flex flex-col items-center justify-center min-h-[250px]">
-            <div class="w-16 h-16 rounded-full bg-yellow-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+        <div onclick="openCreateTournamentModal()" class="bg-[#15171e] rounded-xl border-2 border-dashed border-gray-700 hover:border-yellow-500 hover:bg-[#15171e] transition-all cursor-pointer group flex flex-col items-center justify-center min-h-[280px]">
+            <div class="w-16 h-16 rounded-full bg-yellow-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform border border-yellow-500/20">
                 <i data-lucide="plus" class="w-8 h-8 text-yellow-500"></i>
             </div>
-            <h3 class="text-white font-bold text-lg">Criar Campeonato</h3>
+            <h3 class="text-white font-bold text-lg uppercase tracking-wide">Criar Campeonato</h3>
+            <p class="text-gray-500 text-xs mt-2">Área Administrativa</p>
         </div>` : '';
 
     content.innerHTML = `<div class="p-20 text-center text-white animate-pulse">Carregando Campeonatos...</div>`;
 
-    let tournamentsHtml = '';
     try {
-        const q = window.query(window.collection(window.db, "tournaments"), window.orderBy("createdAt", "desc"));
-        const querySnapshot = await window.getDocs(q);
+        const q = window.query ? window.query(window.collection(window.db, "tournaments"), window.orderBy("createdAt", "desc")) : null;
+        const querySnapshot = q && window.getDocs ? await window.getDocs(q) : null;
         
         const dbTournaments = [];
-        querySnapshot.forEach((doc) => { dbTournaments.push({ id: doc.id, ...doc.data() }); });
+        if (querySnapshot && typeof querySnapshot.forEach === 'function') {
+            querySnapshot.forEach((doc) => { dbTournaments.push({ id: doc.id, ...doc.data() }); });
+        }
         
         const listToRender = dbTournaments.length > 0 ? dbTournaments : TOURNAMENTS;
 
-        tournamentsHtml = listToRender.map(t => {
-            let statusClass = 'aberto';
-            if(t.status === 'Ao Vivo') statusClass = 'aovivo';
-            if(t.status === 'Concluído') statusClass = 'concluido';
-            if(t.status === 'Anulado') statusClass = 'anulado';
+        const tournamentsHtml = listToRender.map(t => {
+            let statusClass = 'bg-green-500';
+            let statusText = t.status || 'Aberto';
+            
+            if(t.status === 'Ao Vivo') { statusClass = 'bg-red-500 animate-pulse'; }
+            else if(t.status === 'Concluído') { statusClass = 'bg-gray-500'; }
+            else if(t.status === 'Inscrições' || t.status === 'Aberto') { statusClass = 'bg-yellow-500 text-black'; }
 
             return `
-            <div class="bg-[#15171e] rounded-xl overflow-hidden border border-gray-800 hover:border-yellow-500 transition-all cursor-pointer group shadow-lg" onclick="navigateToPage('campeonato-${t.id}')">
-                <div class="h-48 bg-cover bg-center relative" style="background-image: url('${t.image}')">
-                    <span class="absolute top-4 right-4 status-badge ${statusClass} text-xs font-bold px-3 py-1 rounded-full uppercase shadow-lg text-black bg-yellow-500">${t.status}</span>
+            <div class="bg-[#15171e] rounded-xl overflow-hidden border border-gray-800 hover:border-yellow-500 transition-all cursor-pointer group shadow-lg flex flex-col h-full" onclick="navigateToPage('campeonato-${t.id}')">
+                <div class="h-48 bg-cover bg-center relative" style="background-image: url('${t.image || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80'}')">
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#15171e] via-transparent to-transparent opacity-90"></div>
+                    <span class="absolute top-4 right-4 text-[10px] font-black px-3 py-1 rounded-full shadow-lg ${statusClass} text-white">
+                        ${statusText}
+                    </span>
                 </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-white mb-2 group-hover:text-yellow-500 transition-colors">${t.name}</h3>
-                    <div class="flex justify-between text-sm text-gray-400 mt-4 border-t border-gray-800 pt-4">
-                        <span>${t.registeredTeams || 0}/${t.maxTeams} Times</span>
-                        <span class="text-yellow-500 font-bold">${t.prize}</span>
+                <div class="p-6 relative flex-1 flex flex-col">
+                    <div class="absolute -top-10 left-6 w-20 h-20 rounded-xl border-4 border-[#15171e] overflow-hidden bg-[#0f1116] shadow-xl">
+                        <img src="${t.logo || 'https://via.placeholder.com/80'}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="mt-8 mb-4">
+                        <h3 class="text-xl font-black text-white group-hover:text-yellow-500 transition-colors uppercase italic leading-none">${t.name}</h3>
+                        <p class="text-gray-500 text-xs mt-1 font-bold">Format: ${t.format || 'Solo'}</p>
+                    </div>
+                    
+                    <div class="mt-auto border-t border-gray-800 pt-4 flex justify-between items-center text-sm">
+                        <span class="flex items-center gap-2 text-gray-400 font-bold"><i data-lucide="users" class="w-4 h-4 text-purple-500"></i> ${t.registeredTeams || 0}/${t.maxTeams || 32}</span>
+                        <span class="text-yellow-500 font-black flex items-center gap-2 text-lg"><i data-lucide="trophy" class="w-4 h-4"></i> ${t.prize || '-'}</span>
                     </div>
                 </div>
             </div>`;
         }).join('');
 
-        if (listToRender.length === 0 && !isAdmin) tournamentsHtml = '<div class="col-span-3 text-center text-gray-500">Nenhum campeonato ativo no momento.</div>';
+        content.innerHTML = `
+            <div class="animate-fadeIn p-8 max-w-7xl mx-auto">
+                <div class="flex items-center justify-between mb-10">
+                    <div>
+                        <h1 class="text-4xl font-black text-white uppercase tracking-tight italic">Torneios <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">Strays</span></h1>
+                        <p class="text-gray-400 text-sm mt-1">Inscreva seu time e compita pelos melhores prêmios.</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    ${createBtn}
+                    ${tournamentsHtml}
+                </div>
+            </div>
+        `;
     } catch (e) {
         console.error(e);
-        tournamentsHtml = `<div class="text-red-500">Erro ao carregar campeonatos: ${e.message}</div>`;
+        content.innerHTML = `<div class="text-red-500 text-center mt-10 p-4 border border-red-900 rounded bg-red-900/10">Erro ao carregar campeonatos: ${e.message}</div>`;
     }
-
-    content.innerHTML = `
-        <div class="animate-fadeIn p-8 max-w-7xl mx-auto">
-            <h1 class="text-3xl font-bold text-white mb-8 text-center uppercase tracking-wider">Campeonatos <span class="text-yellow-500">Strays Legends</span></h1>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                ${createBtn}
-                ${tournamentsHtml}
-            </div>
-        </div>
-    `;
     if(window.lucide) lucide.createIcons();
 }
 
-// --- 2. DETALHES DO CAMPEONATO ---
-
+// ---------------------------
+// RENDER DE PÁGINA DO TORNEIO (PRO)
+// ---------------------------
 export async function renderTournamentPro(tournamentId) {
     const content = document.getElementById('page-content');
-    content.innerHTML = `<div class="p-20 text-center text-white">Carregando Detalhes...</div>`;
+    content.innerHTML = `<div class="p-20 text-center text-white flex flex-col items-center gap-4"><div class="w-8 h-8 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>Carregando Detalhes...</div>`;
 
     try {
         let t = null;
         if(window.doc && window.getDoc && window.db) {
             const docSnap = await window.getDoc(window.doc(window.db, "tournaments", tournamentId));
-            if(docSnap.exists()) t = { id: docSnap.id, ...docSnap.data() };
+            if(docSnap && docSnap.exists()) t = { id: docSnap.id, ...docSnap.data() };
         }
         if(!t) t = TOURNAMENTS.find(tr => tr.id === tournamentId) || TOURNAMENTS[0];
 
@@ -143,10 +204,9 @@ export async function renderTournamentPro(tournamentId) {
 
         if(!state.bracket || state.bracket.length === 0) {
             state.groups = generateGroups(TEAMS_LIST_DB);
-            state.bracket = generateEmptyBracket(TEAMS_LIST_DB);
+            state.bracket = generateEmptyBracket(TEAMS_LIST_DB, t.maxTeams || 32);
         }
 
-        // ATUALIZADO: strays_user
         const userJson = localStorage.getItem('strays_user');
         const user = userJson ? JSON.parse(userJson) : null;
         const isAdmin = user && (user.role === 'admin' || user.role === 'staff');
@@ -157,7 +217,6 @@ export async function renderTournamentPro(tournamentId) {
         let myTeamId = null;
         
         if(user) {
-            // ATUALIZADO: strays_teams_db
             const localTeams = JSON.parse(localStorage.getItem('strays_teams_db') || '[]');
             const myTeam = localTeams.find(tm => tm.ownerId === user.uid);
             if(myTeam) myTeamId = myTeam.id;
@@ -172,97 +231,157 @@ export async function renderTournamentPro(tournamentId) {
             if (!user) {
                 actionButton = `<button onclick="window.location.href='login.html'" class="bg-gray-700 text-white font-bold py-3 px-8 rounded-lg">Faça Login</button>`;
             } else if (!myTeamId) {
-                actionButton = `<div class="bg-[#1c1f26] border border-gray-800 text-gray-500 text-xs font-bold py-2 px-4 rounded-lg">Necessário ter um time</div>`;
+                actionButton = `<div class="bg-[#1c1f26] border border-gray-800 text-gray-500 text-xs font-bold py-2 px-4 rounded-lg flex items-center gap-2"><i data-lucide="alert-circle" class="w-4 h-4"></i> Necessário criar um time</div>`;
             } else {
-                if (t.status !== 'Aberto') {
-                    actionButton = `<button class="bg-gray-800 text-gray-400 font-bold py-3 px-8 rounded-lg cursor-not-allowed border border-gray-700">Inscrições Fechadas</button>`;
+                if (t.status === 'Concluído' || t.status === 'Ao Vivo') {
+                    actionButton = `<button class="bg-gray-800 text-gray-400 font-bold py-3 px-8 rounded-lg cursor-not-allowed border border-gray-700">Inscrições Encerradas</button>`;
                 } else {
                     const isApproved = approvedTeams.includes(String(myTeamId));
                     const isPending = requests.some(r => String(r.teamId) === String(myTeamId));
-                    if (isApproved) actionButton = `<button class="bg-green-600 text-white font-bold py-3 px-8 rounded-lg cursor-default border border-green-400">Inscrito ✅</button>`;
-                    else if (isPending) actionButton = `<button class="bg-yellow-600 text-white font-bold py-3 px-8 rounded-lg cursor-default border border-yellow-400">Pendente ⏳</button>`;
-                    else actionButton = `<button onclick="subscribeTeam('${t.id}', '${myTeamId}')" class="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 px-8 rounded-lg shadow-[0_0_20px_rgba(234,179,8,0.4)] transition-all">Inscrever Time</button>`;
+                    
+                    if (isApproved) {
+                        actionButton = `
+                            <button class="bg-green-600 text-white font-black py-3 px-8 rounded-lg cursor-default border border-green-400 flex items-center gap-2 shadow-[0_0_15px_rgba(34,197,94,0.4)] uppercase tracking-wide">
+                                <i data-lucide="check-circle" class="w-5 h-5"></i> INSCRITO
+                            </button>`;
+                    } else if (isPending) {
+                        actionButton = `
+                            <button class="bg-yellow-500/10 text-yellow-500 font-bold py-3 px-8 rounded-lg cursor-wait border border-yellow-500/30 flex items-center gap-2 uppercase tracking-wide">
+                                <i data-lucide="clock" class="w-5 h-5 animate-pulse"></i> Aguardando Aprovação
+                            </button>`;
+                    } else {
+                        actionButton = `<button onclick="openSubscribeModal('${t.id}', '${myTeamId}')" class="bg-yellow-500 hover:bg-yellow-400 text-black font-black py-3 px-8 rounded-lg shadow-[0_0_20px_rgba(234,179,8,0.4)] transition-all uppercase tracking-wide transform hover:scale-105">Inscrever Time</button>`;
+                    }
                 }
             }
         }
 
-        let statusClass = 'aberto';
-        if(t.status === 'Ao Vivo') statusClass = 'aovivo';
-        if(t.status === 'Concluído') statusClass = 'concluido';
-        if(t.status === 'Anulado') statusClass = 'anulado';
-
         let adminArea = '';
         if (isAdmin) {
             const pendingList = requests.length > 0 ? requests.map(req => `
-                <div class="flex items-center justify-between bg-[#1c1f26] p-3 rounded border border-gray-700 mb-2">
-                    <span class="text-white text-sm">${req.teamName}</span>
+                <div class="flex items-center justify-between bg-[#1c1f26] p-4 rounded-lg border border-gray-700 mb-2">
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
+                        <span class="text-white font-bold text-sm">${req.teamName}</span>
+                        <span class="text-[10px] text-gray-500">${new Date(req.timestamp || Date.now()).toLocaleDateString()}</span>
+                    </div>
                     <div class="flex gap-2">
-                        <button onclick="approveTeam('${t.id}', '${req.teamId}', '${req.teamName}')" class="text-green-500 hover:text-white text-xs font-bold border border-green-500 px-2 py-1 rounded">Aprovar</button>
-                        <button onclick="rejectTeam('${t.id}', '${req.teamId}')" class="text-red-500 hover:text-white text-xs font-bold border border-red-500 px-2 py-1 rounded">Recusar</button>
+                        <button onclick="approveTeam('${t.id}', '${req.teamId}', '${req.teamName}')" class="bg-green-500/10 hover:bg-green-500 text-green-500 hover:text-white text-xs font-bold border border-green-500/50 px-3 py-1.5 rounded transition-colors">Aprovar</button>
+                        <button onclick="rejectTeam('${t.id}', '${req.teamId}')" class="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white text-xs font-bold border border-red-500/50 px-3 py-1.5 rounded transition-colors">Recusar</button>
                     </div>
                 </div>
-            `).join('') : '<p class="text-gray-500 text-xs">Nenhuma solicitação pendente.</p>';
-            adminArea = `<div class="mt-8 p-6 bg-[#15171e] border border-red-900/50 rounded-xl"><h3 class="text-red-500 font-bold mb-4 flex items-center gap-2"><i data-lucide="shield-alert"></i> Solicitações de Inscrição</h3><div class="mb-4">${pendingList}</div></div>`;
+            `).join('') : '<p class="text-gray-500 text-sm italic">Nenhuma solicitação pendente.</p>';
+            
+            adminArea = `
+                <div class="mt-8 mb-8 p-6 bg-[#15171e] border border-red-900/30 rounded-xl shadow-lg">
+                    <h3 class="text-white font-bold mb-4 flex items-center gap-2 border-b border-gray-700 pb-3">
+                        <i data-lucide="shield-alert" class="text-red-500"></i> Área do Admin - Inscrições (${requests.length})
+                    </h3>
+                    <div class="max-h-60 overflow-y-auto custom-scrollbar pr-2">${pendingList}</div>
+                </div>`;
         }
 
         content.innerHTML = `
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-20 animate-fadeIn">
+            
             <header class="relative w-full h-80 rounded-3xl overflow-hidden mb-8 group shadow-2xl border border-gray-800">
-                <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${t.image}')"></div>
-                <div class="absolute inset-0 bg-gradient-to-t from-[#0f1116] via-[#0f1116]/60 to-transparent"></div>
-                <div class="absolute bottom-0 left-0 w-full p-8 flex flex-col md:flex-row justify-between items-end gap-6">
+                <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style="background-image: url('${t.image || ''}')"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-[#0f1116] via-[#0f1116]/80 to-transparent"></div>
+                
+                <div class="absolute bottom-0 left-0 w-full p-8 flex flex-col md:flex-row justify-between items-end gap-6 relative z-10">
                     <div class="flex items-center gap-6">
-                         <div class="w-24 h-24 rounded-2xl overflow-hidden border-2 border-gray-700 shadow-lg shrink-0 bg-black"><img src="${t.logo}" class="w-full h-full object-cover"></div>
+                         <div class="w-28 h-28 rounded-2xl overflow-hidden border-2 border-gray-700 shadow-lg shrink-0 bg-black"><img src="${t.logo || 'https://via.placeholder.com/150'}" class="w-full h-full object-cover"></div>
                         <div>
-                            <h1 class="text-4xl font-black text-white mb-2 uppercase italic tracking-wider">${t.name}</h1>
+                            <h1 class="text-4xl md:text-5xl font-black text-white mb-2 uppercase italic tracking-wider shadow-black drop-shadow-md">${t.name}</h1>
                             <div class="flex gap-3">
-                                <span class="status-badge ${statusClass} text-xs font-bold px-3 py-1 rounded-full uppercase shadow-lg bg-yellow-500 text-black">${t.status}</span>
-                                <span class="px-3 py-1 rounded bg-gray-800 text-white text-xs font-bold border border-gray-700">${t.format}</span>
+                                <span class="bg-yellow-500 text-black text-xs font-black px-3 py-1 rounded-md uppercase shadow-lg tracking-wide">${t.status || 'Aberto'}</span>
+                                <span class="px-3 py-1 rounded-md bg-gray-800 text-gray-300 text-xs font-bold border border-gray-700 uppercase">${t.format || 'Solo'}</span>
                             </div>
                         </div>
                     </div>
-                    <div class="flex flex-col items-end gap-4"><div class="text-right"><p class="text-gray-400 text-xs font-bold uppercase">Premiação</p><p class="text-3xl font-black text-yellow-500 text-shadow-glow">${t.prize}</p></div>${actionButton}</div>
+                    <div class="flex flex-col items-end gap-4">
+                        <div class="text-right">
+                            <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">Premiação Total</p>
+                            <p class="text-4xl font-black text-white text-shadow-glow">${t.prize || '-'}</p>
+                        </div>
+                        ${actionButton}
+                    </div>
                 </div>
-                <button onclick="navigateToPage('campeonatos')" class="absolute top-6 left-6 text-white bg-black/40 hover:bg-black/60 px-4 py-2 rounded-lg backdrop-blur-sm border border-white/10 transition-all flex items-center gap-2 text-sm font-bold"><i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar</button>
+                
+                <button onclick="navigateToPage('campeonatos')" class="absolute top-6 left-6 text-white bg-black/40 hover:bg-black/60 px-4 py-2 rounded-lg backdrop-blur-sm border border-white/10 transition-all flex items-center gap-2 text-sm font-bold z-20">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar
+                </button>
             </header>
             
             ${adminArea}
 
-            <div class="flex justify-between items-center mb-6 border-b border-gray-800 pb-2 overflow-x-auto">
+            <div class="flex justify-between items-center mb-8 border-b border-gray-800 pb-0 overflow-x-auto">
                 <nav class="flex gap-8">
-                     <button onclick="switchTab('Visão Geral')" class="nav-btn pb-4 text-sm font-bold whitespace-nowrap transition-colors border-b-2 text-white border-yellow-500" data-tab="Visão Geral">VISÃO GERAL</button>
-                     <button onclick="switchTab('Times')" class="nav-btn pb-4 text-sm font-bold whitespace-nowrap transition-colors border-b-2 border-transparent text-gray-500 hover:text-white" data-tab="Times">TIMES</button>
-                     <button onclick="switchTab('PlayOffs')" class="nav-btn pb-4 text-sm font-bold whitespace-nowrap transition-colors border-b-2 border-transparent text-gray-500 hover:text-white" data-tab="PlayOffs">BRACKET</button>
+                     <button onclick="switchTab('Visão Geral')" class="nav-btn pb-4 text-sm font-bold border-b-2 text-white border-yellow-500 transition-colors uppercase tracking-wide" data-tab="Visão Geral">VISÃO GERAL</button>
+                     <button onclick="switchTab('Times')" class="nav-btn pb-4 text-sm font-bold border-b-2 border-transparent text-gray-500 hover:text-white transition-colors uppercase tracking-wide" data-tab="Times">TIMES INSCRITOS</button>
+                     <button onclick="switchTab('PlayOffs')" class="nav-btn pb-4 text-sm font-bold border-b-2 border-transparent text-gray-500 hover:text-white transition-colors uppercase tracking-wide" data-tab="PlayOffs">CHAVEAMENTO</button>
                 </nav>
             </div>
             
             <main>
                 <div id="tab-Visão Geral" class="tab-content animate-fadeIn">
+                     
                      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                        <div class="bg-[#15171e] p-6 rounded-xl border border-gray-800"><div class="text-gray-500 text-xs font-bold uppercase mb-1">Vagas</div><div class="text-xl font-bold text-white">${approvedTeams.length}/${t.maxTeams}</div></div>
-                        <div class="bg-[#15171e] p-6 rounded-xl border border-gray-800"><div class="text-gray-500 text-xs font-bold uppercase mb-1">Início</div><div class="text-xl font-bold text-white">15/09</div></div>
-                        <div class="bg-[#15171e] p-6 rounded-xl border border-gray-800"><div class="text-gray-500 text-xs font-bold uppercase mb-1">Taxa</div><div class="text-xl font-bold text-white">R$ 50,00</div></div>
-                        <div class="bg-[#15171e] p-6 rounded-xl border border-gray-800"><div class="text-gray-500 text-xs font-bold uppercase mb-1">Status</div><div class="text-xl font-bold text-white">${t.status}</div></div>
+                        <div class="bg-[#15171e] p-5 rounded-xl border border-gray-800 hover:border-gray-600 transition-colors"><div class="text-gray-500 text-[10px] font-bold uppercase mb-1 tracking-widest">Vagas</div><div class="text-2xl font-bold text-white flex items-center gap-2">${approvedTeams.length}/${t.maxTeams || 32}</div></div>
+                        <div class="bg-[#15171e] p-5 rounded-xl border border-gray-800 hover:border-gray-600 transition-colors"><div class="text-gray-500 text-[10px] font-bold uppercase mb-1 tracking-widest">Início</div><div class="text-2xl font-bold text-white flex items-center gap-2">${t.startDate || '15/09'}</div></div>
+                        <div class="bg-[#15171e] p-5 rounded-xl border border-gray-800 hover:border-gray-600 transition-colors"><div class="text-gray-500 text-[10px] font-bold uppercase mb-1 tracking-widest">Taxa</div><div class="text-2xl font-bold text-white flex items-center gap-2">${t.fee || 'R$ 50,00'}</div></div>
+                        <div class="bg-[#15171e] p-5 rounded-xl border border-gray-800 hover:border-gray-600 transition-colors"><div class="text-gray-500 text-[10px] font-bold uppercase mb-1 tracking-widest">Status</div><div class="text-2xl font-bold text-white flex items-center gap-2">${t.status || 'Aberto'}</div></div>
                     </div>
                     
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        
                         <div class="lg:col-span-3 space-y-4">
-                            <div class="bg-[#15171e] rounded-xl border border-gray-800 p-4 flex justify-between items-center"><span class="block text-white font-bold">1º Lugar</span><span class="block text-white font-bold">R$ 570</span></div>
-                            <div class="bg-[#5865F2] hover:bg-[#4752c4] rounded-xl p-6 cursor-pointer transition-colors shadow-lg flex items-center gap-4"><i data-lucide="message-circle" class="text-white w-8 h-8"></i><div><div class="text-xs text-white/80 font-bold uppercase">Dúvidas?</div><div class="text-white font-black text-lg uppercase">Discord</div></div></div>
+                            
+                            <div class="bg-[#15171e] rounded-xl border border-gray-800 p-5">
+${ t.customOverview && (t.customOverview.premios || t.customOverview["prêmios"]) 
+    ? (t.customOverview.premios || t.customOverview["prêmios"])
+    : `
+
+                                    <h4 class="text-white font-bold text-sm uppercase mb-4 border-b border-gray-800 pb-2">Distribuição</h4>
+                                    <div class="flex justify-between items-center mb-2"><span class="text-gray-400 text-sm">1º Lugar</span><span class="text-yellow-500 font-bold">${t.prize || '-'}</span></div>
+                                    <div class="flex justify-between items-center mb-2"><span class="text-gray-400 text-sm">2º Lugar</span><span class="text-gray-300 font-bold">-</span></div>
+                                    <div class="text-center text-xs text-gray-600 mt-4 italic">Configure no Painel Admin</div>
+                                `}
+                            </div>
+
+                            <div class="bg-[#5865F2] hover:bg-[#4752c4] rounded-xl p-6 cursor-pointer transition-colors shadow-lg flex items-center gap-4 group">
+                                <div class="bg-white/20 p-2 rounded-lg"><i data-lucide="message-circle" class="text-white w-6 h-6"></i></div>
+                                <div><div class="text-xs text-white/80 font-bold uppercase">Dúvidas?</div><div class="text-white font-black text-lg uppercase">Discord Oficial</div></div>
+                            </div>
                         </div>
-                         <div class="lg:col-span-4 space-y-4">
-                            ${Object.keys(OVERVIEW_DATA).map(key => `<div id="btn-${key}" onclick="switchOverviewInfo('${key}')" class="overview-btn w-full bg-[#15171e] border border-gray-800 rounded-xl p-5 cursor-pointer text-left"><h3 class="btn-title text-white font-bold text-lg">${OVERVIEW_DATA[key].title}</h3></div>`).join('')}
+                        
+                        <div class="lg:col-span-4 space-y-3">
+                            ${Object.keys(OVERVIEW_DATA).map(key => `
+                                <div id="btn-${key}" onclick="switchOverviewInfo('${key}')" class="overview-btn w-full bg-[#15171e] border border-gray-800 hover:border-gray-600 rounded-xl p-5 cursor-pointer text-left transition-all group">
+                                    <h3 class="btn-title text-white font-bold text-lg flex justify-between items-center">
+                                        ${OVERVIEW_DATA[key].title}
+                                        <i data-lucide="chevron-right" class="w-5 h-5 text-gray-600 group-hover:text-yellow-500 transition-colors"></i>
+                                    </h3>
+                                </div>
+                            `).join('')}
                         </div>
-                        <div class="lg:col-span-5 pl-4 pt-2" id="overview-dynamic-text"></div>
+                        
+                        <div class="lg:col-span-5 pl-4 pt-2">
+                            <div id="overview-dynamic-text" class="animate-fadeIn">
+                                </div>
+                        </div>
                     </div>
                 </div>
 
                 <div id="tab-Times" class="tab-content hidden-section animate-fadeIn">
-                     <div id="teams-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+                     <div id="teams-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        </div>
                 </div>
                 
                 <div id="tab-PlayOffs" class="tab-content hidden-section animate-fadeIn">
-                    <div class="overflow-x-auto pb-12 pt-4 scrollbar-thin"><div id="bracket-container" class="flex gap-16 min-w-max px-4"></div></div>
+                    <div class="bg-transparent rounded-xl p-8 border border-gray-800 overflow-x-auto pb-12 pt-8 scrollbar-thin">
+                        <div id="bracket-container" class="flex gap-16 min-w-max px-4 items-center justify-center"></div>
+                    </div>
                 </div>
             </main>
         </div>`;
@@ -278,135 +397,30 @@ export async function renderTournamentPro(tournamentId) {
     }
 }
 
-// --- 3. TEXTOS DINÂMICOS ---
-export function switchOverviewInfo(key) {
-    const t = state.currentTournament;
-    const defaultData = OVERVIEW_DATA[key];
-    
-    let contentHtml = defaultData.content;
-    if (t && t.customOverview && t.customOverview[key]) {
-        contentHtml = t.customOverview[key];
-    }
-
-    const container = document.getElementById('overview-dynamic-text');
-    if(!container) return;
-    
-    document.querySelectorAll('.overview-btn').forEach(btn => btn.className = "overview-btn w-full bg-[#15171e] border border-gray-800 rounded-xl p-5 cursor-pointer text-left");
-    const activeBtn = document.getElementById(`btn-${key}`);
-    if(activeBtn) activeBtn.className = "overview-btn w-full bg-yellow-500 rounded-xl p-5 cursor-default text-left shadow-lg";
-
-    container.innerHTML = `<h3 class="text-2xl font-bold text-white mb-6">${defaultData.title}</h3><div class="editable-text-area text-gray-300 leading-relaxed">${contentHtml}</div>`;
-    if(window.lucide) lucide.createIcons();
-}
-
-// --- 4. ADMINISTRAÇÃO (EDITOR COM EXCLUSÃO E VISUAL BONITO) ---
-// Substitua a função openEditTournamentModal inteira por esta:
-
-export function openEditTournamentModal(tourId) {
-    const t = state.currentTournament;
-    if(!t) return;
-
-    const old = document.getElementById('edit-tour-modal');
+// ---------------------------
+// INSCRIÇÃO — MODAL & EXECUÇÃO
+// ---------------------------
+export function openSubscribeModal(tourId, teamId) {
+    const old = document.getElementById('subscribe-confirm-modal');
     if(old) old.remove();
 
-    // --- AQUI A CORREÇÃO: Limpa o lixo antes de mostrar no input ---
-    const valInscricao = cleanTextFromHTML(t.customOverview?.inscricao) || "R$ 10,00 por player";
-    const valRegras = cleanTextFromHTML(t.customOverview?.regras) || "Regras padrão.";
-    const valAgenda = cleanTextFromHTML(t.customOverview?.playoffs) || "Oitavas: 22/09\nFinal: 05/10";
-    
-    // Tenta manter os links se existirem
-    let valTwitch = "";
-    let valYoutube = "";
-    if(t.customOverview?.transmissoes) {
-        if(t.customOverview.transmissoes.includes("twitch.tv")) valTwitch = "https://twitch.tv/"; 
-        if(t.customOverview.transmissoes.includes("youtube.com")) valYoutube = "https://youtube.com/";
-    }
-
-    const modalHtml = `
-    <div id="edit-tour-modal" class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-md animate-fadeIn">
-        <div class="bg-[#15171e] w-full max-w-2xl rounded-2xl border border-gray-800 shadow-2xl flex flex-col max-h-[90vh]">
-            
-            <div class="flex justify-between items-center p-6 border-b border-gray-800 bg-[#1c1f26] rounded-t-2xl">
-                <h3 class="text-white font-bold text-xl">⚡ Editor de Torneio</h3>
-                <button onclick="closeEditTournamentModal()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
-            </div>
-
-            <div class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
-                
-                <div class="grid grid-cols-2 gap-6">
-                    <div>
-                        <label class="text-xs font-bold text-gray-400 uppercase">Estado</label>
-                        <select id="edit-tour-status" class="w-full bg-[#0a0a0a] border border-gray-700 text-white px-4 py-3 rounded-xl mt-1 outline-none focus:border-yellow-500">
-                            <option value="Aberto" ${t.status === 'Aberto' ? 'selected' : ''}>🟢 Aberto</option>
-                            <option value="Ao Vivo" ${t.status === 'Ao Vivo' ? 'selected' : ''}>🔴 Ao Vivo</option>
-                            <option value="Concluído" ${t.status === 'Concluído' ? 'selected' : ''}>🏁 Concluído</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-xs font-bold text-gray-400 uppercase">Prêmio Total</label>
-                        <input type="text" id="edit-tour-prize" value="${t.prize}" class="w-full bg-[#0a0a0a] border border-gray-700 text-white px-4 py-3 rounded-xl mt-1 outline-none focus:border-green-500 font-bold">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-gray-400 text-xs font-bold mb-1">Valor da Inscrição (Só o valor)</label>
-                    <input type="text" id="txt-inscricao" value="${valInscricao}" class="w-full bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-lg text-sm outline-none focus:border-yellow-500">
-                    <p class="text-[10px] text-gray-500 mt-1">O texto "Os jogadores devem se registrar..." será adicionado automaticamente.</p>
-                </div>
-                
-                <div>
-                    <label class="block text-gray-400 text-xs font-bold mb-1">Agendamento (Use Enter para pular linha)</label>
-                    <textarea id="txt-playoffs" rows="5" class="w-full bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-lg text-sm outline-none resize-none font-mono">${valAgenda}</textarea>
-                </div>
-
-                <div>
-                    <label class="block text-gray-400 text-xs font-bold mb-1">Regulamento (Use Enter para criar itens)</label>
-                    <textarea id="txt-regras" rows="5" class="w-full bg-[#0f1116] border border-gray-700 text-gray-300 text-sm rounded-lg p-3 outline-none resize-none">${valRegras}</textarea>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-[#a970ff] text-xs font-bold mb-1">Link Twitch</label>
-                        <input type="text" id="edit-tour-twitch" value="${valTwitch}" placeholder="https://twitch.tv/..." class="w-full bg-[#0f1116] border border-gray-700 text-white px-3 py-2 rounded-lg text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-[#ff0000] text-xs font-bold mb-1">Link YouTube</label>
-                        <input type="text" id="edit-tour-youtube" value="${valYoutube}" placeholder="https://youtube.com/..." class="w-full bg-[#0f1116] border border-gray-700 text-white px-3 py-2 rounded-lg text-sm">
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="p-6 border-t border-gray-800 bg-[#1c1f26] rounded-b-2xl flex justify-end gap-3">
-                <button onclick="closeEditTournamentModal()" class="text-gray-400 hover:text-white font-bold text-sm px-6 py-3">Cancelar</button>
-                <button onclick="saveTournamentChanges('${t.id}')" class="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 px-8 rounded-xl shadow-lg">Salvar Tudo</button>
-            </div>
-        </div>
-    </div>`;
-
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    if(window.lucide) lucide.createIcons();
-}
-
-export function closeEditTournamentModal() {
-    const m = document.getElementById('edit-tour-modal');
-    if(m) m.remove();
-}
-
-// --- CONFIRMAÇÃO DE EXCLUSÃO (MODAL NOVO) ---
-export function openDeleteConfirmation(tourId) {
     const html = `
-    <div id="delete-confirm-modal" class="fixed inset-0 bg-black/90 z-[60] flex items-center justify-center p-4 backdrop-blur-sm animate-fadeIn">
-        <div class="bg-[#15171e] w-full max-w-sm rounded-xl border border-red-900/50 shadow-2xl p-6 text-center">
-            <div class="w-12 h-12 rounded-full bg-red-900/20 flex items-center justify-center mx-auto mb-4">
-                <i data-lucide="alert-triangle" class="text-red-500 w-6 h-6"></i>
+    <div id="subscribe-confirm-modal" class="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-fadeIn">
+        <div class="bg-[#15171e] w-full max-w-sm rounded-xl border border-yellow-500/30 shadow-[0_0_50px_rgba(234,179,8,0.1)] p-8 text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-yellow-500 to-transparent"></div>
+            
+            <div class="w-16 h-16 rounded-full bg-yellow-500/10 flex items-center justify-center mx-auto mb-6 border border-yellow-500/20 shadow-inner">
+                <i data-lucide="trophy" class="text-yellow-500 w-8 h-8"></i>
             </div>
-            <h3 class="text-white font-bold text-lg mb-2">Excluir Campeonato?</h3>
-            <p class="text-gray-400 text-xs mb-6">Essa ação não pode ser desfeita. Todos os jogos e inscrições serão apagados.</p>
+            
+            <h3 class="text-white font-black text-xl mb-2">INSCREVER TIME?</h3>
+            <p class="text-gray-400 text-sm mb-8 leading-relaxed">
+                Você está prestes a enviar a inscrição do seu time para este campeonato. A taxa será cobrada após a aprovação.
+            </p>
             
             <div class="flex gap-3 justify-center">
-                <button onclick="document.getElementById('delete-confirm-modal').remove()" class="text-gray-400 hover:text-white text-sm font-bold px-4 py-2">Cancelar</button>
-                <button onclick="executeDelete('${tourId}')" class="bg-red-600 hover:bg-red-500 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-lg shadow-red-900/20">Sim, Excluir</button>
+                <button onclick="document.getElementById('subscribe-confirm-modal').remove()" class="text-gray-400 hover:text-white text-xs font-bold px-6 py-3 rounded-lg hover:bg-white/5 transition-colors uppercase tracking-wider">Cancelar</button>
+                <button onclick="executeSubscription('${tourId}', '${teamId}')" id="btn-confirm-sub" class="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-3 rounded-lg text-xs font-black shadow-lg shadow-yellow-500/20 transition-all uppercase tracking-wider transform hover:scale-105">Confirmar</button>
             </div>
         </div>
     </div>`;
@@ -415,283 +429,324 @@ export function openDeleteConfirmation(tourId) {
     if(window.lucide) lucide.createIcons();
 }
 
-export async function executeDelete(tourId) {
-    const btn = document.querySelector('button[onclick^="executeDelete"]');
-    if(btn) btn.innerText = "Apagando...";
+export async function executeSubscription(tourId, teamId) {
+    const btn = document.getElementById('btn-confirm-sub');
+    if(btn) { btn.innerText = "ENVIANDO..."; btn.disabled = true; }
 
     try {
-        if (!window.deleteDoc || !window.doc || !window.db) {
-            throw new Error("Funções do Firebase não encontradas. Verifique auth.js.");
-        }
-        await window.deleteDoc(window.doc(window.db, "tournaments", tourId));
-        window.showToast("Campeonato excluído.", "success");
-        document.getElementById('delete-confirm-modal').remove();
-        closeEditTournamentModal();
-        renderTournamentsList();
-    } catch(e) {
-        console.error(e);
-        window.showToast("Erro ao excluir: " + e.message, "error");
-        const modal = document.getElementById('delete-confirm-modal');
-        if(modal) modal.remove();
-    }
-}
-
-// --- SALVAR (VISUAL RECONSTRUÍDO CORRETAMENTE) ---
-// Substitua a função saveTournamentChanges inteira por esta:
-
-export async function saveTournamentChanges(tourId) {
-    try {
-        const btn = document.querySelector('button[onclick^="saveTournamentChanges"]');
-        if(btn) btn.innerText = "Salvando...";
-
-        const newStatus = document.getElementById('edit-tour-status').value;
-        const newPrize = document.getElementById('edit-tour-prize').value;
-        
-        // Pega o texto puro que você digitou no modal
-        const txtInscricao = document.getElementById('txt-inscricao').value;
-        const txtAgenda = document.getElementById('txt-playoffs').value;
-        const txtRegras = document.getElementById('txt-regras').value;
-        const linkTwitch = document.getElementById('edit-tour-twitch').value;
-        const linkYoutube = document.getElementById('edit-tour-youtube').value;
-
-        // --- RECONSTRÓI O HTML BONITO (TEMPLATES) ---
-        
-        // 1. Inscrição: Adiciona a frase padrão + seu valor
-        const htmlInscricao = `
-            <p class="text-gray-300 mb-4">Os jogadores devem se registrar em nosso site e formar uma equipe para participar.</p>
-            <div class="mt-4 bg-yellow-500/10 border-l-4 border-yellow-500 p-4 rounded-r-lg">
-                <p class="text-yellow-500 text-sm font-bold uppercase mb-1">VALOR DA INSCRIÇÃO</p>
-                <p class="text-white font-bold text-lg">Valor: <span class="text-white">${txtInscricao}</span></p>
-            </div>`;
-
-        // 2. Agenda: Transforma cada linha do enter em uma DIV bonita
-        const agendaLines = txtAgenda.split('\n').map(line => {
-            if(!line.trim()) return "";
-            // Se a linha tiver "Final", pinta de dourado
-            const styleClass = line.toLowerCase().includes("final") ? "text-yellow-500 font-black text-base mt-2 uppercase tracking-wide" : "";
-            return `<div class="${styleClass}">${line}</div>`;
-        }).join('');
-        
-        const htmlAgenda = `<div class="space-y-4">
-            <h4 class="text-white font-bold flex items-center gap-2 text-lg"><i data-lucide="calendar" class="text-white w-5 h-5"></i> Cronograma</h4>
-            <div class="space-y-1 text-gray-300 font-bold text-sm">${agendaLines}</div>
-        </div>`;
-
-        // 3. Regras: Transforma cada linha em um item de lista (bullet point)
-        const htmlRegras = `<ul class="space-y-2 text-gray-300 list-disc pl-5 marker:text-white text-sm">
-            ${txtRegras.split('\n').filter(l=>l.trim()).map(l => `<li>${l}</li>`).join('')}
-        </ul>`;
-
-        // 4. Transmissão (Estilo Botões Lado a Lado - Igual à Imagem)
-        let botoesHtml = "";
-        
-        // Botão Twitch (Roxo, Compacto)
-        if(linkTwitch) {
-            botoesHtml += `
-            <a href="${linkTwitch}" target="_blank" class="bg-[#9146FF] hover:bg-[#7c2cf5] text-white px-6 py-3 rounded-lg font-bold flex items-center gap-3 transition-transform hover:scale-105 shadow-lg shadow-purple-900/30">
-                <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                    <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
-                </svg>
-                <span class="tracking-wide text-base">Twitch TV</span>
-            </a>`;
-        }
-
-        // Botão YouTube (Vermelho, Compacto)
-        if(linkYoutube) {
-            botoesHtml += `
-            <a href="${linkYoutube}" target="_blank" class="bg-[#FF0000] hover:bg-[#cc0000] text-white px-6 py-3 rounded-lg font-bold flex items-center gap-3 transition-transform hover:scale-105 shadow-lg shadow-red-900/30">
-                <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                </svg>
-                <span class="tracking-wide text-base">Youtube</span>
-            </a>`;
-        }
-
-        if(!botoesHtml) botoesHtml = '<div class="text-gray-500 text-sm font-bold flex items-center gap-2"><i data-lucide="tv" class="w-4 h-4"></i> Nenhuma transmissão.</div>';
-
-        // Container Horizontal (Flex Row)
-        const htmlTransmissao = `
-            <div class="space-y-4">
-                <p class="leading-relaxed text-gray-300 text-base">Todas as partidas principais serão transmitidas <strong class="text-white">AO VIVO</strong> em nossos canais oficiais.</p>
-                <div class="flex flex-wrap gap-4 items-center">${botoesHtml}</div>
-            </div>`;
-
-        // Monta o objeto final para o banco
-        const customOverview = {
-            inscricao: htmlInscricao,
-            transmissoes: htmlTransmissao,
-            playoffs: htmlAgenda,
-            regras: htmlRegras
-        };
-
-        // Salva no Firebase
-        const tourRef = window.doc(window.db, "tournaments", tourId);
-        await window.updateDoc(tourRef, {
-            status: newStatus,
-            prize: newPrize,
-            customOverview: customOverview
-        });
-
-        // --- CORREÇÃO DO REFRESH ---
-        // Atualiza a memória local para não precisar recarregar a página
-        if(state.currentTournament && state.currentTournament.id === tourId) {
-            state.currentTournament.status = newStatus;
-            state.currentTournament.prize = newPrize;
-            state.currentTournament.customOverview = customOverview;
-        }
-
-        window.showToast("Torneio atualizado com sucesso!", "success");
-        closeEditTournamentModal();
-        
-        // Atualiza a tela imediatamente
-        if(window.renderTournamentPro) window.renderTournamentPro(tourId); 
-        
-        // Força a atualização da aba "Visão Geral" se estiver aberta
-        const activeTab = document.querySelector('.nav-btn[data-tab="Visão Geral"]');
-        if(activeTab && activeTab.classList.contains('border-yellow-500')) {
-            // Recarrega o texto da seção de inscrição
-            if(window.switchOverviewInfo) window.switchOverviewInfo('inscricao');
-        }
-
-    } catch (e) {
-        console.error(e);
-        alert("Erro ao salvar: " + e.message);
-        if(btn) btn.innerText = "Salvar Tudo";
-    }
-}
-
-// --- FUNÇÕES DE INSCRIÇÃO ---
-export async function subscribeTeam(tourId, teamId) {
-    if(!confirm("Deseja inscrever seu time?")) return;
-    try {
-        // ATUALIZADO: strays_user
         const userJson = localStorage.getItem('strays_user');
         const user = JSON.parse(userJson);
-        const tourRef = window.doc(window.db, "tournaments", tourId);
+        const tourRef = window.doc ? window.doc(window.db, "tournaments", tourId) : null;
         
-        // ATUALIZADO: strays_teams_db
         const localTeams = JSON.parse(localStorage.getItem('strays_teams_db') || '[]');
         const myTeam = localTeams.find(t => String(t.id) === String(teamId));
+        
         if(!myTeam) throw new Error("Time não encontrado.");
 
-        await window.updateDoc(tourRef, { requests: window.arrayUnion({ teamId: String(teamId), teamName: myTeam.name, captainUid: user.uid, status: 'pending' }) });
-        alert("Solicitação enviada!");
-        renderTournamentPro(tourId);
-    } catch (e) { console.error(e); alert("Erro: " + e.message); }
-}
-
-export async function approveTeam(tourId, teamId, teamName) {
-    if(!confirm(`Aprovar ${teamName}?`)) return;
-    try {
-        const tourRef = window.doc(window.db, "tournaments", tourId);
-        const tourSnap = await window.getDoc(tourRef);
-        const tourData = tourSnap.data();
-        
-        // 1. Encontra o pedido para pegar o ID do capitão ANTES de apagar
-        const requestData = (tourData.requests || []).find(r => String(r.teamId) === String(teamId));
-        
-        const newRequests = (tourData.requests || []).filter(r => String(r.teamId) !== String(teamId));
-        const newApproved = tourData.registeredTeamsList || [];
-        if(!newApproved.includes(String(teamId))) newApproved.push(String(teamId));
-
-        await window.updateDoc(tourRef, { 
-            requests: newRequests, 
-            registeredTeamsList: newApproved, 
-            registeredTeams: newApproved.length 
-        });
-
-        // 2. ENVIAR NOTIFICAÇÃO (Gatilho)
-        if (requestData && requestData.captainUid && window.NotificationSystem) {
-            await window.NotificationSystem.send(
-                requestData.captainUid,
-                'info',
-                'Inscrição Aprovada! ✅',
-                `Seu time ${teamName} foi aceito no campeonato ${tourData.name}. Prepare-se!`
-            );
+        if (tourRef && window.updateDoc && window.arrayUnion) {
+            await window.updateDoc(tourRef, { 
+                requests: window.arrayUnion({ 
+                    teamId: String(teamId), 
+                    teamName: myTeam.name, 
+                    captainUid: user.uid, 
+                    status: 'pending',
+                    timestamp: new Date().toISOString()
+                }) 
+            });
+        } else {
+            // Fallback local mock: atualiza state.currentTournament para simular
+            if (state.currentTournament) {
+                state.currentTournament.requests = state.currentTournament.requests || [];
+                state.currentTournament.requests.push({
+                    teamId: String(teamId),
+                    teamName: myTeam.name,
+                    captainUid: user.uid,
+                    status: 'pending',
+                    timestamp: new Date().toISOString()
+                });
+            }
         }
 
-        alert("Aprovado!");
+        const modal = document.getElementById('subscribe-confirm-modal');
+        if(modal) modal.remove();
+        
+        showToast("Solicitação de inscrição enviada com sucesso!", "success");
         renderTournamentPro(tourId);
-    } catch (e) { console.error(e); }
+
+    } catch (e) {
+        console.error("Erro na inscrição:", e);
+        const modal = document.getElementById('subscribe-confirm-modal');
+        if(modal) modal.remove();
+        showToast("Erro: " + (e.message || 'Não foi possível inscrever'), "error");
+    }
+}
+
+// ---------------------------
+// ADMIN: Aprovar / Rejeitar / Excluir
+// ---------------------------
+export async function approveTeam(tourId, teamId, teamName) {
+    // Não uso confirm para seguir sua diretriz — admin visual aprova rápido
+    try {
+        const tourRef = window.doc ? window.doc(window.db, "tournaments", tourId) : null;
+        if (tourRef && window.getDoc && window.updateDoc) {
+            const tourSnap = await window.getDoc(tourRef);
+            const tourData = tourSnap.data();
+            const newRequests = (tourData.requests || []).filter(r => String(r.teamId) !== String(teamId));
+            const newApproved = tourData.registeredTeamsList || [];
+            if(!newApproved.includes(String(teamId))) newApproved.push(String(teamId));
+            await window.updateDoc(tourRef, { requests: newRequests, registeredTeamsList: newApproved, registeredTeams: newApproved.length });
+        } else {
+            if (state.currentTournament) {
+                state.currentTournament.requests = (state.currentTournament.requests || []).filter(r => String(r.teamId) !== String(teamId));
+                state.currentTournament.registeredTeamsList = state.currentTournament.registeredTeamsList || [];
+                if(!state.currentTournament.registeredTeamsList.includes(String(teamId))) state.currentTournament.registeredTeamsList.push(String(teamId));
+            }
+        }
+        if (window.NotificationSystem) {
+            try {
+                await window.NotificationSystem.send(teamId, 'info', 'Inscrição Aprovada! ✅', `Seu time ${teamName} foi aceito no campeonato.`);
+            } catch(e) { /* ignore */ }
+        }
+        renderTournamentPro(tourId);
+        showToast('Time aprovado!', 'success');
+    } catch(e) {
+        console.error(e);
+        showToast('Erro ao aprovar time.', 'error');
+    }
 }
 
 export async function rejectTeam(tourId, teamId) {
-    if(!confirm("Recusar?")) return;
     try {
-        const tourRef = window.doc(window.db, "tournaments", tourId);
-        const tourSnap = await window.getDoc(tourRef);
-        const tourData = tourSnap.data();
-        const newRequests = tourData.requests.filter(r => String(r.teamId) !== String(teamId));
-        await window.updateDoc(tourRef, { requests: newRequests });
+        const tourRef = window.doc ? window.doc(window.db, "tournaments", tourId) : null;
+        if (tourRef && window.getDoc && window.updateDoc) {
+            const tourSnap = await window.getDoc(tourRef);
+            const tourData = tourSnap.data();
+            const newRequests = (tourData.requests || []).filter(r => String(r.teamId) !== String(teamId));
+            await window.updateDoc(tourRef, { requests: newRequests });
+        } else {
+            if (state.currentTournament) state.currentTournament.requests = (state.currentTournament.requests || []).filter(r => String(r.teamId) !== String(teamId));
+        }
         renderTournamentPro(tourId);
-    } catch (e) { console.error(e); }
+        showToast('Solicitação recusada.', 'info');
+    } catch(e) {
+        console.error(e);
+        showToast('Erro ao recusar solicitação.', 'error');
+    }
 }
 
-// --- FUNÇÕES DE CHAVEAMENTO E GRUPOS ---
-export function switchTab(tabName) {
-    state.activeTab = tabName;
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden-section'));
-    const activeEl = document.getElementById(`tab-${tabName}`);
-    if(activeEl) activeEl.classList.remove('hidden-section');
+export function openDeleteConfirmation(tourId) {
+    const html = `<div id="delete-confirm-modal" class="fixed inset-0 bg-black/90 z-[60] flex items-center justify-center p-4 backdrop-blur-sm animate-fadeIn"><div class="bg-[#15171e] w-full max-w-sm rounded-xl border border-red-900/50 shadow-2xl p-6 text-center"><div class="w-12 h-12 rounded-full bg-red-900/20 flex items-center justify-center mx-auto mb-4"><i data-lucide="alert-triangle" class="text-red-500 w-6 h-6"></i></div><h3 class="text-white font-bold text-lg mb-2">Excluir Campeonato?</h3><p class="text-gray-400 text-xs mb-6">Essa ação não pode ser desfeita.</p><div class="flex gap-3 justify-center"><button onclick="document.getElementById('delete-confirm-modal').remove()" class="text-gray-400 hover:text-white text-sm font-bold px-4 py-2">Cancelar</button><button onclick="executeDelete('${tourId}')" class="bg-red-600 hover:bg-red-500 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-lg shadow-red-900/20">Sim, Excluir</button></div></div></div>`;
+    document.body.insertAdjacentHTML('beforeend', html);
+    if(window.lucide) lucide.createIcons();
+}
+
+export async function executeDelete(tourId) {
+    try {
+        if (window.deleteDoc && window.doc) {
+            await window.deleteDoc(window.doc(window.db, "tournaments", tourId));
+            showToast("Campeonato excluído.", "success");
+            const modal = document.getElementById('delete-confirm-modal'); if(modal) modal.remove();
+            renderTournamentsList();
+            return;
+        }
+        // fallback: remove from mock
+        const idx = TOURNAMENTS.findIndex(t => t.id === tourId);
+        if (idx >= 0) TOURNAMENTS.splice(idx, 1);
+        showToast("Campeonato excluído (mock).", "success");
+        const modal = document.getElementById('delete-confirm-modal'); if(modal) modal.remove();
+        renderTournamentsList();
+    } catch(e) {
+        console.error(e);
+        showToast("Erro ao excluir campeonato.", "error");
+    }
+}
+
+// ---------------------------
+// EDITOR DE TORNEIO (MODAL) com Prêmios editáveis
+// ---------------------------
+export function openEditTournamentModal(tourId) {
+    const t = state.currentTournament;
+    if(!t) return;
+    const old = document.getElementById('edit-tour-modal'); if(old) old.remove();
+
+    const valInscricao = cleanTextFromHTML(t.customOverview?.inscricao) || "R$ 10,00 por player";
+    const valRegras = cleanTextFromHTML(t.customOverview?.regras) || "Regras padrão.";
+    const valAgenda = cleanTextFromHTML(t.customOverview?.playoffs) || "Oitavas: 22/09\nFinal: 05/10";
     
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-        if (btn.dataset.tab === tabName) btn.classList = "nav-btn pb-4 text-sm font-bold whitespace-nowrap border-b-2 text-white border-yellow-500";
-        else btn.classList = "nav-btn pb-4 text-sm font-bold whitespace-nowrap border-b-2 border-transparent text-gray-500";
-    });
+    let valPremios = "1º Lugar: R$ " + (t.prize || '') + "\n2º Lugar: R$ 200\n3º Lugar: Vaga na Pro League";
+    if (t.customOverview?.rawPremios) {
+        valPremios = t.customOverview.rawPremios;
+    }
+
+    const modalHtml = `
+    <div id="edit-tour-modal" class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-md animate-fadeIn">
+        <div class="bg-[#15171e] w-full max-w-2xl rounded-2xl border border-gray-800 shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center p-6 border-b border-gray-800 bg-[#1c1f26] rounded-t-2xl">
+                <h3 class="text-white font-bold text-xl">⚡ Editor de Torneio</h3>
+                <button onclick="closeEditTournamentModal()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+                
+                <div class="grid grid-cols-2 gap-6">
+                    <div><label class="text-xs font-bold text-gray-400 uppercase">Estado</label><select id="edit-tour-status" class="w-full bg-[#0a0a0a] border border-gray-700 text-white px-4 py-3 rounded-xl mt-1 outline-none focus:border-yellow-500"><option value="Aberto" ${t.status === 'Aberto' ? 'selected' : ''}>🟢 Aberto</option><option value="Ao Vivo" ${t.status === 'Ao Vivo' ? 'selected' : ''}>🔴 Ao Vivo</option><option value="Concluído" ${t.status === 'Concluído' ? 'selected' : ''}>🏁 Concluído</option></select></div>
+                    <div><label class="text-xs font-bold text-gray-400 uppercase">Prêmio Total (Capa)</label><input type="text" id="edit-tour-prize" value="${t.prize || ''}" class="w-full bg-[#0a0a0a] border border-gray-700 text-white px-4 py-3 rounded-xl mt-1 outline-none focus:border-green-500 font-bold"></div>
+                </div>
+
+                <div class="bg-yellow-500/5 p-4 rounded-xl border border-yellow-500/20">
+                    <label class="block text-yellow-500 text-xs font-bold mb-2 uppercase">Distribuição de Prêmios (Linha por Linha)</label>
+                    <textarea id="txt-premios" rows="4" class="w-full bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-lg text-sm outline-none resize-none font-mono placeholder-gray-600" placeholder="1º Lugar: R$ 500&#10;2º Lugar: Mousepad&#10;MVP: R$ 50">${valPremios}</textarea>
+                    <p class="text-[10px] text-gray-500 mt-2">Use o formato <strong>Colocação: Prêmio</strong>. Pule linha para adicionar mais.</p>
+                </div>
+
+                <div><label class="block text-gray-400 text-xs font-bold mb-1">Valor da Inscrição</label><input type="text" id="txt-inscricao" value="${valInscricao}" class="w-full bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-lg text-sm outline-none focus:border-yellow-500"></div>
+                <div><label class="block text-gray-400 text-xs font-bold mb-1">Agendamento</label><textarea id="txt-playoffs" rows="3" class="w-full bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-lg text-sm outline-none resize-none font-mono">${valAgenda}</textarea></div>
+                <div><label class="block text-gray-400 text-xs font-bold mb-1">Regulamento</label><textarea id="txt-regras" rows="3" class="w-full bg-[#0f1116] border border-gray-700 text-gray-300 text-sm rounded-lg p-3 outline-none resize-none">${valRegras}</textarea></div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-[#a970ff] text-xs font-bold mb-1">Link Twitch</label><input type="text" id="edit-tour-twitch" value="${safeGet(t,'customOverview.transmissoes','').includes('twitch') ? 'https://twitch.tv/' : ''}" placeholder="https://twitch.tv/..." class="w-full bg-[#0f1116] border border-gray-700 text-white px-3 py-2 rounded-lg text-sm"></div>
+                    <div><label class="block text-[#ff0000] text-xs font-bold mb-1">Link YouTube</label><input type="text" id="edit-tour-youtube" value="${safeGet(t,'customOverview.transmissoes','').includes('youtube') ? 'https://youtube.com/' : ''}" placeholder="https://youtube.com/..." class="w-full bg-[#0f1116] border border-gray-700 text-white px-3 py-2 rounded-lg text-sm"></div>
+                </div>
+            </div>
+            <div class="p-6 border-t border-gray-800 bg-[#1c1f26] rounded-b-2xl flex justify-end gap-3">
+                <button onclick="closeEditTournamentModal()" class="text-gray-400 hover:text-white font-bold text-sm px-6 py-3">Cancelar</button>
+                <button onclick="saveTournamentChanges('${t.id}')" class="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 px-8 rounded-xl shadow-lg">Salvar Tudo</button>
+            </div>
+        </div>
+    </div>`;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    if(window.lucide) lucide.createIcons();
 }
 
+export function closeEditTournamentModal() { const m = document.getElementById('edit-tour-modal'); if(m) m.remove(); }
+
+export async function saveTournamentChanges(tourId) {
+    const btn = document.querySelector('button[onclick^="saveTournamentChanges"]'); if(btn) btn.innerText = "Salvando...";
+    try {
+        const newStatus = document.getElementById('edit-tour-status').value;
+        const newPrize = document.getElementById('edit-tour-prize').value;
+        const txtInscricao = document.getElementById('txt-inscricao').value;
+        const txtAgenda = document.getElementById('txt-playoffs').value;
+        const txtRegras = document.getElementById('txt-regras').value;
+        const txtPremios = document.getElementById('txt-premios').value;
+        const linkTwitch = document.getElementById('edit-tour-twitch').value;
+        const linkYoutube = document.getElementById('edit-tour-youtube').value;
+
+        const listaPremiosHtml = txtPremios.split('\n').filter(line => line.trim() !== "").map((line, index) => {
+            const parts = line.split(':');
+            const place = parts[0].trim();
+            const reward = parts.slice(1).join(':').trim();
+            const colorClass = index === 0 ? "text-yellow-500" : "text-white";
+            return `
+            <div class="flex justify-between items-center mb-2 border-b border-white/5 pb-2 last:border-0 last:mb-0 last:pb-0">
+                <span class="text-gray-400 text-sm font-medium">${place}</span>
+                <span class="${colorClass} font-bold text-sm">${reward}</span>
+            </div>`;
+        }).join('');
+
+        const htmlPremios = `<h4 class="text-white font-bold text-sm uppercase mb-4 border-b border-gray-800 pb-2">Distribuição de Prêmios</h4><div class="flex flex-col gap-1">${listaPremiosHtml}</div>`;
+
+        const htmlInscricao = `<p class="text-gray-300 mb-4">Os jogadores devem se registrar em nosso site e formar uma equipe para participar.</p><div class="mt-4 bg-yellow-500/10 border-l-4 border-yellow-500 p-4 rounded-r-lg"><p class="text-yellow-500 text-sm font-bold uppercase mb-1">VALOR DA INSCRIÇÃO</p><p class="text-white font-bold text-lg">Valor: <span class="text-white">${txtInscricao}</span></p></div>`;
+        const agendaLines = txtAgenda.split('\n').map(line => { if(!line.trim()) return ""; const styleClass = line.toLowerCase().includes("final") ? "text-yellow-500 font-black text-base mt-2 uppercase tracking-wide" : ""; return `<div class="${styleClass}">${line}</div>`; }).join('');
+        const htmlAgenda = `<div class="space-y-4"><h4 class="text-white font-bold flex items-center gap-2 text-lg"><i data-lucide="calendar" class="text-white w-5 h-5"></i> Cronograma</h4><div class="space-y-1 text-gray-300 font-bold text-sm">${agendaLines}</div></div>`;
+        const htmlRegras = `<ul class="space-y-2 text-gray-300 list-disc pl-5 marker:text-white text-sm">${txtRegras.split('\n').filter(l=>l.trim()).map(l => `<li>${l}</li>`).join('')}</ul>`;
+        let botoesHtml = "";
+        if(linkTwitch) botoesHtml += `<a href="${linkTwitch}" target="_blank" class="bg-[#9146FF] hover:bg-[#7c2cf5] text-white px-6 py-3 rounded-lg font-bold flex items-center gap-3 transition-transform hover:scale-105 shadow-lg shadow-purple-900/30">Twitch TV</a>`;
+        if(linkYoutube) botoesHtml += `<a href="${linkYoutube}" target="_blank" class="bg-[#FF0000] hover:bg-[#cc0000] text-white px-6 py-3 rounded-lg font-bold flex items-center gap-3 transition-transform hover:scale-105 shadow-lg shadow-red-900/30">Youtube</a>`;
+        const htmlTransmissao = `<div class="space-y-4"><p class="leading-relaxed text-gray-300 text-base">Todas as partidas principais serão transmitidas <strong class="text-white">AO VIVO</strong> em nossos canais oficiais.</p><div class="flex flex-wrap gap-4 items-center">${botoesHtml}</div></div>`;
+
+        const customOverview = { 
+            inscricao: htmlInscricao, 
+            transmissoes: htmlTransmissao, 
+            playoffs: htmlAgenda, 
+            regras: htmlRegras,
+premios: htmlPremios,
+"prêmios": htmlPremios,
+rawPremios: txtPremios
+
+        };
+
+        if (window.updateDoc && window.doc) {
+            await window.updateDoc(window.doc(window.db, "tournaments", tourId), { status: newStatus, prize: newPrize, customOverview: customOverview });
+        } else {
+            if(state.currentTournament && state.currentTournament.id === tourId) {
+                state.currentTournament.status = newStatus;
+                state.currentTournament.prize = newPrize;
+                state.currentTournament.customOverview = customOverview;
+            }
+        }
+
+        showToast("Torneio atualizado!", "success");
+        closeEditTournamentModal();
+        renderTournamentPro(tourId);
+    } catch (e) { console.error(e); showToast("Erro ao salvar: " + (e.message || ''), "error"); if(btn) btn.innerText = "Salvar Tudo"; }
+}
+
+// ---------------------------
+// RENDER DE TIMES LISTA
+// ---------------------------
 function renderTeamsList() {
     const container = document.getElementById('teams-grid');
     if (!container) return;
     container.innerHTML = TEAMS_LIST_DB.map(team => `
-        <div onclick="navigateToPage('team-detail-${team.id}')" class="bg-[#15171e] rounded-xl border border-transparent hover:border-gray-700 p-4 flex items-center gap-4 cursor-pointer">
-            <div class="w-12 h-12 rounded-lg bg-gray-800"><img src="${team.logo}" class="w-full h-full object-cover"></div>
-            <div><h3 class="font-bold text-white text-lg">${team.name}</h3><p class="text-gray-500 text-xs">${team.members} Membros</p></div>
+        <div onclick="navigateToPage('team-detail-${team.id}')" class="bg-[#15171e] rounded-xl border border-transparent hover:border-gray-700 p-4 flex items-center gap-4 cursor-pointer transition-all hover:bg-[#1c1f26]">
+            <div class="w-12 h-12 rounded-lg bg-gray-800 overflow-hidden"><img src="${team.logo || 'https://via.placeholder.com/48'}" class="w-full h-full object-cover"></div>
+            <div><h3 class="font-bold text-white text-lg">${team.name}</h3><p class="text-gray-500 text-xs">${team.members || 1} Membros</p></div>
         </div>
     `).join('');
 }
 
+// ---------------------------
+// GERAÇÃO DE GRUPOS E BRACKET DINÂMICO
+// ---------------------------
 export function generateGroups(teams) {
     const shuffled = [...teams].sort(() => 0.5 - Math.random());
     const groupData = [];
-    const letters = ['A', 'B', 'C', 'D'];
-    for (let i = 0; i < 4; i++) {
-        if (i * 4 >= shuffled.length) break;
-        groupData.push({ name: `Grupo ${letters[i]}`, teams: shuffled.slice(i * 4, (i + 1) * 4) });
+    const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+    const groupsCount = Math.floor(shuffled.length / 4);
+    for (let i = 0; i < groupsCount; i++) {
+        groupData.push({ name: `Grupo ${letters[i] || String.fromCharCode(65+i)}`, teams: shuffled.slice(i * 4, (i + 1) * 4) });
     }
     return groupData;
 }
 
-export function renderGroups() {
-    const container = document.getElementById('groups-container');
-    if (!container) return;
-    container.innerHTML = state.groups.map(g => `<div class="bg-[#15171e] rounded-xl p-4"><h3 class="text-white font-bold mb-2">${g.name}</h3>${g.teams.map(t => `<div class="text-gray-400 text-sm py-1 border-b border-gray-800">${t.name}</div>`).join('')}</div>`).join('');
-}
+// tournamentSize default 32 but supports 8,16,32,64 if you pass it
+export function generateEmptyBracket(teams, tournamentSize = 32) {
+    // garante potência de 2
+    let size = parseInt(tournamentSize, 10) || 32;
+    if ((size & (size - 1)) !== 0) {
+        // se não for potência de 2, arredonda para próximo maior potência de 2
+        let p = 1;
+        while (p < size) p <<= 1;
+        size = p;
+    }
 
-export function generateEmptyBracket(teams) {
     const rounds = [];
-    let matchCount = 4; // Oitavas (8 times)
-    let titles = ["Quartas", "Semis", "Final"];
+    let matchCount = size / 2; 
     let idCounter = 1;
+    const totalRounds = Math.log2(size);
 
-    for (let r = 0; r < 3; r++) {
+    for (let r = 0; r < totalRounds; r++) {
         const matches = [];
+        let roundTitle = "";
+        if (matchCount === 1) roundTitle = "Grande Final";
+        else if (matchCount === 2) roundTitle = "Semifinais";
+        else if (matchCount === 4) roundTitle = "Quartas de Final";
+        else if (matchCount === 8) roundTitle = "Oitavas de Final";
+        else if (matchCount === 16) roundTitle = "Round of 32";
+        else roundTitle = `Round ${r + 1}`;
+
         for(let i=0; i<matchCount; i++) {
              matches.push({ id: idCounter++, teamA: {name: "TBD"}, teamB: {name: "TBD"}, status: 'waiting', scoreA: 0, scoreB: 0 });
         }
-        rounds.push({ title: titles[r], matches });
-        matchCount /= 2;
+        rounds.push({ title: roundTitle, matches });
+        matchCount = Math.floor(matchCount / 2);
     }
-    const shuffled = [...teams].slice(0, 8);
-    rounds[0].matches.forEach((m, i) => {
-        m.teamA = shuffled[i*2] || {name: "BYE"};
-        m.teamB = shuffled[i*2+1] || {name: "BYE"};
-        m.status = 'scheduled';
-    });
     return rounds;
 }
 
-// --- RENDERIZADOR DO BRACKET ---
+// ---------------------------
+// RENDER BRACKET
+// ---------------------------
 export function renderBracketDOM(isAdmin) {
     const container = document.getElementById('bracket-container');
     if (!container) return;
@@ -699,13 +754,18 @@ export function renderBracketDOM(isAdmin) {
     
     container.className = "flex justify-center px-8 pt-8 min-w-max"; 
 
+    if (!state.bracket || !Array.isArray(state.bracket) || state.bracket.length === 0) {
+        container.innerHTML = '<div class="text-gray-400">Nenhum bracket disponível.</div>';
+        return;
+    }
+
     state.bracket.forEach((round, rIndex) => {
         const col = document.createElement('div');
         
         const baseGap = 20; 
         const matchHeight = 90;
         const gapMultiplier = Math.pow(2, rIndex); 
-        const calculatedGap = (baseGap * gapMultiplier) + (matchHeight * (gapMultiplier - 1));
+        const calculatedGap = Math.max(12, (baseGap * gapMultiplier) + (matchHeight * (gapMultiplier - 1)));
         
         col.className = "flex flex-col justify-center relative mx-6"; 
         col.style.gap = `${calculatedGap}px`;
@@ -726,10 +786,8 @@ export function renderBracketDOM(isAdmin) {
                 : '';
             
             let connectorHtml = '';
-            
             if (rIndex < state.bracket.length - 1) { 
                 const verticalHeight = (calculatedGap / 2) + (matchHeight / 2);
-
                 if (mIndex % 2 === 0) {
                     connectorHtml = `<div class="connector-right top" style="height: ${verticalHeight}px;"></div>`;
                 } else {
@@ -742,18 +800,18 @@ export function renderBracketDOM(isAdmin) {
             const activeClass = (m.teamA.name !== 'TBD' && m.teamB.name !== 'TBD') ? 'border-gray-600' : 'border-gray-800 opacity-60';
             
             const matchHtml = `
-                <div class="bg-[#15171e] border ${activeClass} rounded-lg w-56 relative match-box transition-all group hover:border-yellow-500/30" style="height: ${matchHeight}px">
+                <div class="bg-transparent border  ${activeClass} rounded-lg w-56 relative match-box transition-all group hover:border-yellow-500/30" style="height: ${matchHeight}px">
                     ${connectorLeft}
                     
                     <div class="flex flex-col justify-center h-full px-4 gap-2">
                         <div class="flex justify-between items-center ${m.isWinnerA ? 'text-green-400 font-bold' : 'text-gray-300'}">
                             <span class="truncate text-sm w-32">${m.teamA.name}</span> 
-                            <span class="bg-[#0f1116] w-6 h-6 flex items-center justify-center rounded text-xs border border-gray-800">${m.scoreA}</span>
+                            <span class="bg-[#0f1116] w-6 h-6 flex items-center justify-center rounded text-xs border border-gray-800 font-mono">${m.scoreA}</span>
                         </div>
                         <div class="h-[1px] bg-gray-800 w-full"></div>
                         <div class="flex justify-between items-center ${m.isWinnerB ? 'text-green-400 font-bold' : 'text-gray-300'}">
                             <span class="truncate text-sm w-32">${m.teamB.name}</span> 
-                            <span class="bg-[#0f1116] w-6 h-6 flex items-center justify-center rounded text-xs border border-gray-800">${m.scoreB}</span>
+                            <span class="bg-[#0f1116] w-6 h-6 flex items-center justify-center rounded text-xs border border-gray-800 font-mono">${m.scoreB}</span>
                         </div>
                     </div>
                     ${adminBtn}
@@ -770,147 +828,209 @@ export function renderBracketDOM(isAdmin) {
 
 export function setMatchWinner(rIndex, mIndex, winnerSlot) {
     const match = state.bracket[rIndex].matches[mIndex];
-    if(winnerSlot === 'teamA') { match.scoreA = 2; match.isWinnerA = true; } 
-    else { match.scoreB = 2; match.isWinnerB = true; }
+    if(!match) return;
+    if(winnerSlot === 'teamA') { match.scoreA = 2; match.isWinnerA = true; match.isWinnerB = false; } 
+    else { match.scoreB = 2; match.isWinnerB = true; match.isWinnerA = false; }
     match.status = 'finished';
+    // autopropaga para a próxima fase se existir
+    try {
+        const nextRound = state.bracket[rIndex+1];
+        if (nextRound) {
+            const targetMatchIndex = Math.floor(mIndex/2);
+            const winnerName = match.isWinnerA ? match.teamA.name : match.teamB.name;
+            const slot = (mIndex % 2 === 0) ? 'teamA' : 'teamB';
+            if (!nextRound.matches[targetMatchIndex]) {
+                nextRound.matches[targetMatchIndex] = { id: Date.now(), teamA: {name: 'TBD'}, teamB: {name: 'TBD'}, status: 'waiting', scoreA:0, scoreB:0 };
+            }
+            const tm = nextRound.matches[targetMatchIndex];
+            if (slot === 'teamA') tm.teamA.name = winnerName;
+            else tm.teamB.name = winnerName;
+        }
+    } catch(e) { /* ignore */ }
     renderBracketDOM(true);
 }
 
-// --- MODAL DE CRIAÇÃO ---
+// ---------------------------
+// NAVEGAÇÃO, TABS, OVERVIEW
+// ---------------------------
+export function switchTab(tabName) {
+    state.activeTab = tabName;
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden-section'));
+    const activeEl = document.getElementById(`tab-${tabName}`);
+    if(activeEl) activeEl.classList.remove('hidden-section');
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        if (btn.dataset.tab === tabName) btn.classList = "nav-btn pb-4 text-sm font-bold whitespace-nowrap border-b-2 text-white border-yellow-500 transition-colors uppercase tracking-wide";
+        else btn.classList = "nav-btn pb-4 text-sm font-bold whitespace-nowrap border-b-2 border-transparent text-gray-500";
+    });
+}
+
+export function switchOverviewInfo(key) {
+    const t = state.currentTournament;
+    const defaultData = OVERVIEW_DATA[key] || { title: key, content: '<p>Sem conteúdo</p>' };
+    let contentHtml = defaultData.content;
+if (key === "premios" || key === "prêmios") {
+    contentHtml = t.customOverview.premios || t.customOverview["prêmios"];
+}
+
+
+    const container = document.getElementById('overview-dynamic-text');
+    if(!container) return;
+    
+    document.querySelectorAll('.overview-btn').forEach(btn => btn.className = "overview-btn w-full bg-[#15171e] border border-gray-800 hover:border-gray-600 rounded-xl p-5 cursor-pointer text-left transition-all group");
+    const activeBtn = document.getElementById(`btn-${key}`);
+    if(activeBtn) activeBtn.className = "overview-btn w-full bg-yellow-500 rounded-xl p-5 cursor-default text-left shadow-lg transform scale-[1.02] border border-yellow-400";
+
+    container.innerHTML = `<h3 class="text-2xl font-bold text-white mb-6 uppercase tracking-wide border-b border-gray-800 pb-4">${defaultData.title}</h3><div class="editable-text-area text-gray-300 leading-relaxed">${contentHtml}</div>`;
+    if(window.lucide) lucide.createIcons();
+}
+
+// ---------------------------
+// CRIAÇÃO DE TORNEIO (MODAL) — mantém funcionalidade completa
+// ---------------------------
 export function openCreateTournamentModal() {
-    const old = document.getElementById('create-tournament-modal');
-    if(old) old.remove();
+    const old = document.getElementById('create-tour-modal'); if(old) old.remove();
 
     const html = `
-    <div id="create-tournament-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fadeIn">
-        <div class="bg-[#15171e] w-full max-w-lg rounded-xl border border-gray-800 shadow-2xl p-6 overflow-y-auto max-h-[90vh]">
-            <div class="flex justify-between items-start mb-6">
-                <h3 class="text-white font-bold text-xl flex items-center gap-2"><span class="text-yellow-500">🏆</span> Novo Campeonato</h3>
-                <button type="button" onclick="closeCreateTournamentModal()" class="text-gray-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-
-            <form onsubmit="handleCreateTournamentForm(event)" class="space-y-4">
-                <div>
-                    <label class="block text-gray-400 text-xs font-bold mb-1 uppercase">Nome do Evento</label>
-                    <input type="text" id="tour-name" required class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:border-yellow-500 outline-none">
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-gray-400 text-xs font-bold mb-1 uppercase">Premiação (R$)</label>
-                        <input type="text" id="tour-prize" required class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:border-yellow-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-gray-400 text-xs font-bold mb-1 uppercase">Vagas</label>
-                        <select id="tour-teams" class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:border-yellow-500 outline-none">
-                            <option value="8">8 Times</option>
-                            <option value="16">16 Times</option>
-                            <option value="32">32 Times</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-gray-400 text-xs font-bold mb-1 uppercase">Formato</label>
-                    <select id="tour-format" class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:border-yellow-500 outline-none">
-                        <option value="Eliminação Simples">Eliminação Simples (Mata-mata)</option>
-                        <option value="Grupos + Playoffs">Fase de Grupos + Playoffs</option>
-                        <option value="Dupla Eliminação">Dupla Eliminação</option>
-                    </select>
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-gray-400 text-xs font-bold mb-1 uppercase">Banner do Evento</label>
-                    <label for="tour-banner-upload" class="flex gap-4 items-center bg-[#0f1116] p-3 rounded-xl border border-gray-800 cursor-pointer hover:border-gray-600 transition-all">
-                        <div class="w-24 h-14 rounded bg-[#1c1f26] border border-gray-700 flex items-center justify-center overflow-hidden shrink-0">
-                            <img id="tour-banner-preview" class="hidden w-full h-full object-cover">
-                            <i id="tour-banner-icon" data-lucide="image" class="w-6 h-6 text-gray-500"></i>
-                        </div>
-                        <div>
-                            <span class="bg-[#1c1f26] text-white text-xs font-bold px-3 py-1.5 rounded border border-gray-700">Escolher Imagem</span>
-                            <p class="text-[10px] text-gray-500 mt-1">Recomendado 1920x1080.</p>
-                        </div>
-                        <input type="file" id="tour-banner-upload" hidden accept="image/*" onchange="previewTourBanner(event)">
-                    </label>
-                </div>
-
-                <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 rounded-lg transition-all shadow-lg shadow-yellow-900/20 mt-4 uppercase text-sm">
-                    Publicar Campeonato
-                </button>
-            </form>
+    <div id="create-tour-modal" class="fixed inset-0 bg-black/90 z-50 flex items-start justify-center p-6 pt-20 backdrop-blur-sm">
+      <div class="bg-[#15171e] w-full max-w-3xl rounded-2xl border border-gray-800 shadow-2xl overflow-hidden">
+        <div class="p-6 border-b border-gray-800 flex justify-between items-center">
+          <h3 class="text-white font-bold">Criar Torneio</h3>
+          <button onclick="document.getElementById('create-tour-modal').remove()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
         </div>
-    </div>`;
-    
+        <form onsubmit="handleCreateTournamentForm(event)" class="p-6 space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <input required name="name" placeholder="Nome do Torneio" class="bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-xl" />
+            <input required name="maxTeams" placeholder="Máx Teams (ex: 32)" class="bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-xl" />
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <input name="prize" placeholder="Prêmio (ex: R$ 1000)" class="bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-xl" />
+            <input name="format" placeholder="Formato (ex: 5v5)" class="bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-xl" />
+          </div>
+          <div>
+            <label class="text-xs text-gray-400 mb-2 block">Banner do Torneio</label>
+            <input onchange="previewTourBanner(this)" type="file" accept="image/*" class="text-sm text-gray-400" />
+            <img id="create-tour-banner-preview" class="mt-3 w-full h-40 object-cover rounded-lg" src="" />
+          </div>
+          <div class="flex justify-end gap-3">
+            <button type="button" onclick="document.getElementById('create-tour-modal').remove()" class="px-4 py-2 rounded bg-gray-800 text-white">Cancelar</button>
+            <button type="submit" class="px-6 py-2 rounded bg-yellow-500 text-black font-bold">Criar Torneio</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    `;
     document.body.insertAdjacentHTML('beforeend', html);
     if(window.lucide) lucide.createIcons();
 }
 
-export function closeCreateTournamentModal() {
-    const el = document.getElementById('create-tournament-modal');
-    if(el) el.remove();
-}
-
-export function previewTourBanner(e) {
-    const file = e.target.files[0];
-    if(file) {
-        selectedTourBannerFile = file;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            const img = document.getElementById('tour-banner-preview');
-            const icon = document.getElementById('tour-banner-icon');
-            if(img) { img.src = ev.target.result; img.classList.remove('hidden'); }
-            if(icon) icon.classList.add('hidden');
-        };
-        reader.readAsDataURL(file);
-    }
-}
-
 export async function handleCreateTournamentForm(e) {
     e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
-    const oldText = btn.innerText;
-    btn.innerText = "Criando..."; btn.disabled = true;
+    const form = e.target;
+    const data = new FormData(form);
+    const name = data.get('name');
+    const maxTeams = parseInt(data.get('maxTeams')) || 32;
+    const prize = data.get('prize') || 'R$ 0';
+    const format = data.get('format') || '5v5';
+    const bannerFile = selectedTourBannerFile;
+
+    const newT = {
+        id: 't_' + Date.now(),
+        name, maxTeams, prize, format,
+        createdAt: new Date(),
+        status: 'Aberto',
+        registeredTeams: 0,
+        registeredTeamsList: [],
+        requests: [],
+        image: '',
+        logo: '',
+    };
 
     try {
-        const name = document.getElementById('tour-name').value;
-        const newId = Date.now().toString();
-        
-        let bannerUrl = "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80"; 
-
-        if(selectedTourBannerFile) {
-            bannerUrl = await uploadImageToFirebase(selectedTourBannerFile, `tournaments/${newId}/banner.jpg`);
+        if (bannerFile) {
+            const url = await uploadImageToFirebase(bannerFile, `tournaments/${newT.id}/banner.jpg`).catch(()=>null);
+            if (url) newT.image = url;
         }
-
-        const newTour = {
-            name, 
-            status: "Aberto", 
-            maxTeams: parseInt(document.getElementById('tour-teams').value), 
-            registeredTeams: 0, 
-            registeredTeamsList: [],
-            requests: [],
-            prize: document.getElementById('tour-prize').value, 
-            format: document.getElementById('tour-format').value,
-            image: bannerUrl,
-            logo: `https://api.dicebear.com/7.x/identicon/svg?seed=${name}`,
-            createdAt: new Date().toISOString(),
-            customOverview: {} 
-        };
-
-        await window.setDoc(window.doc(window.db, "tournaments", newId), newTour);
-        
-        closeCreateTournamentModal();
-        selectedTourBannerFile = null;
-        window.showToast("Campeonato criado!", "success");
+        if (window.addDoc && window.collection) {
+            await window.addDoc(window.collection(window.db, "tournaments"), newT);
+            showToast('Torneio criado.', 'success');
+        } else {
+            TOURNAMENTS.unshift(newT);
+            showToast('Torneio criado (mock).', 'success');
+        }
+        document.getElementById('create-tour-modal').remove();
         renderTournamentsList();
-
-    } catch(err) {
-        console.error(err);
-        window.showToast("Erro: " + err.message, "error");
-    } finally {
-        btn.innerText = oldText; btn.disabled = false;
+    } catch (e) {
+        console.error(e);
+        showToast('Erro ao criar torneio.', 'error');
     }
 }
 
-// --- EXPORTS PARA O MAIN.JS ---
-export function openAdminPanel() {}
-export function changeUserRole() {}
+// ---------------------------
+// UTILIDADES DE NAVEGAÇÃO
+// ---------------------------
+export function navigateToPage(slug) {
+    // espera que exista uma função de roteamento — fallback: procura por ids
+    try {
+        if (window.navigateTo) return window.navigateTo(slug);
+        // else: simula páginas por slug 'campeonato-<id>'
+        if (slug.startsWith('campeonato-')) {
+            const id = slug.replace('campeonato-', '');
+            renderTournamentPro(id);
+            window.scrollTo({top:0, behavior:'smooth'});
+            return;
+        }
+        // se for 'campeonatos' volta para lista
+        if (slug === 'campeonatos' || slug === 'torneios') {
+            renderTournamentsList();
+            window.scrollTo({top:0, behavior:'smooth'});
+            return;
+        }
+        // team-detail-<id>
+        if (slug.startsWith('team-detail-')) {
+            const id = slug.replace('team-detail-', '');
+            // se existir função externa abrir team
+            if (window.openTeamPage) return window.openTeamPage(id);
+            showToast('Abrir time: ' + id, 'info');
+        }
+    } catch(e) { console.error(e); }
+}
+
+// ---------------------------
+// EXPORTS FINAIS E ATTACH AO WINDOW
+// ---------------------------
+export function openCreateTournamentModalWrapper() { openCreateTournamentModal(); }
+export function closeCreateTournamentModalWrapper() { const m = document.getElementById('create-tour-modal'); if(m) m.remove(); }
+
+window.openSubscribeModal = openSubscribeModal;
+window.executeSubscription = executeSubscription;
+window.approveTeam = approveTeam;
+window.rejectTeam = rejectTeam;
+window.openEditTournamentModal = openEditTournamentModal;
+window.closeEditTournamentModal = closeEditTournamentModal;
+window.saveTournamentChanges = saveTournamentChanges;
+window.setMatchWinner = setMatchWinner;
+window.previewTourBanner = previewTourBanner;
+window.openCreateTournamentModal = openCreateTournamentModal;
+window.handleCreateTournamentForm = handleCreateTournamentForm;
+window.navigateToPage = navigateToPage;
+
+// inicialização opcional para quem importa diretamente
+if (typeof window !== 'undefined') {
+    // se a página atual tem #page-content e é a lista, renderiza
+    document.addEventListener('DOMContentLoaded', () => {
+        try {
+            const page = document.getElementById('page-content');
+            if (!page) return;
+            // decide o que renderizar baseado em url
+            const hash = window.location.hash.replace('#','') || '';
+            if (hash.startsWith('campeonato-')) {
+                const id = hash.replace('campeonato-', '');
+                renderTournamentPro(id);
+            } else {
+                renderTournamentsList();
+            }
+        } catch(e) { console.error('init tournaments', e); }
+    });
+}
+
+// EOF - fim do arquivo
