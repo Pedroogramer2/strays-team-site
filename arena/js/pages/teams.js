@@ -1,10 +1,11 @@
-// js/pages/teams.js
+// No topo do teams.js
 import { TEAMS_LIST_DB, ROLES_IMG } from '../database.js';
 import { state } from '../state.js';
 
-// --- VARIÁVEIS GLOBAIS ---
-let selectedLogoFile = null;
-let selectedBannerFile = null;
+// --- VARIÁVEIS GLOBAIS DE UPLOAD ---
+// Usamos window. para garantir que não se percam
+window.selectedLogoFile = null;
+window.selectedBannerFile = null;
 let playerToRemoveId = null;
 
 // =========================================
@@ -402,7 +403,7 @@ export async function renderTeamSettings(teamId) {
                                     </div>
                                     <div>
                                         <button onclick="document.getElementById('edit-team-logo').click()" class="bg-[#1c1f26] border border-gray-700 text-white text-xs font-bold px-4 py-2 rounded hover:bg-gray-700 transition-colors">Enviar nova logo</button>
-                                        <input type="file" id="edit-team-logo" hidden accept="image/*" onchange="window.previewEditLogo(event)">
+                                        <input type="file" id="edit-team-logo" hidden accept="image/*" onchange="window.previewEditLogo(this)">
                                     </div>
                                 </div>
                                 <div class="flex flex-col items-center gap-4 flex-1">
@@ -411,7 +412,7 @@ export async function renderTeamSettings(teamId) {
                                     </div>
                                     <div>
                                         <button onclick="document.getElementById('edit-team-banner').click()" class="bg-[#1c1f26] border border-gray-700 text-white text-xs font-bold px-4 py-2 rounded hover:bg-gray-700 transition-colors">Enviar nova capa</button>
-                                        <input type="file" id="edit-team-banner" hidden accept="image/*" onchange="window.previewEditBanner(event)">
+                                        <input type="file" id="edit-team-banner" hidden accept="image/*" onchange="window.previewEditBanner(this)">
                                     </div>
                                 </div>
                             </div>
@@ -688,27 +689,16 @@ export async function handleCreateTeamForm(e) {
 // =========================================
 // 7. PREVIEWS E SUPORTE (GLOBAL WINDOW)
 // =========================================
-window.previewCreateLogo = function(e) {
-    const file = e.target.files[0];
-    if(file) {
-        selectedLogoFile = file;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            const img = document.getElementById('create-team-preview');
-            const iconContainer = document.getElementById('create-team-icon-container');
-            if(img) { img.src = ev.target.result; img.classList.remove('hidden'); }
-            if(iconContainer) iconContainer.classList.add('hidden');
-        };
-        reader.readAsDataURL(file);
-    }
-}
 
-// Funções de preview na edição (precisam estar no escopo global para onclick)
-window.previewEditLogo = function(event) {
-    console.log("Logo preview...");
-    const input = event.target;
+// Preview do Logo na EDIÇÃO (Gerenciar Time)
+export function previewEditLogo(event) {
+    // Garante que pega o input, seja passando 'this' ou 'event'
+    const input = event.target ? event.target : event;
+    
     if (input.files && input.files[0]) {
-        selectedLogoFile = input.files[0];
+        window.selectedLogoFile = input.files[0]; // Salva na global
+        console.log("Logo selecionada:", input.files[0].name);
+        
         const reader = new FileReader();
         reader.onload = function(e) {
             const img = document.getElementById('edit-team-logo-preview');
@@ -716,13 +706,17 @@ window.previewEditLogo = function(event) {
         };
         reader.readAsDataURL(input.files[0]);
     }
-};
+}
 
-window.previewEditBanner = function(event) {
-    console.log("Banner preview...");
-    const input = event.target;
+// Preview do Banner na EDIÇÃO (Gerenciar Time)
+export function previewEditBanner(event) {
+    // Garante que pega o input, seja passando 'this' ou 'event'
+    const input = event.target ? event.target : event;
+
     if (input.files && input.files[0]) {
-        selectedBannerFile = input.files[0];
+        window.selectedBannerFile = input.files[0]; // Salva na global
+        console.log("Banner selecionado:", input.files[0].name);
+
         const reader = new FileReader();
         reader.onload = function(e) {
             const img = document.getElementById('edit-team-banner-preview');
@@ -730,36 +724,32 @@ window.previewEditBanner = function(event) {
         };
         reader.readAsDataURL(input.files[0]);
     }
-};
+}
 
-// Função de Preview do Banner (Corrigida)
-window.previewEditBanner = function(event) {
-    console.log("Banner selecionado..."); // Debug
+// Garante compatibilidade caso algo chame direto do window
+window.previewEditLogo = previewEditLogo;
+window.previewEditBanner = previewEditBanner;
+
+// Preview na Criação (Novo time)
+window.previewCreateLogo = function(event) {
     const input = event.target;
-    
-    if (input.files && input.files[0]) {
-        // 1. Atualiza a variável global
-        selectedBannerFile = input.files[0];
-        
-        // 2. Lê o arquivo
+    if(input.files && input.files[0]) {
+        window.selectedLogoFile = input.files[0];
         const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = document.getElementById('edit-team-banner-preview');
-            if (img) {
-                img.src = e.target.result;
-                img.style.display = 'block';
-            } else {
-                console.error("Elemento da imagem do banner não encontrado no HTML");
-            }
+        reader.onload = (ev) => {
+            const img = document.getElementById('create-team-preview');
+            const icon = document.getElementById('create-team-icon-container');
+            if(img) { img.src = ev.target.result; img.classList.remove('hidden'); }
+            if(icon) icon.classList.add('hidden');
         };
         reader.readAsDataURL(input.files[0]);
     }
-};
+}
 
 // Salvar edições do time
 export async function saveTeamSettings() {
     const teamId = state.currentTeamId;
-    if (!teamId) return;
+    if (!teamId) return window.showToast("Erro: ID do time perdido.", "error");
     
     const btn = document.getElementById('btn-save-team');
     const oldText = btn.innerText;
@@ -768,12 +758,13 @@ export async function saveTeamSettings() {
     try {
         let updates = {};
         
-        if (selectedLogoFile) {
-            const url = await uploadImageToFirebase(selectedLogoFile, `teams/${teamId}/logo.jpg`);
+        // Verifica as globais window.
+        if (window.selectedLogoFile) {
+            const url = await uploadImageToFirebase(window.selectedLogoFile, `teams/${teamId}/logo.jpg`);
             updates.logo = url;
         }
-        if (selectedBannerFile) {
-            const url = await uploadImageToFirebase(selectedBannerFile, `teams/${teamId}/banner.jpg`);
+        if (window.selectedBannerFile) {
+            const url = await uploadImageToFirebase(window.selectedBannerFile, `teams/${teamId}/banner.jpg`);
             updates.banner = url;
         }
 
@@ -788,6 +779,7 @@ export async function saveTeamSettings() {
         const teamRef = window.doc(window.db, "teams", teamId);
         await window.updateDoc(teamRef, updates);
 
+        // Atualiza Cache Local
         let teams = JSON.parse(localStorage.getItem('strays_teams_db') || '[]');
         const idx = teams.findIndex(t => String(t.id) === String(teamId));
         if (idx > -1) {
@@ -795,7 +787,10 @@ export async function saveTeamSettings() {
             localStorage.setItem('strays_teams_db', JSON.stringify(teams));
         }
         
-        selectedLogoFile = null; selectedBannerFile = null;
+        // Limpa
+        window.selectedLogoFile = null; 
+        window.selectedBannerFile = null;
+        
         window.showToast("Time atualizado com sucesso!", "success");
         renderTeamSettings(teamId); 
 
@@ -1064,7 +1059,7 @@ export async function confirmAddPlayer() {
     }
 }
 
-// BINDINGS FINAIS PARA GARANTIR FUNCIONAMENTO NO HTML (FALLBACK)
+// BINDINGS FINAIS (Conecta as funções ao HTML)
 window.switchSettingsTab = switchSettingsTab;
 window.openCreateTeamModal = openCreateTeamModal;
 window.closeCreateTeamModal = closeCreateTeamModal;
