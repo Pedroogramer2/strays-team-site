@@ -754,3 +754,8 @@ a { text-decoration: none; color: inherit; transition: 0.2s; }
     top: 15px !important;
 }
 .sidebar-toggle svg { width: 16px; height: 16px; }
+
+.toast.error {
+    background-color: #ef4444; /* Vermelho */
+    border-color: rgba(255, 255, 255, 0.1);
+}

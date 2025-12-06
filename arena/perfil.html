@@ -395,7 +395,7 @@
             const tagInput = document.getElementById('riot-tag').value.replace('#', '').trim();
             const btn = document.getElementById('btn-connect-riot');
 
-            if (!nickInput || !tagInput) { alert("Preencha nick e tag."); return; }
+            if (!nickInput || !tagInput) { showToast("Preencha nick e tag.", "error"); return; }
 
             btn.innerText = "Buscando..."; btn.disabled = true;
 
@@ -482,7 +482,7 @@
 
             } catch (error) {
                 console.error(error);
-                alert("Erro: " + error.message);
+                showToast("Erro: " + error.message, "error");
             } finally {
                 btn.innerText = "Adicionar Conta"; btn.disabled = false;
             }
@@ -520,7 +520,7 @@
                 localStorage.setItem('strays_user', JSON.stringify(user));
                 showToast("Conta desvinculada.");
                 closeUnlinkModal(); closeManageModal(); loadProfileData();
-            } catch(e) { console.error(e); alert("Erro ao desvincular."); } finally { btn.innerText = "Sim, desvincular"; btn.disabled = false; }
+            } catch(e) { console.error(e); showToast("Erro ao desvincular.", "error"); } finally { btn.innerText = "Sim, desvincular"; btn.disabled = false; }
         };
 
         window.switchProfileTab = (tab) => {
