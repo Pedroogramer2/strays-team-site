@@ -172,66 +172,100 @@ export async function renderTeamsPage() {
 // =========================================
 // 2. PÁGINA DE DETALHES DO TIME
 // =========================================
-export function renderTeamDetailPage(teamId) {
+export async function renderTeamDetailPage(teamId) {
     const content = document.getElementById('page-content');
-    const customTeams = JSON.parse(localStorage.getItem('strays_teams_db') || '[]');
-    const allTeams = [...customTeams, ...TEAMS_LIST_DB];
+    content.innerHTML = `<div class="p-20 text-center text-white animate-pulse flex flex-col items-center gap-4"><div class="w-8 h-8 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>Carregando Perfil do Time...</div>`;
     
-    const t = allTeams.find(team => String(team.id) === String(teamId));
-    if (!t) return content.innerHTML = `<div class="text-center text-white mt-20 text-xl font-bold">Time não encontrado.</div>`;
-    
-    const userJson = localStorage.getItem('strays_user');
-    const user = userJson ? JSON.parse(userJson) : null;
-    
-    const isOwner = user && String(t.ownerId) === String(user.uid);
-    const isCaptainMember = user && t.roster && Array.isArray(t.roster) && t.roster.some(m => m.uid === user.uid && m.role === 'Capitão');
-    const canEdit = isOwner || isCaptainMember;
+    try {
+        let t = null;
 
-    state.currentTeamId = t.id; 
-    
-    const editButton = canEdit ? `<button onclick="renderTeamSettings('${t.id}')" class="bg-yellow-500 hover:bg-yellow-400 text-black border border-yellow-500 px-4 py-2 rounded-lg transition-all flex items-center gap-2 font-bold text-sm shadow-[0_0_15px_rgba(234,179,8,0.4)]"><i data-lucide="settings" class="w-4 h-4"></i> Editar Time</button>` : '';
+        // 1. Tenta buscar no Firebase (Nuvem)
+        if (window.doc && window.getDoc && window.db) {
+            const docRef = window.doc(window.db, "teams", String(teamId));
+            const docSnap = await window.getDoc(docRef);
+            if (docSnap.exists()) {
+                t = { id: docSnap.id, ...docSnap.data() };
+            }
+        }
 
-    const bannerSrc = t.banner || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80';
-    const logoSrc = t.logo || `https://api.dicebear.com/7.x/identicon/svg?seed=${t.name}`;
+        // 2. Fallback: Se não achou na nuvem, tenta no LocalStorage ou DB fixo (para times antigos/mock)
+        if (!t) {
+            const customTeams = JSON.parse(localStorage.getItem('strays_teams_db') || '[]');
+            const allTeams = [...customTeams, ...TEAMS_LIST_DB];
+            t = allTeams.find(team => String(team.id) === String(teamId));
+        }
 
-    content.innerHTML = `
-        <div class="animate-fadeIn max-w-7xl mx-auto pb-20 relative">
-            <div class="relative w-full h-72 rounded-b-3xl overflow-hidden group shadow-2xl -mt-6">
-                <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${bannerSrc}')"></div>
-                <div class="absolute inset-0 bg-gradient-to-t from-[#0f1116] via-[#0f1116]/60 to-transparent"></div>
-                <div class="absolute bottom-0 left-0 w-full p-8 flex items-center justify-between">
-                    <div class="flex items-center gap-6">
-                        <div class="w-32 h-32 rounded-full bg-[#0f1116] p-1 border-2 border-[#2a2d35] shadow-2xl shrink-0 relative overflow-hidden">
-                            <img src="${logoSrc}" class="w-full h-full rounded-full object-cover">
-                        </div>
-                        <div class="mb-2">
-                            <h1 class="text-4xl font-black text-white uppercase drop-shadow-lg leading-none mb-2">${t.name}</h1>
-                            <div class="flex items-center gap-3 text-sm text-gray-300 font-bold">
-                                <span class="bg-yellow-500 text-black text-xs px-2 py-0.5 rounded font-bold">${t.tag || 'TAG'}</span>
-                                <span>• Brasil</span>
+        if (!t) return content.innerHTML = `<div class="text-center text-white mt-20 text-xl font-bold">Time não encontrado ou erro de conexão.</div>`;
+        
+        // SALVA NO ESTADO GLOBAL PARA AS ABAS USAREM DEPOIS
+        state.currentTeam = t;
+        state.currentTeamId = t.id;
+
+        const userJson = localStorage.getItem('strays_user');
+        const user = userJson ? JSON.parse(userJson) : null;
+        
+        const isOwner = user && String(t.ownerId) === String(user.uid);
+        const isCaptainMember = user && t.roster && Array.isArray(t.roster) && t.roster.some(m => m.uid === user.uid && m.role === 'Capitão');
+        const canEdit = isOwner || isCaptainMember;
+
+        const editButton = canEdit ? `<button onclick="renderTeamSettings('${t.id}')" class="bg-yellow-500 hover:bg-yellow-400 text-black border border-yellow-500 px-4 py-2 rounded-lg transition-all flex items-center gap-2 font-bold text-sm shadow-[0_0_15px_rgba(234,179,8,0.4)]"><i data-lucide="settings" class="w-4 h-4"></i> Editar Time</button>` : '';
+
+        const bannerSrc = t.banner || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80';
+        const logoSrc = t.logo || `https://api.dicebear.com/7.x/identicon/svg?seed=${t.name}`;
+
+        content.innerHTML = `
+            <div class="animate-fadeIn max-w-7xl mx-auto pb-20 relative">
+                <div class="relative w-full h-72 rounded-b-3xl overflow-hidden group shadow-2xl -mt-6">
+                    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${bannerSrc}')"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#0f1116] via-[#0f1116]/60 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 w-full p-8 flex items-center justify-between">
+                        <div class="flex items-center gap-6">
+                            <div class="w-32 h-32 rounded-full bg-[#0f1116] p-1 border-2 border-[#2a2d35] shadow-2xl shrink-0 relative overflow-hidden">
+                                <img src="${logoSrc}" class="w-full h-full rounded-full object-cover">
+                            </div>
+                            <div class="mb-2">
+                                <h1 class="text-4xl font-black text-white uppercase drop-shadow-lg leading-none mb-2">${t.name}</h1>
+                                <div class="flex items-center gap-3 text-sm text-gray-300 font-bold">
+                                    <span class="bg-yellow-500 text-black text-xs px-2 py-0.5 rounded font-bold">${t.tag || 'TAG'}</span>
+                                    <span>• Brasil</span>
+                                </div>
                             </div>
                         </div>
+                        <div class="flex gap-2">${editButton}</div>
                     </div>
-                    <div class="flex gap-2">${editButton}</div>
                 </div>
-            </div>
-            <div class="mt-8 mb-8 border-b border-gray-800">
-                <nav class="flex gap-8" id="team-tabs-nav">
-                    <button onclick="switchTeamTab('overview', '${t.id}')" class="team-tab-btn active text-white border-yellow-500 pb-3 border-b-2 font-bold text-sm transition-colors" data-tab="overview">Visão Geral</button>
-                    <button onclick="switchTeamTab('players', '${t.id}')" class="team-tab-btn text-gray-500 border-transparent pb-3 border-b-2 font-bold text-sm hover:text-gray-300 transition-colors" data-tab="players">Jogadores</button>
-                    <button onclick="switchTeamTab('matches', '${t.id}')" class="team-tab-btn text-gray-500 border-transparent pb-3 border-b-2 font-bold text-sm hover:text-gray-300 transition-colors" data-tab="matches">Partidas</button>
-                </nav>
-            </div>
-            <main id="team-dynamic-content"></main>
-        </div>`;
-    switchTeamTab('overview', t.id);
+                <div class="mt-8 mb-8 border-b border-gray-800">
+                    <nav class="flex gap-8" id="team-tabs-nav">
+                        <button onclick="switchTeamTab('overview', '${t.id}')" class="team-tab-btn active text-white border-yellow-500 pb-3 border-b-2 font-bold text-sm transition-colors" data-tab="overview">Visão Geral</button>
+                        <button onclick="switchTeamTab('players', '${t.id}')" class="team-tab-btn text-gray-500 border-transparent pb-3 border-b-2 font-bold text-sm hover:text-gray-300 transition-colors" data-tab="players">Jogadores</button>
+                        <button onclick="switchTeamTab('matches', '${t.id}')" class="team-tab-btn text-gray-500 border-transparent pb-3 border-b-2 font-bold text-sm hover:text-gray-300 transition-colors" data-tab="matches">Partidas</button>
+                    </nav>
+                </div>
+                <main id="team-dynamic-content"></main>
+            </div>`;
+        
+        // Chama a aba inicial
+        switchTeamTab('overview', t.id);
+
+    } catch (e) {
+        console.error(e);
+        content.innerHTML = `<div class="text-center text-red-500 mt-20">Erro ao carregar detalhes: ${e.message}</div>`;
+    }
 }
 
 export function switchTeamTab(tabName, teamId) {
-    const customTeams = JSON.parse(localStorage.getItem('strays_teams_db') || '[]');
-    const allTeams = [...customTeams, ...TEAMS_LIST_DB];
-    const t = allTeams.find(team => String(team.id) === String(teamId));
-    if(!t) return;
+    // CORREÇÃO: Pega o time do estado global (já carregado do Firebase)
+    let t = state.currentTeam;
+
+    // Se por acaso o estado estiver vazio (recarregou a página direto na função), tenta fallback
+    if (!t || String(t.id) !== String(teamId)) {
+        const customTeams = JSON.parse(localStorage.getItem('strays_teams_db') || '[]');
+        const allTeams = [...customTeams, ...TEAMS_LIST_DB];
+        t = allTeams.find(team => String(team.id) === String(teamId));
+    }
+    
+    if(!t) return; // Se ainda não achou, aborta (evita o erro)
+
     const container = document.getElementById('team-dynamic-content');
     
     document.querySelectorAll('.team-tab-btn').forEach(btn => { 
