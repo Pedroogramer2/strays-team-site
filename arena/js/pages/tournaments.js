@@ -1287,22 +1287,5 @@ window.handleCreateTournamentForm = handleCreateTournamentForm;
 window.navigateToPage = navigateToPage;
 
 // inicialização opcional para quem importa diretamente
-if (typeof window !== 'undefined') {
-    // se a página atual tem #page-content e é a lista, renderiza
-    document.addEventListener('DOMContentLoaded', () => {
-        try {
-            const page = document.getElementById('page-content');
-            if (!page) return;
-            // decide o que renderizar baseado em url
-            const hash = window.location.hash.replace('#','') || '';
-            if (hash.startsWith('campeonato-')) {
-                const id = hash.replace('campeonato-', '');
-                renderTournamentPro(id);
-            } else {
-                renderTournamentsList();
-            }
-        } catch(e) { console.error('init tournaments', e); }
-    });
-}
 
 // EOF - fim do arquivo

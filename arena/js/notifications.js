@@ -115,70 +115,75 @@ window.NotificationSystem = {
 
     // 4. ACEITAR CONVITE
     acceptInvite: async (notifId, teamId) => {
-        const user = auth.currentUser;
-        if (!user) return;
+    const user = auth.currentUser;
+    if (!user) return;
 
-        if(window.showToast) window.showToast("Entrando no time...", "info");
+    if(window.showToast) window.showToast("Entrando no time...", "info");
 
-        try {
-            const teamRef = doc(db, "teams", teamId);
-            const teamSnap = await getDoc(teamRef);
+    try {
+        const teamRef = doc(db, "teams", teamId);
+        const teamSnap = await getDoc(teamRef);
 
-            if (!teamSnap.exists()) {
-                window.showToast("Time não existe mais.", "error");
-                await NotificationSystem.delete(notifId);
-                return;
-            }
-
-            const teamData = teamSnap.data();
-            
-            if (teamData.roster && teamData.roster.some(m => m.uid === user.uid)) {
-                window.showToast("Você já está neste time.", "info");
-                await NotificationSystem.delete(notifId);
-                return;
-            }
-
-            const userDoc = await getDoc(doc(db, "users", user.uid));
-            const userData = userDoc.data();
-
-            const newMember = {
-                uid: user.uid,
-                nick: userData.nick || user.displayName,
-                name: userData.name || user.displayName,
-                photo: userData.photo || user.photoURL,
-                role: 'Membro',
-                gameRole: 'Flex',
-                riotAccount: userData.riotAccount || null
-            };
-
-            await updateDoc(teamRef, {
-                roster: arrayUnion(newMember),
-                members: (teamData.members || 0) + 1
-            });
-
+        if (!teamSnap.exists()) {
+            window.showToast("Time não existe mais.", "error");
             await NotificationSystem.delete(notifId);
-
-            // Atualiza LocalStorage
-            let localTeams = JSON.parse(localStorage.getItem('strays_teams_db') || '[]');
-            const localIndex = localTeams.findIndex(t => String(t.id) === String(teamId));
-            if(localIndex > -1) {
-                localTeams[localIndex].roster.push(newMember);
-                localTeams[localIndex].members += 1;
-                localStorage.setItem('strays_teams_db', JSON.stringify(localTeams));
-            }
-
-            window.showToast(`Bem-vindo ao ${teamData.name}!`, "success");
-            setTimeout(() => {
-                window.location.href = `index.html#team-detail-${teamId}`;
-                window.location.reload();
-            }, 1000);
-
-        } catch (e) {
-            console.error(e);
-            window.showToast("Erro ao entrar no time.", "error");
+            return;
         }
-    },
 
+        const teamData = teamSnap.data();
+        
+        if (teamData.roster && teamData.roster.some(m => m.uid === user.uid)) {
+            window.showToast("Você já está neste time.", "info");
+            await NotificationSystem.delete(notifId);
+            return;
+        }
+
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const userData = userDoc.data();
+        const userNick = userData.nick || user.displayName || 'Jogador';
+
+        const newMember = {
+            uid: user.uid,
+            nick: userNick,
+            name: userData.name || user.displayName,
+            photo: userData.photo || user.photoURL,
+            role: 'Membro',
+            gameRole: 'Flex',
+            riotAccount: userData.riotAccount || null,
+            joinedAt: new Date().toISOString()
+        };
+
+        // --- ATUALIZAÇÃO DO HISTÓRICO (ENTROU) ---
+        const newHistory = teamData.history || [];
+        newHistory.push({
+            action: 'joined',
+            player: userNick,
+            date: new Date().toISOString()
+        });
+
+        // Remove do log de convites pendentes
+        const newInvitesLog = (teamData.invitesLog || []).filter(i => i.uid !== user.uid);
+
+        await updateDoc(teamRef, {
+            roster: arrayUnion(newMember),
+            members: (teamData.members || 0) + 1,
+            history: newHistory,
+            invitesLog: newInvitesLog
+        });
+
+        await NotificationSystem.delete(notifId);
+
+        window.showToast(`Bem-vindo ao ${teamData.name}!`, "success");
+        setTimeout(() => {
+            window.location.href = `index.html#team-detail-${teamId}`;
+            window.location.reload();
+        }, 1000);
+
+    } catch (e) {
+        console.error(e);
+        window.showToast("Erro ao entrar no time.", "error");
+    }
+},
     // 5. APAGAR UMA
     delete: async (id) => {
         try {

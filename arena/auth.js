@@ -1,4 +1,4 @@
-// auth.js
+// auth.js - ATUALIZADO (Sem Alerts)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { 
     getAuth, 
@@ -71,13 +71,18 @@ window.where = where;
 window.orderBy = orderBy;
 window.arrayUnion = arrayUnion;
 
-// --- FUNÇÕES DE AUTH ---
-function isValidEmailDomain(email) {
-    const allowedDomains = ['gmail.com', 'outlook.com', 'hotmail.com', 'live.com'];
-    const domain = email.split('@')[1];
-    return allowedDomains.includes(domain);
+// Helper para Toast seguro (caso main.js não tenha carregado ainda)
+function safeToast(msg, type = 'error') {
+    if (window.showToast) {
+        window.showToast(msg, type);
+    } else {
+        console.warn("Toast system not ready, falling back to alert:", msg);
+        // Fallback temporário apenas se o toast falhar muito feio
+        alert(msg); 
+    }
 }
 
+// --- FUNÇÕES DE AUTH ---
 async function saveUserSession(user) {
     let role = 'user';
     let riotAccount = null;
@@ -110,7 +115,6 @@ async function saveUserSession(user) {
         riotAccount: riotAccount
     };
     
-    // --- CORREÇÃO AQUI: Mudado de u4nted_user para strays_user ---
     localStorage.setItem('strays_user', JSON.stringify(userData));
     
     window.dispatchEvent(new Event('auth-change'));
@@ -124,7 +128,7 @@ window.handleGoogleAuth = async () => {
         await saveUserSession(user);
     } catch (error) {
         console.error("Erro Google:", error);
-        alert("Erro ao conectar com Google: " + error.message);
+        safeToast("Erro ao conectar com Google: " + error.message, "error");
     }
 };
 
@@ -136,8 +140,8 @@ window.handleRegisterEmail = async (event) => {
     const senha = document.getElementById('reg-senha').value;
     const confirmSenha = document.getElementById('reg-confirm').value;
 
-    if (senha !== confirmSenha) { alert("Senhas não coincidem!"); return; }
-    if (!nick) { alert("Preencha o Nick!"); return; }
+    if (senha !== confirmSenha) { safeToast("Senhas não coincidem!", "error"); return; }
+    if (!nick) { safeToast("Preencha o Nick!", "error"); return; }
 
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
@@ -146,8 +150,9 @@ window.handleRegisterEmail = async (event) => {
         await setDoc(doc(db, "users", user.uid), {
             email: email, name: nome, nick: nick, role: 'user', createdAt: new Date(), riotAccount: null
         });
+        safeToast("Conta criada com sucesso!", "success");
         await saveUserSession(user);
-    } catch (error) { alert("Erro ao cadastrar: " + error.message); }
+    } catch (error) { safeToast("Erro ao cadastrar: " + error.message, "error"); }
 };
 
 window.handleLoginEmail = async (event) => {
@@ -157,12 +162,11 @@ window.handleLoginEmail = async (event) => {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, senha);
         await saveUserSession(userCredential.user);
-    } catch (error) { alert("Erro ao entrar: " + error.message); }
+    } catch (error) { safeToast("Erro ao entrar: " + error.message, "error"); }
 };
 
 window.handleLogout = () => {
     signOut(auth).then(() => {
-        // --- CORREÇÃO AQUI TAMBÉM ---
         localStorage.removeItem('strays_user');
         window.dispatchEvent(new Event('auth-change'));
         window.location.href = 'index.html';
@@ -171,11 +175,35 @@ window.handleLogout = () => {
 
 window.searchUserByNick = async (nickToFind) => {
     try {
-        const q = query(collection(db, "users"), where("nick", "==", nickToFind));
-        const querySnapshot = await getDocs(q);
-        if (!querySnapshot.empty) { return { uid: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() }; }
+        console.log("Buscando usuário:", nickToFind);
+        
+        // 1. Tenta buscar pelo campo 'nick'
+        const qNick = query(collection(db, "users"), where("nick", "==", nickToFind));
+        const snapNick = await getDocs(qNick);
+        
+        if (!snapNick.empty) { 
+            const docData = snapNick.docs[0].data();
+            console.log("Encontrado por nick:", docData);
+            return { uid: snapNick.docs[0].id, ...docData }; 
+        }
+
+        // 2. Se não achou, tenta buscar pelo campo 'name' (Nome real)
+        // Isso resolve o caso onde a pessoa cadastrou "Pedro" como nome e o nick ficou igual ou vazio
+        const qName = query(collection(db, "users"), where("name", "==", nickToFind));
+        const snapName = await getDocs(qName);
+
+        if (!snapName.empty) {
+            const docData = snapName.docs[0].data();
+            console.log("Encontrado por nome:", docData);
+            return { uid: snapName.docs[0].id, ...docData };
+        }
+
+        console.log("Nenhum usuário encontrado.");
         return null;
-    } catch (error) { return null; }
+    } catch (error) { 
+        console.error("Erro na busca:", error);
+        return null; 
+    }
 };
 
 window.getAllUsers = async () => {
@@ -186,7 +214,7 @@ window.getAllUsers = async () => {
 window.changeUserRole = async (targetUid, newRole) => {
     try {
         await updateDoc(doc(db, "users", targetUid), { role: newRole });
-        alert(`Sucesso! Cargo alterado para ${newRole}`);
+        safeToast(`Sucesso! Cargo alterado para ${newRole}`, "success");
         if(window.renderAdminPanel) window.renderAdminPanel();
-    } catch (error) { alert("Erro ao mudar cargo."); }
+    } catch (error) { safeToast("Erro ao mudar cargo.", "error"); }
 }
