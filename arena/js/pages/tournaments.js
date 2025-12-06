@@ -139,22 +139,28 @@ export async function renderTournamentsList() {
             else if(t.status === 'Concluído') { statusClass = 'bg-gray-500'; }
             else if(t.status === 'Inscrições' || t.status === 'Aberto') { statusClass = 'bg-yellow-500 text-black'; }
 
+            const deleteBtn = isAdmin ? `
+    <button onclick="event.stopPropagation(); openDeleteConfirmation('${t.id}')" 
+        class="absolute top-4 left-4 z-20 bg-black/60 hover:bg-red-600 text-gray-300 hover:text-white p-2 rounded-lg border border-white/10 hover:border-red-500 transition-all backdrop-blur-md shadow-lg group-hover:scale-110" 
+        title="Excluir Campeonato">
+        <i data-lucide="trash-2" class="w-4 h-4"></i>
+    </button>
+` : '';
+
             return `
             <div class="bg-[#15171e] rounded-xl overflow-hidden border border-gray-800 hover:border-yellow-500 transition-all cursor-pointer group shadow-lg flex flex-col h-full" onclick="navigateToPage('campeonato-${t.id}')">
                 <div class="h-48 bg-cover bg-center relative" style="background-image: url('${t.image || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80'}')">
                     <div class="absolute inset-0 bg-gradient-to-t from-[#15171e] via-transparent to-transparent opacity-90"></div>
+                    ${deleteBtn}
                     <span class="absolute top-4 right-4 text-[10px] font-black px-3 py-1 rounded-full shadow-lg ${statusClass} text-white">
                         ${statusText}
                     </span>
                 </div>
                 <div class="p-6 relative flex-1 flex flex-col">
-                    <div class="absolute -top-10 left-6 w-20 h-20 rounded-xl border-4 border-[#15171e] overflow-hidden bg-[#0f1116] shadow-xl">
-                        <img src="${t.logo || 'https://via.placeholder.com/80'}" class="w-full h-full object-cover">
-                    </div>
-                    <div class="mt-8 mb-4">
-                        <h3 class="text-xl font-black text-white group-hover:text-yellow-500 transition-colors uppercase italic leading-none">${t.name}</h3>
-                        <p class="text-gray-500 text-xs mt-1 font-bold">Format: ${t.format || 'Solo'}</p>
-                    </div>
+    <div class="mt-2 mb-4"> 
+        <h3 class="text-xl font-black text-white group-hover:text-yellow-500 transition-colors uppercase italic leading-none">${t.name}</h3>
+        <p class="text-gray-500 text-xs mt-1 font-bold">Format: ${t.format || 'Solo'}</p>
+    </div>
                     
                     <div class="mt-auto border-t border-gray-800 pt-4 flex justify-between items-center text-sm">
                         <span class="flex items-center gap-2 text-gray-400 font-bold"><i data-lucide="users" class="w-4 h-4 text-purple-500"></i> ${t.registeredTeams || 0}/${t.maxTeams || 32}</span>
@@ -290,7 +296,6 @@ export async function renderTournamentPro(tournamentId) {
                 
                 <div class="absolute bottom-0 left-0 w-full p-8 flex flex-col md:flex-row justify-between items-end gap-6 relative z-10">
                     <div class="flex items-center gap-6">
-                         <div class="w-28 h-28 rounded-2xl overflow-hidden border-2 border-gray-700 shadow-lg shrink-0 bg-black"><img src="${t.logo || 'https://via.placeholder.com/150'}" class="w-full h-full object-cover"></div>
                         <div>
                             <h1 class="text-4xl md:text-5xl font-black text-white mb-2 uppercase italic tracking-wider shadow-black drop-shadow-md">${t.name}</h1>
                             <div class="flex gap-3">
@@ -564,17 +569,22 @@ export async function executeDelete(tourId) {
 // ---------------------------
 // EDITOR DE TORNEIO (MODAL) com Prêmios editáveis
 // ---------------------------
+// --- EDITOR DE TORNEIO (CORRIGIDO PARA ACEITAR CAMPO VAZIO) ---
+// --- EDITOR DE TORNEIO (ATUALIZADO COM CAMPO DE LINK DE PAGAMENTO) ---
 export function openEditTournamentModal(tourId) {
     const t = state.currentTournament;
     if(!t) return;
     const old = document.getElementById('edit-tour-modal'); if(old) old.remove();
 
-    const valInscricao = cleanTextFromHTML(t.customOverview?.inscricao) || "R$ 10,00 por player";
-    const valRegras = cleanTextFromHTML(t.customOverview?.regras) || "Regras padrão.";
-    const valAgenda = cleanTextFromHTML(t.customOverview?.playoffs) || "Oitavas: 22/09\nFinal: 05/10";
+    const valInscricao = t.customOverview?.rawInscricao ?? (cleanTextFromHTML(t.customOverview?.inscricao) || "R$ 10,00 por player");
+    const valRegras = t.customOverview?.rawRegras ?? (cleanTextFromHTML(t.customOverview?.regras) || "Regras padrão.");
+    const valAgenda = t.customOverview?.rawPlayoffs ?? (cleanTextFromHTML(t.customOverview?.playoffs) || "Oitavas: 22/09\nFinal: 05/10");
     
+    // NOVO: Recupera o link salvo, ou deixa vazio
+    const valLinkPagamento = t.customOverview?.paymentLink || "";
+
     let valPremios = "1º Lugar: R$ " + (t.prize || '') + "\n2º Lugar: R$ 200\n3º Lugar: Vaga na Pro League";
-    if (t.customOverview?.rawPremios) {
+    if (t.customOverview?.rawPremios !== undefined && t.customOverview?.rawPremios !== null) {
         valPremios = t.customOverview.rawPremios;
     }
 
@@ -588,28 +598,61 @@ export function openEditTournamentModal(tourId) {
             <div class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
                 
                 <div class="grid grid-cols-2 gap-6">
-                    <div><label class="text-xs font-bold text-gray-400 uppercase">Estado</label><select id="edit-tour-status" class="w-full bg-[#0a0a0a] border border-gray-700 text-white px-4 py-3 rounded-xl mt-1 outline-none focus:border-yellow-500"><option value="Aberto" ${t.status === 'Aberto' ? 'selected' : ''}>🟢 Aberto</option><option value="Ao Vivo" ${t.status === 'Ao Vivo' ? 'selected' : ''}>🔴 Ao Vivo</option><option value="Concluído" ${t.status === 'Concluído' ? 'selected' : ''}>🏁 Concluído</option></select></div>
-                    <div><label class="text-xs font-bold text-gray-400 uppercase">Prêmio Total (Capa)</label><input type="text" id="edit-tour-prize" value="${t.prize || ''}" class="w-full bg-[#0a0a0a] border border-gray-700 text-white px-4 py-3 rounded-xl mt-1 outline-none focus:border-green-500 font-bold"></div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-400 uppercase">Estado</label>
+                        <select id="edit-tour-status" class="w-full bg-[#0a0a0a] border border-gray-700 text-white px-4 py-3 rounded-xl mt-1 outline-none focus:border-yellow-500">
+                            <option value="Aberto" ${t.status === 'Aberto' ? 'selected' : ''}>🟢 Aberto</option>
+                            <option value="Ao Vivo" ${t.status === 'Ao Vivo' ? 'selected' : ''}>🔴 Ao Vivo</option>
+                            <option value="Concluído" ${t.status === 'Concluído' ? 'selected' : ''}>🏁 Concluído</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-400 uppercase">Data de Início</label>
+                        <input type="text" id="edit-tour-startdate" value="${t.startDate || ''}" placeholder="Ex: 15/09" class="w-full bg-[#0a0a0a] border border-gray-700 text-white px-4 py-3 rounded-xl mt-1 outline-none focus:border-yellow-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-gray-400 uppercase">Prêmio Total (Capa)</label>
+                    <input type="text" id="edit-tour-prize" value="${t.prize || ''}" class="w-full bg-[#0a0a0a] border border-gray-700 text-white px-4 py-3 rounded-xl mt-1 outline-none focus:border-green-500 font-bold">
                 </div>
 
                 <div class="bg-yellow-500/5 p-4 rounded-xl border border-yellow-500/20">
-                    <label class="block text-yellow-500 text-xs font-bold mb-2 uppercase">Distribuição de Prêmios (Linha por Linha)</label>
-                    <textarea id="txt-premios" rows="4" class="w-full bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-lg text-sm outline-none resize-none font-mono placeholder-gray-600" placeholder="1º Lugar: R$ 500&#10;2º Lugar: Mousepad&#10;MVP: R$ 50">${valPremios}</textarea>
-                    <p class="text-[10px] text-gray-500 mt-2">Use o formato <strong>Colocação: Prêmio</strong>. Pule linha para adicionar mais.</p>
+                    <label class="block text-yellow-500 text-xs font-bold mb-2 uppercase">Distribuição de Prêmios</label>
+                    <textarea id="txt-premios" rows="4" class="w-full bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-lg text-sm outline-none resize-none font-mono placeholder-gray-600">${valPremios}</textarea>
                 </div>
 
-                <div><label class="block text-gray-400 text-xs font-bold mb-1">Valor da Inscrição</label><input type="text" id="txt-inscricao" value="${valInscricao}" class="w-full bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-lg text-sm outline-none focus:border-yellow-500"></div>
+                <div class="grid grid-cols-1 gap-4 bg-[#1c1f26] p-4 rounded-xl border border-gray-800">
+                    <div>
+                        <label class="block text-gray-400 text-xs font-bold mb-1">Texto do Valor (Ex: R$ 50,00)</label>
+                        <input type="text" id="txt-inscricao" value="${valInscricao}" class="w-full bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-lg text-sm outline-none focus:border-yellow-500">
+                    </div>
+                    <div>
+                        <label class="block text-yellow-500 text-xs font-bold mb-1 flex items-center gap-2">
+                            <i data-lucide="link" class="w-3 h-3"></i> Link para Pagamento (Botão)
+                        </label>
+                        <input type="text" id="edit-tour-payment-link" value="${valLinkPagamento}" placeholder="Ex: https://forms.google.com/..." class="w-full bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-lg text-sm outline-none focus:border-yellow-500 placeholder-gray-600">
+                        <p class="text-[10px] text-gray-500 mt-1">Se deixar vazio, o botão "PAGUE AQUI" não aparecerá.</p>
+                    </div>
+                </div>
+
                 <div><label class="block text-gray-400 text-xs font-bold mb-1">Agendamento</label><textarea id="txt-playoffs" rows="3" class="w-full bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-lg text-sm outline-none resize-none font-mono">${valAgenda}</textarea></div>
                 <div><label class="block text-gray-400 text-xs font-bold mb-1">Regulamento</label><textarea id="txt-regras" rows="3" class="w-full bg-[#0f1116] border border-gray-700 text-gray-300 text-sm rounded-lg p-3 outline-none resize-none">${valRegras}</textarea></div>
                 
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-[#a970ff] text-xs font-bold mb-1">Link Twitch</label><input type="text" id="edit-tour-twitch" value="${safeGet(t,'customOverview.transmissoes','').includes('twitch') ? 'https://twitch.tv/' : ''}" placeholder="https://twitch.tv/..." class="w-full bg-[#0f1116] border border-gray-700 text-white px-3 py-2 rounded-lg text-sm"></div>
-                    <div><label class="block text-[#ff0000] text-xs font-bold mb-1">Link YouTube</label><input type="text" id="edit-tour-youtube" value="${safeGet(t,'customOverview.transmissoes','').includes('youtube') ? 'https://youtube.com/' : ''}" placeholder="https://youtube.com/..." class="w-full bg-[#0f1116] border border-gray-700 text-white px-3 py-2 rounded-lg text-sm"></div>
+                    <div><label class="block text-[#a970ff] text-xs font-bold mb-1">Link Twitch</label><input type="text" id="edit-tour-twitch" value="${safeGet(t,'customOverview.transmissoes','').includes('twitch') ? 'https://twitch.tv/' : ''}" placeholder="Link Twitch" class="w-full bg-[#0f1116] border border-gray-700 text-white px-3 py-2 rounded-lg text-sm"></div>
+                    <div><label class="block text-[#ff0000] text-xs font-bold mb-1">Link YouTube</label><input type="text" id="edit-tour-youtube" value="${safeGet(t,'customOverview.transmissoes','').includes('youtube') ? 'https://youtube.com/' : ''}" placeholder="Link Youtube" class="w-full bg-[#0f1116] border border-gray-700 text-white px-3 py-2 rounded-lg text-sm"></div>
                 </div>
             </div>
-            <div class="p-6 border-t border-gray-800 bg-[#1c1f26] rounded-b-2xl flex justify-end gap-3">
-                <button onclick="closeEditTournamentModal()" class="text-gray-400 hover:text-white font-bold text-sm px-6 py-3">Cancelar</button>
-                <button onclick="saveTournamentChanges('${t.id}')" class="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 px-8 rounded-xl shadow-lg">Salvar Tudo</button>
+            
+            <div class="p-6 border-t border-gray-800 bg-[#1c1f26] rounded-b-2xl flex justify-between items-center">
+                <button onclick="openDeleteConfirmation('${t.id}')" class="text-red-500 hover:text-white hover:bg-red-600/90 border border-transparent hover:border-red-500 px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i> Excluir Torneio
+                </button>
+                <div class="flex gap-3">
+                    <button onclick="closeEditTournamentModal()" class="text-gray-400 hover:text-white font-bold text-sm px-6 py-3">Cancelar</button>
+                    <button onclick="saveTournamentChanges('${t.id}')" class="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 px-8 rounded-xl shadow-lg">Salvar Tudo</button>
+                </div>
             </div>
         </div>
     </div>`;
@@ -624,13 +667,19 @@ export async function saveTournamentChanges(tourId) {
     try {
         const newStatus = document.getElementById('edit-tour-status').value;
         const newPrize = document.getElementById('edit-tour-prize').value;
+        const newStartDate = document.getElementById('edit-tour-startdate').value;
+        
         const txtInscricao = document.getElementById('txt-inscricao').value;
+        // NOVO: Pega o valor do link
+        const txtPaymentLink = document.getElementById('edit-tour-payment-link').value;
+        
         const txtAgenda = document.getElementById('txt-playoffs').value;
         const txtRegras = document.getElementById('txt-regras').value;
         const txtPremios = document.getElementById('txt-premios').value;
         const linkTwitch = document.getElementById('edit-tour-twitch').value;
         const linkYoutube = document.getElementById('edit-tour-youtube').value;
 
+        // Monta HTML de Prêmios
         const listaPremiosHtml = txtPremios.split('\n').filter(line => line.trim() !== "").map((line, index) => {
             const parts = line.split(':');
             const place = parts[0].trim();
@@ -639,16 +688,44 @@ export async function saveTournamentChanges(tourId) {
             return `
             <div class="flex justify-between items-center mb-2 border-b border-white/5 pb-2 last:border-0 last:mb-0 last:pb-0">
                 <span class="text-gray-400 text-sm font-medium">${place}</span>
-                <span class="${colorClass} font-bold text-sm">${reward}</span>
+                <span class="text-yellow-500 font-bold text-sm">${reward}</span>
             </div>`;
         }).join('');
-
         const htmlPremios = `<h4 class="text-white font-bold text-sm uppercase mb-4 border-b border-gray-800 pb-2">Distribuição de Prêmios</h4><div class="flex flex-col gap-1">${listaPremiosHtml}</div>`;
 
-        const htmlInscricao = `<p class="text-gray-300 mb-4">Os jogadores devem se registrar em nosso site e formar uma equipe para participar.</p><div class="mt-4 bg-yellow-500/10 border-l-4 border-yellow-500 p-4 rounded-r-lg"><p class="text-yellow-500 text-sm font-bold uppercase mb-1">VALOR DA INSCRIÇÃO</p><p class="text-white font-bold text-lg">Valor: <span class="text-white">${txtInscricao}</span></p></div>`;
+        // ============================================================
+        // MONTA HTML DE INSCRIÇÃO COM O BOTÃO DOURADO
+        // ============================================================
+        let btnPagamentoHtml = "";
+        
+        // Se tiver link, cria o botão dourado estilo Twitch (mas amarelo)
+        if(txtPaymentLink && txtPaymentLink.trim() !== "") {
+            btnPagamentoHtml = `
+            <a href="${txtPaymentLink}" target="_blank" class="w-full mt-6 bg-yellow-500 hover:bg-yellow-400 text-black font-black py-4 rounded-xl flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(234,179,8,0.3)] transition-transform hover:scale-[1.02] uppercase tracking-widest text-lg group">
+                <i data-lucide="credit-card" class="w-6 h-6 text-black group-hover:scale-110 transition-transform"></i>
+                PAGUE AQUI
+            </a>
+            `;
+        }
+
+        const htmlInscricao = `
+            <p class="text-gray-300 mb-4">Os jogadores devem se registrar em nosso site e formar uma equipe para participar.</p>
+            <div class="mt-4 bg-yellow-500/10 border-l-4 border-yellow-500 p-4 rounded-r-lg">
+                <p class="text-yellow-500 text-sm font-bold uppercase mb-1">VALOR DA INSCRIÇÃO</p>
+                <p class="text-white font-bold text-lg">Valor: <span class="text-white">${txtInscricao}</span></p>
+            </div>
+            ${btnPagamentoHtml}
+        `;
+        // ============================================================
+        
+        // Monta HTML da Agenda
         const agendaLines = txtAgenda.split('\n').map(line => { if(!line.trim()) return ""; const styleClass = line.toLowerCase().includes("final") ? "text-yellow-500 font-black text-base mt-2 uppercase tracking-wide" : ""; return `<div class="${styleClass}">${line}</div>`; }).join('');
         const htmlAgenda = `<div class="space-y-4"><h4 class="text-white font-bold flex items-center gap-2 text-lg"><i data-lucide="calendar" class="text-white w-5 h-5"></i> Cronograma</h4><div class="space-y-1 text-gray-300 font-bold text-sm">${agendaLines}</div></div>`;
+        
+        // Monta HTML de Regras
         const htmlRegras = `<ul class="space-y-2 text-gray-300 list-disc pl-5 marker:text-white text-sm">${txtRegras.split('\n').filter(l=>l.trim()).map(l => `<li>${l}</li>`).join('')}</ul>`;
+        
+        // Monta HTML de Transmissão
         let botoesHtml = "";
         if(linkTwitch) botoesHtml += `<a href="${linkTwitch}" target="_blank" class="bg-[#9146FF] hover:bg-[#7c2cf5] text-white px-6 py-3 rounded-lg font-bold flex items-center gap-3 transition-transform hover:scale-105 shadow-lg shadow-purple-900/30">Twitch TV</a>`;
         if(linkYoutube) botoesHtml += `<a href="${linkYoutube}" target="_blank" class="bg-[#FF0000] hover:bg-[#cc0000] text-white px-6 py-3 rounded-lg font-bold flex items-center gap-3 transition-transform hover:scale-105 shadow-lg shadow-red-900/30">Youtube</a>`;
@@ -659,19 +736,27 @@ export async function saveTournamentChanges(tourId) {
             transmissoes: htmlTransmissao, 
             playoffs: htmlAgenda, 
             regras: htmlRegras,
-premios: htmlPremios,
-"prêmios": htmlPremios,
-rawPremios: txtPremios
+            premios: htmlPremios,
+            "prêmios": htmlPremios,
+            rawPremios: txtPremios,
+            rawInscricao: txtInscricao,
+            rawPlayoffs: txtAgenda,
+            rawRegras: txtRegras,
+            paymentLink: txtPaymentLink // Salva o link cru para poder editar depois
+        };
 
+        const updateData = { 
+            status: newStatus, 
+            prize: newPrize, 
+            startDate: newStartDate, 
+            customOverview: customOverview 
         };
 
         if (window.updateDoc && window.doc) {
-            await window.updateDoc(window.doc(window.db, "tournaments", tourId), { status: newStatus, prize: newPrize, customOverview: customOverview });
+            await window.updateDoc(window.doc(window.db, "tournaments", tourId), updateData);
         } else {
             if(state.currentTournament && state.currentTournament.id === tourId) {
-                state.currentTournament.status = newStatus;
-                state.currentTournament.prize = newPrize;
-                state.currentTournament.customOverview = customOverview;
+                Object.assign(state.currentTournament, updateData);
             }
         }
 
@@ -866,102 +951,239 @@ export function switchTab(tabName) {
 
 export function switchOverviewInfo(key) {
     const t = state.currentTournament;
+    // Pega o conteúdo padrão do arquivo de banco de dados
     const defaultData = OVERVIEW_DATA[key] || { title: key, content: '<p>Sem conteúdo</p>' };
+    
     let contentHtml = defaultData.content;
-if (key === "premios" || key === "prêmios") {
-    contentHtml = t.customOverview.premios || t.customOverview["prêmios"];
-}
 
+    // LÓGICA CORRIGIDA: Verifica se existe personalização salva no torneio
+    if (t && t.customOverview) {
+        // Mapeamento: O botão pode se chamar 'calendario', mas no banco salvamos como 'playoffs'
+        if (key === 'calendario' && t.customOverview.playoffs) {
+            contentHtml = t.customOverview.playoffs;
+        }
+        // Regras
+        else if (key === 'regras' && t.customOverview.regras) {
+            contentHtml = t.customOverview.regras;
+        }
+        // Inscrição
+        else if (key === 'inscricao' && t.customOverview.inscricao) {
+            contentHtml = t.customOverview.inscricao;
+        }
+        // Transmissão
+        else if (key === 'transmissoes' && t.customOverview.transmissoes) {
+            contentHtml = t.customOverview.transmissoes;
+        }
+        // Prêmios (lida com acento ou sem)
+        else if ((key === 'premios' || key === 'prêmios') && (t.customOverview.premios || t.customOverview["prêmios"])) {
+            contentHtml = t.customOverview.premios || t.customOverview["prêmios"];
+        }
+        // Caso genérico (se o nome da chave for igual)
+        else if (t.customOverview[key]) {
+            contentHtml = t.customOverview[key];
+        }
+    }
 
     const container = document.getElementById('overview-dynamic-text');
     if(!container) return;
     
+    // Atualiza visual dos botões
     document.querySelectorAll('.overview-btn').forEach(btn => btn.className = "overview-btn w-full bg-[#15171e] border border-gray-800 hover:border-gray-600 rounded-xl p-5 cursor-pointer text-left transition-all group");
     const activeBtn = document.getElementById(`btn-${key}`);
     if(activeBtn) activeBtn.className = "overview-btn w-full bg-yellow-500 rounded-xl p-5 cursor-default text-left shadow-lg transform scale-[1.02] border border-yellow-400";
 
-    container.innerHTML = `<h3 class="text-2xl font-bold text-white mb-6 uppercase tracking-wide border-b border-gray-800 pb-4">${defaultData.title}</h3><div class="editable-text-area text-gray-300 leading-relaxed">${contentHtml}</div>`;
+    // Injeta o HTML (editado ou padrão)
+    container.innerHTML = `
+        <h3 class="text-2xl font-bold text-white mb-6 uppercase tracking-wide border-b border-gray-800 pb-4">
+            ${defaultData.title}
+        </h3>
+        <div class="editable-text-area text-gray-300 leading-relaxed">
+            ${contentHtml}
+        </div>`;
+        
     if(window.lucide) lucide.createIcons();
 }
 
 // ---------------------------
-// CRIAÇÃO DE TORNEIO (MODAL) — mantém funcionalidade completa
+// CRIAÇÃO DE TORNEIO (CORRIGIDO: VISUAL + LÓGICA)
 // ---------------------------
+
+// 1. ABRIR O MODAL (Visual Sofisticado igual à FOTO 2)
 export function openCreateTournamentModal() {
-    const old = document.getElementById('create-tour-modal'); if(old) old.remove();
+    // Garante que fecha anteriores
+    const old = document.getElementById('create-tournament-modal');
+    if(old) old.remove();
 
     const html = `
-    <div id="create-tour-modal" class="fixed inset-0 bg-black/90 z-50 flex items-start justify-center p-6 pt-20 backdrop-blur-sm">
-      <div class="bg-[#15171e] w-full max-w-3xl rounded-2xl border border-gray-800 shadow-2xl overflow-hidden">
-        <div class="p-6 border-b border-gray-800 flex justify-between items-center">
-          <h3 class="text-white font-bold">Criar Torneio</h3>
-          <button onclick="document.getElementById('create-tour-modal').remove()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+    <div id="create-tournament-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fadeIn">
+        <div class="bg-[#15171e] w-full max-w-lg rounded-xl border border-gray-800 shadow-2xl p-6 overflow-y-auto max-h-[90vh]">
+            
+            <div class="flex justify-between items-start mb-6">
+                <h3 class="text-white font-bold text-xl flex items-center gap-2">
+                    <span class="text-yellow-500">🏆</span> Novo Campeonato
+                </h3>
+                <button type="button" onclick="closeCreateTournamentModal()" class="text-gray-500 hover:text-white transition-colors">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleCreateTournamentForm(event)" class="space-y-4">
+                <div>
+                    <label class="block text-gray-400 text-xs font-bold mb-1 uppercase">Nome do Evento</label>
+                    <input type="text" id="tour-name" required class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:border-yellow-500 outline-none placeholder-gray-600">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-400 text-xs font-bold mb-1 uppercase">Premiação (R$)</label>
+                        <input type="text" id="tour-prize" required class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:border-yellow-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-xs font-bold mb-1 uppercase">Vagas</label>
+                        <select id="tour-teams" class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:border-yellow-500 outline-none">
+                            <option value="8">8 Times</option>
+                            <option value="16">16 Times</option>
+                            <option value="32">32 Times</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-400 text-xs font-bold mb-1 uppercase">Formato</label>
+                    <select id="tour-format" class="w-full bg-[#0f1116] border border-gray-800 text-white px-4 py-3 rounded-lg text-sm focus:border-yellow-500 outline-none">
+                        <option value="Eliminação Simples">Eliminação Simples (Mata-mata)</option>
+                        <option value="Grupos + Playoffs">Fase de Grupos + Playoffs</option>
+                        <option value="Dupla Eliminação">Dupla Eliminação</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-400 text-xs font-bold mb-1 uppercase">Banner do Evento</label>
+                    
+                    <label for="tour-banner-upload" class="flex gap-4 items-center bg-[#0f1116] p-4 rounded-xl border border-gray-800 cursor-pointer hover:border-gray-600 transition-all h-24 relative overflow-hidden group">
+                        
+                        <div class="w-16 h-full rounded bg-[#1c1f26] border border-gray-700 flex items-center justify-center overflow-hidden shrink-0 z-10">
+                            <img id="create-tour-banner-preview" class="w-full h-full object-cover hidden">
+                            <i id="tour-banner-icon" data-lucide="image" class="w-6 h-6 text-gray-500"></i>
+                        </div>
+                        
+                        <div class="z-10">
+                            <span class="bg-[#1c1f26] text-white text-xs font-bold px-3 py-1.5 rounded border border-gray-700 shadow-sm group-hover:bg-gray-700 transition-colors">Escolher Imagem</span>
+                            <p class="text-[10px] text-gray-500 mt-2">Recomendado 1920x1080.</p>
+                        </div>
+
+                        <input type="file" id="tour-banner-upload" hidden accept="image/*" onchange="previewTourBannerInternal(this)">
+                    </label>
+                </div>
+
+                <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 rounded-lg transition-all shadow-lg shadow-yellow-900/20 mt-4 uppercase text-sm tracking-wide">
+                    Publicar Campeonato
+                </button>
+            </form>
         </div>
-        <form onsubmit="handleCreateTournamentForm(event)" class="p-6 space-y-4">
-          <div class="grid grid-cols-2 gap-4">
-            <input required name="name" placeholder="Nome do Torneio" class="bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-xl" />
-            <input required name="maxTeams" placeholder="Máx Teams (ex: 32)" class="bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-xl" />
-          </div>
-          <div class="grid grid-cols-2 gap-4">
-            <input name="prize" placeholder="Prêmio (ex: R$ 1000)" class="bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-xl" />
-            <input name="format" placeholder="Formato (ex: 5v5)" class="bg-[#0f1116] border border-gray-700 text-white px-4 py-3 rounded-xl" />
-          </div>
-          <div>
-            <label class="text-xs text-gray-400 mb-2 block">Banner do Torneio</label>
-            <input onchange="previewTourBanner(this)" type="file" accept="image/*" class="text-sm text-gray-400" />
-            <img id="create-tour-banner-preview" class="mt-3 w-full h-40 object-cover rounded-lg" src="" />
-          </div>
-          <div class="flex justify-end gap-3">
-            <button type="button" onclick="document.getElementById('create-tour-modal').remove()" class="px-4 py-2 rounded bg-gray-800 text-white">Cancelar</button>
-            <button type="submit" class="px-6 py-2 rounded bg-yellow-500 text-black font-bold">Criar Torneio</button>
-          </div>
-        </form>
-      </div>
-    </div>
-    `;
+    </div>`;
+    
     document.body.insertAdjacentHTML('beforeend', html);
     if(window.lucide) lucide.createIcons();
 }
 
+// 2. FUNÇÃO DE FECHAR CORRETA
+export function closeCreateTournamentModal() {
+    const el = document.getElementById('create-tournament-modal');
+    if(el) el.remove();
+}
+
+// 3. PREVIEW INTERNO (Adaptado para o ID deste modal)
+window.previewTourBannerInternal = function(input) {
+    // Reutiliza a lógica global, mas controla o ícone também
+    const file = input.files && input.files[0];
+    if (!file) return;
+    
+    // Atualiza variável global do arquivo para o upload
+    // (Nota: precisamos acessar a variavel selectedTourBannerFile definida lá em cima no seu arquivo)
+    // Como ela não foi exportada, vamos defini-la no escopo global temporariamente ou confiar que o upload pegue do input
+    
+    const url = URL.createObjectURL(file);
+    const img = document.getElementById('create-tour-banner-preview');
+    const icon = document.getElementById('tour-banner-icon');
+    
+    if (img) {
+        img.src = url;
+        img.classList.remove('hidden');
+    }
+    if (icon) {
+        icon.classList.add('hidden');
+    }
+}
+
+// 4. SALVAR (Lógica corrigida para pegar IDs e não FormData)
 export async function handleCreateTournamentForm(e) {
     e.preventDefault();
-    const form = e.target;
-    const data = new FormData(form);
-    const name = data.get('name');
-    const maxTeams = parseInt(data.get('maxTeams')) || 32;
-    const prize = data.get('prize') || 'R$ 0';
-    const format = data.get('format') || '5v5';
-    const bannerFile = selectedTourBannerFile;
-
-    const newT = {
-        id: 't_' + Date.now(),
-        name, maxTeams, prize, format,
-        createdAt: new Date(),
-        status: 'Aberto',
-        registeredTeams: 0,
-        registeredTeamsList: [],
-        requests: [],
-        image: '',
-        logo: '',
-    };
+    
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.innerText = "Criando...";
+    btn.disabled = true;
 
     try {
+        // Pega valores pelo ID direto (FormData falha se não tiver name="")
+        const name = document.getElementById('tour-name').value;
+        const prize = document.getElementById('tour-prize').value;
+        const teamsVal = document.getElementById('tour-teams').value;
+        const format = document.getElementById('tour-format').value;
+        
+        // Pega o arquivo direto do input
+        const fileInput = document.getElementById('tour-banner-upload');
+        const bannerFile = fileInput && fileInput.files ? fileInput.files[0] : null;
+
+        const newT = {
+            name: name,
+            maxTeams: parseInt(teamsVal) || 32,
+            prize: prize,
+            format: format,
+            createdAt: new Date(), // Firebase timestamp preferencialmente
+            status: 'Aberto',
+            registeredTeams: 0,
+            registeredTeamsList: [],
+            requests: [],
+            image: '', // será preenchido após upload
+            logo: `https://api.dicebear.com/7.x/identicon/svg?seed=${name}`,
+            customOverview: {}
+        };
+
+        // Upload da Imagem
         if (bannerFile) {
-            const url = await uploadImageToFirebase(bannerFile, `tournaments/${newT.id}/banner.jpg`).catch(()=>null);
+            // Gera ID temporário se não tiver DB, ou usa Date
+            const tempId = 't_' + Date.now();
+            const url = await uploadImageToFirebase(bannerFile, `tournaments/${tempId}/banner.jpg`).catch(err => {
+                console.error("Erro imagem:", err);
+                return null;
+            });
             if (url) newT.image = url;
-        }
-        if (window.addDoc && window.collection) {
-            await window.addDoc(window.collection(window.db, "tournaments"), newT);
-            showToast('Torneio criado.', 'success');
         } else {
-            TOURNAMENTS.unshift(newT);
-            showToast('Torneio criado (mock).', 'success');
+            // Imagem padrão
+            newT.image = "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80";
         }
-        document.getElementById('create-tour-modal').remove();
+
+        // Salvar no Firebase ou Mock
+        if (window.addDoc && window.collection && window.db) {
+            await window.addDoc(window.collection(window.db, "tournaments"), newT);
+            showToast('Campeonato criado com sucesso!', 'success');
+        } else {
+            // Fallback para array local
+            newT.id = 't_' + Date.now();
+            TOURNAMENTS.unshift(newT);
+            showToast('Torneio criado (Modo Local).', 'success');
+        }
+
+        closeCreateTournamentModal();
         renderTournamentsList();
-    } catch (e) {
-        console.error(e);
-        showToast('Erro ao criar torneio.', 'error');
+
+    } catch (err) {
+        console.error(err);
+        showToast('Erro ao criar: ' + err.message, 'error');
+    } finally {
+        btn.innerText = "PUBLICAR CAMPEONATO";
+        btn.disabled = false;
     }
 }
 
